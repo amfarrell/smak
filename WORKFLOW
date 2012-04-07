@@ -1,0 +1,33 @@
+
+To start:
+`git clone git@github.com:afarrell/smak.git`
+`git branch (chris|danica|andrew)`
+`git checkout (chris|danica|andrew)`
+==============================
+If you are unsure of the status of the repo, 
+`git status` or even `gitk`
+
+To edit:
+--------
+*edit some file*
+`git add $filename`
+`git commit -m "starting a new feature to frobnicate the toggle."`
+*edit some more*
+`git add $filename`
+`git commit --amend`
+until you are finished with the feature, editing the commit message as necessary.
+When you are, 
+`git push origin (chris|danica)`
+`git fetch` to grab updates to other peoples code.
+
+To merge:
+---------
+Suppose chris sees that everything in danica's branch is useful to him, 
+then he can pull it into your own branch with
+`git merge danica`
+likewise, danica might do
+`git merge chris`
+
+The branch `prod` is for stuff we're sure we want to keep, which we should
+be careful about committing to.
+The branch `scratch` is the very opposite.
