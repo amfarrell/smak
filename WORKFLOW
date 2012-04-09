@@ -6,7 +6,7 @@ sudo bin/cake install
 coffee --help
 
 Using coffeescript
-echo "alias coffeesmak='coffee -o ./coffeescript/ ~/projects/ui/smak-cw ./javascript/ &'" >> ~/.bashrc
+echo "alias coffeesmak='coffee -o ./javascript/ -cw ./coffeescript/ &'" >> ~/.bashrc
 # Note that you might want to point to the absolute paths to this project.
 # such as /home/afarrell/projects/ui/smak/coffeescript
 source ~/.bashrc
