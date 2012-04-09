@@ -1,3 +1,17 @@
+Installing Coffeescript on ubuntu:
+sudo apt-get install nodejs npm
+wget http://github.com/jashkenas/coffee-script/tarball/master
+tar -xvvf jashkenas-coffee-script-1.2.0-139-g53fe10e.tar.gz
+sudo bin/cake install
+coffee --help
+
+Using coffeescript
+echo "alias coffeesmak='coffee -o ./coffeescript/ ~/projects/ui/smak-cw ./javascript/ &'" >> ~/.bashrc
+# Note that you might want to point to the absolute paths to this project.
+# such as /home/afarrell/projects/ui/smak/coffeescript
+source ~/.bashrc
+then, every time you start editing code, run
+coffeesmak
 
 To start:
 `git clone git@github.com:afarrell/smak.git`
@@ -31,3 +45,20 @@ likewise, danica might do
 The branch `prod` is for stuff we're sure we want to keep, which we should
 be careful about committing to.
 The branch `scratch` is the very opposite.
+
+Coffeescript - cleaner javascript.
+==================================
+See http://coffeescript.org/
+
+sudo apt-get install nodejs npm &&
+sudo npm install coffee-script
+
+It compiles to clean-looking javascript.
+We want to make writing coffeescript dead-simple.
+
+run `coffee --watch --compile example.coffee -o`
+for any coffeescript, and the javascript will 
+update automatically. 
+
+todo: have vim do this on `w`
+

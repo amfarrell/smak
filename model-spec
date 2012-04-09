@@ -1,0 +1,17 @@
+Activity:
+- name
+- location
+- start
+- end
+- duration
+- range (morning, noon, afternoon, night, late-night)
+    or specific start time
+- user-created?
+
+I need two stores:
+    selected events
+    suggested events
+
+also list of suggested
+
+also add a basic html form
