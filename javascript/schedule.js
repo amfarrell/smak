@@ -1,7 +1,16 @@
+
+var blockHeight = 20;  // vertical pixels per 15 minute chunk
+var scheduleLength = 24; // # of blocks of 15 minutes
+var startTime = 9;  
+
 function drawSchedule(schedule){
   console.log(schedule);
   var prevItem="";
-  var blockHeight = 20;  // vertical pixels per 15 minute chunk
+  
+  scheduleLength = schedule.length;
+  $('.schedule').height(blockHeight*schedule.length);    
+  $('.scheduleGrid').height(blockHeight*schedule.length);     
+  drawScheduleGrid();
   
   $('.schedule').html("<div></div>");    //find location of top of schedule
   var startLocation = $(".schedule div:last").position();
@@ -61,4 +70,16 @@ function drawSchedule(schedule){
       $(".schedule div.item:last").height(height+blockHeight);
     }
   }
+}
+
+function drawScheduleGrid(){
+  $('.scheduleGrid').html("<table cellspacing='0'></table");
+  for(var i=0; i<scheduleLength; i++){
+    if (i%4==0){
+      var time = (startTime + i/4)%12;
+      if (time==0) time = 12;
+      $('.scheduleGrid table').append("<tr><td style='width:20px'>"+time+"</td><td style='width:280px'></td></tr>");
+    }
+  }
+  $('.scheduleGrid td').height(blockHeight*4);
 }

@@ -1,17 +1,28 @@
 .schedule{
-  border:1px solid;
   width: 300px;
-  height:500px;
 }
-#test{
-   width: 100px; height: 100px; background: silver;
+.scheduleGrid{
+  position:absolute;
+  background: lightblue;
+  height:100px;
+  width:300px;
+}
+.scheduleGrid td{
+  border:1px solid;
+  padding:0px;
+  margin:0px;
+  text-align:center;
+}
+table{
+  padding:0;
+  margin:0;
 }
 .scheduleItem{
   border:1px solid;
   text-align:center;
-  width: 270px;
+  width: 260px;
   position: relative;
   cursor: move;
   background:grey;
-  margin-left:20px;
+  margin-left:30px;
 }

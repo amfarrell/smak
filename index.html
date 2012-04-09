@@ -22,24 +22,16 @@
 <script type="text/javascript">
 
 $(document).ready(function() {
-  var schedule = "AAAA  BBBBCC  ";
+  var schedule = "AAAA  BBBBCC        ";
   drawSchedule(schedule);
-    $("#test").resizable({
-    containment: "parent",
-    grid: [50, 20],
-    handles: "n,s",
-  });
-  $("#test").resizable({
-    stop: function(event, ui) {
-      console.log($(this).height())
-    }
-  });
  });
  
 </script>
 
-<div class="schedule"></div>
-<br /><br />
-<div id="test">stuff</div>
+  <div class="scheduleGrid">
+  </div>
+<div class="schedule">
+</div>
+
 </body>
 </html>
