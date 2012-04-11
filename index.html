@@ -1,23 +1,62 @@
-<html>
-    <head>
-        <link rel="stylesheet" type="text/css" href="styles/main.css" />
-        <script src='./javascript/jquery.json-2.3.js'></script>
-        <script src='./javascript/jquery-1.7.2.js'></script>
-        <script src='./javascript/jstorage.js'></script>
-        <script src='./javascript/ObjectModel.js'></script>
-        <script>
-            $("#create_activity").click(function () {
-               alert($("#activity_form").serializeArray()); 
-            });
-        </script>
-    </head>
-    <form id="activity_form">
-        Name:<input type="text" name="name" /><br />
-        Location:<input type="text" name="location" /><br />
-        Start:<input type="text" name="start" />
-        End:<input type="text" name="end" /><br />
-        Duration:<input type="text" name="duration" /><br />
-        Range:<input type="text" name="range" /><br />
-        <div id="create_activity" class="normalbutton"/>Submit</div>
-    </form>
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+  
+  <script src='./javascript/jquery-1.7.2.js'></script>
+  <script src='./javascript/jquery.json-2.3.js'></script>
+  <script src='./javascript/jquery-ui-1.8.18.js'></script>
+  <script src='./javascript/jstorage.js'></script>
+  <script src='./javascript/ObjectModel.js'></script>
+  <script type="text/javascript" src="./javascript/schedule.js"></script>  
+  <script type="text/javascript" src="./javascript/edit_distance.js"></script>  
+  
+  <script>
+      $("#create_activity").click(function () {
+         alert($("#activity_form").serializeArray()); 
+      });
+  </script>
+  <link rel="stylesheet" type="text/css" href="schedule.css" />
+  <link rel="stylesheet" href="development-bundle/themes/base/jquery.ui.all.css">
+</head>
+
+<body>
+<script type="text/javascript">
+
+$(document).ready(function() {
+  var schedule = "AAAA  BBBBCC  ";
+  drawSchedule(schedule);
+    $("#test").resizable({
+    containment: "parent",
+    grid: [50, 20],
+    handles: "n,s",
+  });
+  $("#test").resizable({
+    stop: function(event, ui) {
+      console.log($(this).height())
+    }
+  });
+ });
+ 
+</script>
+
+<div class="schedule"></div>
+<br /><br />
+<div id="test">stuff</div>
+<div id="new_activity">
+  <form id="activity_form">
+      Name:<input type="text" name="name" /><br />
+      Location:<input type="text" name="location" /><br />
+      Start:<input type="text" name="start" />
+      End:<input type="text" name="end" /><br />
+      Duration:<input type="text" name="duration" /><br />
+      Range:<input type="text" name="range" /><br />
+      <div id="create_activity" class="normalbutton"/>Submit</div>
+  </form>
+</div>
+</body>
 </html>
+>>>>>>> a93a1218fcbe438e4fba10c4a644b7373e0b097e

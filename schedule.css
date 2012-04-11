@@ -1,0 +1,17 @@
+.schedule{
+  border:1px solid;
+  width: 300px;
+  height:500px;
+}
+#test{
+   width: 100px; height: 100px; background: silver;
+}
+.scheduleItem{
+  border:1px solid;
+  text-align:center;
+  width: 270px;
+  position: relative;
+  cursor: move;
+  background:grey;
+  margin-left:20px;
+}

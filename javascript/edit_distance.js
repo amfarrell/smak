@@ -1,0 +1,316 @@
+
+/* 	Cases not handled:
+
+		1.) When the activity needing to be moved goes off the end of the day (we 
+				assert fail on this case)
+
+*/
+
+// -----------------------------------------------------------------------------
+// Parameters
+// -----------------------------------------------------------------------------
+
+var DEBUG = false
+var DISPLACEMENT_COST = 1000
+var MOVEMENT_COST = 1
+var MOVEMENT_POLY = 2
+var ELIMINATION_COST = 10000
+
+// -----------------------------------------------------------------------------
+// Low-level Helpers
+// -----------------------------------------------------------------------------
+
+// Debugging
+
+function AssertException(message) { this.message = message; }
+AssertException.prototype.toString = function () {
+  return 'AssertException: ' + this.message;
+}
+
+function assert(exp, message) {
+  if (!exp) {
+    throw new AssertException(message);
+  }
+}
+
+function pprint(string) { 
+	return "[" + string + "]"
+}
+
+// Arrays
+
+function count_array_occurances(array, id) {
+	var count = 0
+	for (var i = 0; i < array.length; i++) {
+		if (array[i] == id) count++
+	}
+	return count
+}
+
+function array_replace(array, from, to) {
+	array = array.slice()
+	for (var i = 0; i < array.length; i++) {
+		if (array[i] == from) array.splice(i, 1, to)
+	}
+	return array
+}
+
+function array_unique_elements(array) {
+	return array.filter(function(itm,i,a) {
+    										return i==a.indexOf(itm);
+											})
+}
+
+// -----------------------------------------------------------------------------
+// Edit distance helpers
+// -----------------------------------------------------------------------------
+
+function activity(id, start_pos, len) {
+	this.id = id;
+	this.start_pos = start_pos;
+	this.len = len;
+}
+
+// useful for calculating edit distances
+function model_from_string(input) {
+	var last_char = null
+	var last_start = null
+	var last_len = 0
+	var activities = new Array()
+	for (var i = 0; i < input.length; i++) {
+		if (input[i] != last_char) {
+			if (last_char != null) {
+				activities.push(new activity(last_char, last_start, last_len))
+			}
+			last_char = input[i]
+			last_start = i
+			last_len = 1
+		} else {
+			last_len++;
+		}
+	}
+	activities.push(new activity(last_char, last_start, last_len))
+	return activities
+}
+
+// -----------------------------------------------------------------------------
+// Movement Primitives (act on arrays of strings)
+// -----------------------------------------------------------------------------
+
+function is_ok() {
+		// check 1: make sure the activity blocks are contiguous
+	// TODO
+}
+
+// removes 'id' from the state (assumes that ID only appears once) and replaces 
+// it with white space
+function remove(state, id) {
+	state = state.slice()
+	var start = state.indexOf(id)
+	while (state[start] == id) {
+		state.splice(start, 1, " ")
+		start++
+	}
+	return state
+}
+
+// adds 'id' at the specified position for the specified length.  If any 
+// activities are collided with, returns those items and remove them entirely 
+// from the string.
+function add(state, id, pos_final, len) {
+	assert(state.length >= pos_final + len, "add: length violation")
+
+	var original_state = state
+	state = state.slice()
+	var displaced = new Array()
+	for (var i = pos_final; i < pos_final + len; i++) {
+		if (state[i] != " " && displaced.indexOf(state[i]) == -1) 
+			displaced.push(state[i])
+		state.splice(i, 1, id)
+	}
+
+	// pull out items that we pushed into displaced from the state vector 
+	// (resolves partial collisions)
+	var displaced_expanded = new Array()
+	for (var i = 0; i < displaced.length; i++) {
+		var count = count_array_occurances(original_state, displaced[i])
+		state = array_replace(state, displaced[i], " ")
+		displaced_expanded.push(Array(count+1).join(displaced[i]))
+	}
+
+	return [state, displaced_expanded]
+}
+
+// insert a new character of some length between two activities (insertions must 
+// happen at activity boundaries)
+function insert(state, id, pos, len, locked) {
+	state = state.slice()
+	var original_len = state.length
+	var locked_char = state[locked]
+
+	// insert the new item
+	for (var i = 0; i < len; i++) state.splice(pos, 0, id)
+
+	// remove whitespace to make blocks align better
+	var num_inserted = 0
+	for (var i = pos + len; i < state.length; i++) {
+		if (state[i] == " ") {
+			state.splice(i, 1)
+			num_inserted++
+			i--;
+			if (num_inserted == len) break;
+		}
+	}
+	
+	// check 1: did we move the locked item?
+	if (state[locked] != locked_char) return [false, null]
+
+	// check 2: do we need to cut off anything?
+	assert(original_len <= state.length, "insert: length violation")
+	if (original_len < state.length) {
+		var last_character = state[original_len-1]
+		var prefix = state.slice(0, original_len)
+		var suffix = state.slice(original_len, state.length)
+		if (suffix.indexOf(last_character) != -1) {
+			// eliminate partial cutoffs, too
+			prefix = array_replace(prefix, last_character, " ")
+		}
+		state = prefix
+	}
+
+	return [true, state]
+}
+
+// returns the index of the first occurance of each different character.  
+// each whitespace character is considered a different character
+function find_breaks(state) {
+	var breaks = new Array()
+	breaks.push(0)
+	last_char = state[0]
+	for (var i = 1; i < state.length; i++) {
+		if (state[i] != last_char || state[i] == " ") breaks.push(i)
+		last_char = state[i]
+	}
+	return breaks
+}
+
+// the "brute force" enumeration
+//
+// given a starting point and a list of displacements, enumerate all state 
+// configurations after the displacements are added back.
+function get_configurations(displacements, partial_configurations, locked) {
+	if (displacements.length == 0) {
+		return partial_configurations
+	}
+	var new_configurations = new Array()
+	var next = displacements.pop()
+	var id = next.charAt(0)
+	var len = next.length
+	for (var i = 0; i < partial_configurations.length; i++) {
+		var start_points = find_breaks(partial_configurations[i])
+		for (var j = 0; j < start_points.length; j++) {
+			var new_configuration = insert(	partial_configurations[i], id, 
+																			start_points[j], len, locked)
+
+			//console.log("PC: [" + partial_configurations[i] + "], I: " + start_points[j] + ", Inserting: " + id + ", Result: " + new_configuration[0] + ":: [" + new_configuration[1] + "]")
+
+			if (new_configuration[0])
+				new_configurations.push(new_configuration[1])
+		}
+	}
+	return get_configurations(displacements, new_configurations, locked)
+}
+
+// -----------------------------------------------------------------------------
+// Cost Functions
+// -----------------------------------------------------------------------------
+
+function cost_function(initial_state, configuration, exclude) {
+	var old_model = model_from_string(initial_state)
+	var new_model = model_from_string(configuration)
+
+	// calculate displacement and movement costs
+	var displacement_cost = 0
+	var movement_cost = 0
+	for (var i = 0; i < old_model.length; i++) {
+		var current_old = old_model[i]
+		if (current_old.id != " " && current_old.id != exclude) {
+			for (var j = 0; j < new_model.length; j++) {
+				var current_new = new_model[j]
+				if (current_new.id == current_old.id) {
+					// displacement
+					if (current_new.start_pos != current_old.start_pos) {
+						displacement_cost += DISPLACEMENT_COST
+					}
+					movement_cost += Math.pow(Math.abs(current_new.start_pos - current_old.start_pos) * MOVEMENT_COST, MOVEMENT_POLY)
+					break;
+				}
+			}
+		}
+	}
+
+	// elimination cost
+	var elimination_cost = 0
+	var initial_state_set = array_unique_elements(initial_state)
+	for (var i = 0; i < initial_state_set.length; i++) {
+		if (configuration.indexOf(initial_state_set[i]) == -1) {
+			elimination_cost += ELIMINATION_COST
+		}
+	}
+	
+	var total_cost = displacement_cost + movement_cost + elimination_cost
+	if (DEBUG) console.log("Cost: from [" + initial_state + "] -> [" + configuration + "] = " + total_cost)
+	return total_cost
+}
+
+// -----------------------------------------------------------------------------
+// Main Algorithm
+// -----------------------------------------------------------------------------
+
+function edit_distance(string, id, pos_final, len) {
+	var state = string.split("")
+	var initial_state = state
+
+	// Assertions
+	// check that pos_init and pos_final are legal starts-of-activities
+	assert(state.length >= pos_final + len, "main: length violation")
+
+	state = remove(state, id)
+	add_attempt = add(state, id, pos_final, len)
+	state = add_attempt[0]
+	displaced = add_attempt[1]
+	if (displaced.length > 0) {
+		//console.log("Complex case... Displaced: " + displaced + ", state: " + state)
+		configurations = get_configurations(displaced, [state.slice()], pos_final)
+		var min_cost = Number.MAX_VALUE
+		var min_configuration = null
+		for (var i = 0; i < configurations.length; i++) {
+			if (DEBUG) console.log("Testing config: [" + configurations[i] + "]")
+			var cost = cost_function(initial_state, configurations[i], id)
+			if (cost < min_cost) {
+				if (DEBUG) console.log("Keeping configuration!")
+				min_cost = cost
+				min_configuration = configurations[i]
+			}
+		}
+		assert(min_configuration != null, "main: no final config???")
+		state = min_configuration
+	}
+	return state.join("").replace(/,/g, "")
+}
+
+// -----------------------------------------------------------------------------
+// Tests
+// -----------------------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------------------
+// Calls
+// -----------------------------------------------------------------------------
+
+var init = "AABBCC"
+var test = edit_distance(init, "A", 4, 2)
+
+console.log("FINAL RESULT: " + pprint(init) + " -> " + pprint(test))
+
