@@ -33,27 +33,20 @@ function drawSchedule(newSchedule){
 
 function setupActivity(name, duration, list, verticalPos){  //list = ".schedule" or ".activitiesList"
   $(list).append('<div class="scheduleItem item" id='+name+'>'+name+'</div>');
-  
-  // Set item to it's current absolute position
-  $(list + " div.item:last").css({
-    "position": "absolute",
-    "left":0,
-    "top":verticalPos*blockHeight
-  });
-  
+    
   // Make item draggable
   $(list + " div.item:last").draggable({
     containment: ".activitiesContainer",  
     snap: '.schedule, .activitiesList',
     snapMode: "inner",
     cursor: "move",
-    //grid: [1, blockHeight],  
+    //grid: [1, blockHeight], 
     stack: "div.item", 
     opacity: 0.75, 
     stop: function(event, ui) { 
       var height = Math.round(($(this).height() + 2) / blockHeight);
-      if ((list == ".schedule" && ($(this).position().left>-160)) ||
-          (list == ".activitiesList" && ($(this).position().left>scheduleItemWidth/2)) ){
+      if ((list == ".schedule" && ($(this).position().left>-160)) ||  // move in schedule
+          (list == ".activitiesList" && ($(this).position().left>scheduleItemWidth/2)) ){  // move from Activities to Schedule
         var positionY = Math.round(($(this).position().top)/blockHeight);
         console.log(schedule + ", "+ $(this).attr("id") + ", "+ positionY +  ", "+ height);        
         drawSchedule(edit_distance(schedule,$(this).attr("id"), positionY,height));
@@ -61,9 +54,12 @@ function setupActivity(name, duration, list, verticalPos){  //list = ".schedule"
           $(this).remove();
         }
       }else if(list == ".schedule") {   // move from Schedule to Activities
+        console.log("remove");
         addActivity($(this).attr("id"), height/4);
         $(this).remove();
         schedule = schedule.replace(new RegExp($(this).attr("id"), 'g'), " "); // remove item from schedule
+      }else{  // move within Schedule
+        $(this).css({"left":0, "top":0}); //return to original position
       }
     }
   })
@@ -73,17 +69,42 @@ function setupActivity(name, duration, list, verticalPos){  //list = ".schedule"
     containment: ".activitiesContainer",  
     //grid: [50, blockHeight],
     handles: "n,s",
+    start: function(event, ui) {  
+      $(this).after("<div class='spaceHolder' style='height:"+ ($(this).height()+2) +"px'></div>");
+    },
     stop: function(event, ui) {
       if (list == ".schedule" ){
         var positionY = Math.round(($(this).position().top)/blockHeight);
         var height = Math.round(($(this).height() + 2) / blockHeight);
         console.log(schedule + ", "+ $(this).attr("id") + ", "+ positionY +  ", "+ height);        
         drawSchedule(edit_distance(schedule,$(this).attr("id"), positionY,height));
+      }else{
+        $(".activitiesList div.scheduleItem").css({
+          "position": "relative",
+          "left":0,
+          "top":0
+        });
+        $(".spaceHolder").remove();
       }
     }
   });
+  
   $(list + " div.item:last").height(blockHeight*duration - 2);  // -2 to compensate for the border height
 
+  
+  // Set item to it's current absolute position
+  if (list==".schedule"){
+    $(list + " div.item:last").css({
+      "position": "absolute",
+      "left":0,
+      "top":verticalPos*blockHeight
+    });
+  }else{
+    /*$( list + " div.item:last" ).bind( "resize", function(event, ui)  {
+          ui.size.height = ui.originalSize.height;
+          (ui.helper).css({'position': '', 'top': '0px'});
+    });*/
+  }
 }
 
 function addActivity(name, duration){ //duration in hours

@@ -4,10 +4,14 @@
   width: 260px;
   position: relative;
 }
-
 .activitiesContainer{
   position:absolute;
   width:565px;
+}
+.wrapper{
+  position: relative;
+  left:0;
+  top:0;
 }
 
 /* Schedule column */
