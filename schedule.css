@@ -1,28 +1,55 @@
+
+/* Activities column */
+.activitiesList{
+  width: 260px;
+  position: relative;
+}
+
+.activitiesContainer{
+  position:absolute;
+  width:565px;
+}
+
+/* Schedule column */
 .schedule{
-  width: 300px;
+  width: 260px;
+  position: absolute;
+  left:30px;
 }
 .scheduleGrid{
-  position:absolute;
-  background: lightblue;
-  height:100px;
+  position:relative;
+  background: #B3E2F2;
   width:300px;
 }
 .scheduleGrid td{
   border:1px solid;
-  padding:0px;
-  margin:0px;
   text-align:center;
-}
-table{
-  padding:0;
-  margin:0;
 }
 .scheduleItem{
   border:1px solid;
   text-align:center;
-  width: 260px;
-  position: relative;
-  cursor: move;
-  background:grey;
-  margin-left:30px;
+  width: 258px;
+  
+  background:#D5F0F9;
+  margin-left:auto;
+  margin-right:auto;
+}
+.ui-draggable  { 
+  cursor: move; 
+}
+
+/* Map column */
+.map{
+  width: 300px;
+}
+
+
+h2{
+  text-align:center;
+}
+.layout td{
+}
+td{
+  padding:0px;
+  margin:0px;
 }
