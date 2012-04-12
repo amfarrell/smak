@@ -27,7 +27,7 @@
 <script type="text/javascript">
 
 $(document).ready(function() {
-  var schedule = "AAAA  BBBBCC  ";
+  drawScheduleGrid();
   drawSchedule(schedule);
     $("#test").resizable({
     containment: "parent",
@@ -49,9 +49,33 @@ $(document).ready(function() {
       $("#activity_range").val());
     console.log($.jStorage.index());
     });
+
+  addActivity("D", 2.5);
+  addActivity("E", 1);
  });
  
 </script>
+<h1>SMak</h1>
+<table class="layout" cellspacing='5'>
+
+<tr><td><h2>Activities</h2></td><td><h2>Schedule</h2></td><td><h2>Map</h2></td></tr>
+
+<tr><td valign="top">
+  <div class="activitiesContainer"></div>
+  <div class="activitiesList"></div>
+
+</td><td>
+  <div class="scheduleGrid"> 
+    <div class="schedule">  </div>
+  </div>
+  
+</td><td>
+  <div class="map"></div>
+</td>
+
+</tr></table>
+
+
 
 <div class="schedule"></div>
 <br /><br />
