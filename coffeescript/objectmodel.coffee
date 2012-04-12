@@ -8,5 +8,5 @@ activities = [new Activity("lunch with Robert", "42.3656, -71.0215", "13:00", "1
          new Activity("Sailing", "42.3607, -71.0733", "09:45", "11:00", 75, "08:00-15:30", true),
          new Activity("Gawking at students in course III lab", "42.3603, -71.0958", "11:15", "12:00", 45, "11:00-16:30", true),
          ];
-window.Activity = Activity;
-window.activities = activities;
+
+window.O = {'Activity':Activity, 'activites':activities}
