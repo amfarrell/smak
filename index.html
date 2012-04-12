@@ -39,6 +39,16 @@ $(document).ready(function() {
       console.log($(this).height())
     }
   });
+  $("#create_activity").click(function() {
+    O.Activity(
+      $("#activity_name").val(),
+      $("#activity_location").val(),
+      $("#activity_start").val(),
+      $("#activity_end").val(),
+      $("#activity_duration").val(),
+      $("#activity_range").val());
+    console.log($.jStorage.index());
+    });
  });
  
 </script>
@@ -48,14 +58,14 @@ $(document).ready(function() {
 <div id="test">stuff</div>
 <div id="new_activity">
   <form id="activity_form">
-      Name:<input type="text" name="name" /><br />
-      Location:<input type="text" name="location" /><br />
-      Start:<input type="text" name="start" />
-      End:<input type="text" name="end" /><br />
-      Duration:<input type="text" name="duration" /><br />
-      Range:<input type="text" name="range" /><br />
-      <div id="create_activity" class="normalbutton"/>Submit</div>
+    Name:<input type="text" name="name" id="activity_name"></input><br />
+      Location:<input type="text" name="location" id="activity_location"></input><br />
+      Start:<input type="text" name="start" id="activity_start"></input>
+      End:<input type="text" name="end"  id="activity_end"></input><br />
+      Duration:<input type="text" name="duration" id="activity_duration"></input><br />
+      Range:<input type="text" name="range" id="activity_range"></input><br />
   </form>
+    <button id="create_activity" class="normalbutton"/>Submit</button>
 </div>
 </body>
 </html>
