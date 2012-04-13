@@ -104,7 +104,7 @@ function setupActivity(id, duration, list, verticalPos){  //list = ".schedule" o
   
   // Make item resizable
   $(list + " div.item:last").resizable({
-    containment: "#doBetween"+id,  
+    //containment: "#doBetween"+id,  
     handles: "n,s",
     start: function(event, ui) {  
       $(this).after("<div class='spaceHolder' style='height:"+ ($(this).height()+borderWidth*2) +"px'></div>");
@@ -154,7 +154,7 @@ function setupActivity(id, duration, list, verticalPos){  //list = ".schedule" o
   // Add doBetweenbox
   if($("#doBetween"+id).length==0){   // if it doesn't exist already
     $(".activitiesContainer").after('<div class="doBetweenContainer" id="doBetween'+id+'"><div class="doBetween"></div></div>');
-    $("#doBetween"+id).height(blockHeight*6);
+    $("#doBetween"+id).height(blockHeight*20);
     $("#doBetween"+id).css("z-index",-2).fadeTo(1,0);
     $("#doBetween"+id).resizable({
       //containment: ".activitiesContainer",  

@@ -13,7 +13,7 @@
 var DEBUG = false
 var DISPLACEMENT_COST = 1000
 var MOVEMENT_COST = 1
-var MOVEMENT_POLY = 2
+var MOVEMENT_POLY = 4
 var ELIMINATION_COST = 10000
 
 // -----------------------------------------------------------------------------
@@ -141,12 +141,32 @@ function add(state, id, pos_final, len) {
 	return [state, displaced_expanded]
 }
 
-// insert a new character of some length between two activities (insertions must 
-// happen at activity boundaries)
+// insert a new character of some length between two activities.  Activities 
+// after the given activity are pushed forward.  If the activity is pushed on 
+// top of an existing activity, that activity is pushed backwards.
 function insert(state, id, pos, len, locked) {
+	//console.log("Calling insert() ~ PC: [" + state + "], Insert at: " + pos + ", ID: " + id)
+
 	state = state.slice()
 	var original_len = state.length
 	var locked_char = state[locked]
+	var locked_char_first = locked
+	var locked_char_last = state.lastIndexOf(state[locked])
+
+	// are we inserting in the middle of an activity?
+	if (pos > 0 && state[pos] == state[pos-1]) {
+		var b_id = state[pos]
+		var b_len = count_array_occurances(state, b_id)
+		state = array_replace(state, b_id, " ")
+		var b_state = state.slice(0, pos)
+		var b_state_len = b_state.length
+		b_state.reverse()
+		state = state.slice(pos)
+		b_state = insert(b_state, b_id, 0, b_len, "")[1]
+		b_state.reverse()
+		assert(b_state_len == b_state.length, "b_state length mismatch")
+		state = b_state.concat(state)
+	}
 
 	// insert the new item
 	for (var i = 0; i < len; i++) state.splice(pos, 0, id)
@@ -161,12 +181,13 @@ function insert(state, id, pos, len, locked) {
 			if (num_inserted == len) break;
 		}
 	}
-	
+
 	// check 1: did we move the locked item?
-	if (state[locked] != locked_char) return [false, null]
+	if (state[locked_char_first] != locked_char ||
+			state[locked_char_last] != locked_char) return [false, null]
 
 	// check 2: do we need to cut off anything?
-	assert(original_len <= state.length, "insert: length violation")
+	//assert(original_len <= state.length, "insert: length violation")
 	if (original_len < state.length) {
 		var last_character = state[original_len-1]
 		var prefix = state.slice(0, original_len)
@@ -186,10 +207,10 @@ function insert(state, id, pos, len, locked) {
 function find_breaks(state) {
 	var breaks = new Array()
 	breaks.push(0)
-	last_char = state[0]
+	//last_char = state[0]
 	for (var i = 1; i < state.length; i++) {
-		if (state[i] != last_char || state[i] == " ") breaks.push(i)
-		last_char = state[i]
+		//if (state[i] != last_char || state[i] == " ") just enumerate all of them... find better solns?
+		breaks.push(i)
 	}
 	return breaks
 }
@@ -208,12 +229,11 @@ function get_configurations(displacements, partial_configurations, locked) {
 	var len = next.length
 	for (var i = 0; i < partial_configurations.length; i++) {
 		var start_points = find_breaks(partial_configurations[i])
+		//console.log("Start points for " + id + ": " + start_points)
 		for (var j = 0; j < start_points.length; j++) {
 			var new_configuration = insert(	partial_configurations[i], id, 
 																			start_points[j], len, locked)
-
-			//console.log("PC: [" + partial_configurations[i] + "], I: " + start_points[j] + ", Inserting: " + id + ", Result: " + new_configuration[0] + ":: [" + new_configuration[1] + "]")
-
+			//console.log("Finished insert() ~ Result: [" + new_configuration[1] + "]")
 			if (new_configuration[0])
 				new_configurations.push(new_configuration[1])
 		}
@@ -259,7 +279,7 @@ function cost_function(initial_state, configuration, exclude) {
 	}
 	
 	var total_cost = displacement_cost + movement_cost + elimination_cost
-	if (DEBUG) console.log("Cost: from [" + initial_state + "] -> [" + configuration + "] = " + total_cost)
+	console.log("Cost: from [" + initial_state + "] -> [" + configuration + "] = " + total_cost + "\t(" + displacement_cost + ", " + movement_cost + ", " + elimination_cost + ")")
 	return total_cost
 }
 
@@ -309,8 +329,9 @@ function edit_distance(string, id, pos_final, len) {
 // Calls
 // -----------------------------------------------------------------------------
 
-var init = "AABBCC"
-var test = edit_distance(init, "A", 4, 2)
+//          012345678
+var init = " BBC"
+var test = edit_distance(init, "C", 1, 2)
 
 console.log("FINAL RESULT: " + pprint(init) + " -> " + pprint(test))
 

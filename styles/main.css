@@ -73,6 +73,7 @@
 }
 .doBetween{
   background:#3A859D;
+  position: absolute;
   /*border: groove #12576E;
   border-width:5px 0px;
   top:-5px;*/
@@ -81,7 +82,7 @@
   height:100%;
 }
 .doBetween.hover{
-  background:#D5F0F9;
+  /*background:#D5F0F9;*/
 }
 
 .ui-draggable  { 

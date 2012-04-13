@@ -30,16 +30,7 @@
 $(document).ready(function() {
   drawScheduleGrid();
   drawSchedule(schedule);
-    $("#test").resizable({
-    containment: "parent",
-    grid: [50, 20],
-    handles: "n,s",
-  });
-  $("#test").resizable({
-    stop: function(event, ui) {
-      console.log($(this).height())
-    }
-  });
+
   $("#create_activity").click(function() {
     O.Activity(
       $("#activity_name").val(),
@@ -62,9 +53,24 @@ $(document).ready(function() {
 <h1>SMak</h1>
 <table class="layout" cellspacing='5'>
 
-<tr><td><h2>Activities</h2></td><td><h2>Schedule</h2></td><td><h2>Map</h2></td></tr>
+<tr><td><h2>Add Activity</h2></td><td><h2>Activities</h2></td><td><h2>Schedule</h2></td><td><h2>Map</h2></td></tr>
 
-<tr><td valign="top">
+<tr>
+<td valign="top">
+<div id="new_activity">
+  <form id="activity_form">
+    Name:<input type="text" name="name" id="activity_name"></input><br />
+      Location:<input type="text" name="location" id="activity_location"></input><br />
+      Start:<input type="text" name="start" id="activity_start"></input>
+      End:<input type="text" name="end"  id="activity_end"></input><br />
+      Duration:<input type="text" name="duration" id="activity_duration"></input><br />
+      Range:<input type="text" name="range" id="activity_range"></input><br />
+  </form>
+    <button id="create_activity" class="normalbutton"/>Submit</button>
+</div>
+</td>
+
+<td valign="top">
   <div class="activitiesContainer"></div>
   <div class="activitiesList"></div>
 
@@ -80,17 +86,6 @@ $(document).ready(function() {
 </tr></table>
 
 <br /><br />
-<div id="test">stuff</div>
-<div id="new_activity">
-  <form id="activity_form">
-    Name:<input type="text" name="name" id="activity_name"></input><br />
-      Location:<input type="text" name="location" id="activity_location"></input><br />
-      Start:<input type="text" name="start" id="activity_start"></input>
-      End:<input type="text" name="end"  id="activity_end"></input><br />
-      Duration:<input type="text" name="duration" id="activity_duration"></input><br />
-      Range:<input type="text" name="range" id="activity_range"></input><br />
-  </form>
-    <button id="create_activity" class="normalbutton"/>Submit</button>
-</div>
+
 </body>
 </html>
