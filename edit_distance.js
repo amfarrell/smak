@@ -149,11 +149,14 @@ function insert(state, id, pos, len, locked) {
 
 	state = state.slice()
 	var original_len = state.length
-	var locked_char = state[locked]
-	var locked_char_first = locked
-	var locked_char_last = state.lastIndexOf(state[locked])
+	if (locked > -1) {
+		var locked_char = state[locked]
+		var locked_char_first = locked
+		var locked_char_last = state.lastIndexOf(state[locked])
+	}
 
 	// are we inserting in the middle of an activity?
+	// if so, push that activity backwards
 	if (pos > 0 && state[pos] == state[pos-1]) {
 		var b_id = state[pos]
 		var b_len = count_array_occurances(state, b_id)
@@ -183,8 +186,9 @@ function insert(state, id, pos, len, locked) {
 	}
 
 	// check 1: did we move the locked item?
-	if (state[locked_char_first] != locked_char ||
-			state[locked_char_last] != locked_char) return [false, null]
+	if (locked != -1 && (state[locked_char_first] != locked_char) ||
+											(state[locked_char_last] != locked_char) )
+		return [false, null]
 
 	// check 2: do we need to cut off anything?
 	//assert(original_len <= state.length, "insert: length violation")
@@ -198,7 +202,7 @@ function insert(state, id, pos, len, locked) {
 		}
 		state = prefix
 	}
-
+	
 	return [true, state]
 }
 
@@ -219,7 +223,7 @@ function find_breaks(state) {
 //
 // given a starting point and a list of displacements, enumerate all state 
 // configurations after the displacements are added back.
-function get_configurations(displacements, partial_configurations, locked) {
+function get_configurations(displacements, partial_configurations, locked, start, end) {
 	if (displacements.length == 0) {
 		return partial_configurations
 	}
@@ -284,10 +288,10 @@ function cost_function(initial_state, configuration, exclude) {
 }
 
 // -----------------------------------------------------------------------------
-// Main Algorithm
+// Main Algorithms
 // -----------------------------------------------------------------------------
 
-function main(string, id, pos_final, len) {
+function edit_distance(string, id, pos_final, len) {
 	var state = string.split("")
 	var initial_state = state
 
@@ -299,24 +303,53 @@ function main(string, id, pos_final, len) {
 	add_attempt = add(state, id, pos_final, len)
 	state = add_attempt[0]
 	displaced = add_attempt[1]
-	if (displaced.length > 0) {
-		//console.log("Complex case... Displaced: " + displaced + ", state: " + state)
-		configurations = get_configurations(displaced, [state.slice()], pos_final)
-		var min_cost = Number.MAX_VALUE
-		var min_configuration = null
-		for (var i = 0; i < configurations.length; i++) {
-			if (DEBUG) console.log("Testing config: [" + configurations[i] + "]")
-			var cost = cost_function(initial_state, configurations[i], id)
-			if (cost < min_cost) {
-				if (DEBUG) console.log("Keeping configuration!")
-				min_cost = cost
-				min_configuration = configurations[i]
-			}
+
+	configurations = get_configurations(displaced, [state.slice()], pos_final)
+
+	var min_cost = Number.MAX_VALUE
+	var min_configuration = null
+	for (var i = 0; i < configurations.length; i++) {
+		if (DEBUG) console.log("Testing config: [" + configurations[i] + "]")
+		var cost = cost_function(initial_state, configurations[i], id)
+		if (cost < min_cost) {
+			if (DEBUG) console.log("Keeping configuration!")
+			min_cost = cost
+			min_configuration = configurations[i]
 		}
-		assert(min_configuration != null, "main: no final config???")
-		state = min_configuration
 	}
+	assert(min_configuration != null, "main: no final config?")
+	state = min_configuration
+
 	return state.join("").replace(/,/g, "")
+}
+
+function constrain_bounds(string, start, stop) {
+	var state = string.split("")
+	var end_delta = state.length - stop
+
+	// push forward
+	for (var i = 0; i < start; i++) {
+		var id = state[i]
+		if (id != " ") {
+			var len = count_array_occurances(state, id)
+			state = array_replace(state, id, " ")
+			state = insert(state, id, i+1, len, -1)[1]
+		}
+	}
+	state = state.slice(start).reverse()
+
+	// push backwards
+	for (var i = 0; i < end_delta; i++) {
+		var id = state[i]
+		if (id != " ") {
+			var len = count_array_occurances(state, id)
+			state = array_replace(state, id, " ")
+			state = insert(state, id, i+1, len, -1)[1]
+		}
+	}
+	state = state.slice(end_delta).reverse()
+
+	return Array(start+1).join(" ") + state.join("").replace(/,/g, "") + Array(end_delta+1).join(" ")
 }
 
 // -----------------------------------------------------------------------------
@@ -329,9 +362,9 @@ function main(string, id, pos_final, len) {
 // Calls
 // -----------------------------------------------------------------------------
 
-//          012345678
-var init = " BBC"
-var test = main(init, "C", 1, 2)
+var init = "AA BBCC        "
+//var test = edit_distance(init, "C", 8, 2)
+//test = constrain_bounds(init, 2, init.length)
 
 console.log("FINAL RESULT: " + pprint(init) + " -> " + pprint(test))
 
