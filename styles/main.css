@@ -1,3 +1,21 @@
+/* Form */
+
+.normalbutton {
+    color: white;
+    background-color:#44ee44;
+    border: 2px solid#226622; 
+}
+.hoverbutton {
+    color: white;
+    background-color:#229922;
+    border: 2px solid#226622; 
+}
+.clickbutton {
+    color: white;
+    background-color:#44ee44;
+    border: 2px solid#226622; 
+}
+
 
 /* Activities column */
 .activitiesList{
@@ -55,7 +73,6 @@
 }
 .doBetween{
   background:#3A859D;
-  position: absolute;
   /*border: groove #12576E;
   border-width:5px 0px;
   top:-5px;*/
