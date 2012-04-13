@@ -46,13 +46,16 @@ $(document).ready(function() {
       $("#activity_start").val(),
       $("#activity_end").val(),
       $("#activity_duration").val(),
-      $("#activity_range").val());
+      $("#activity_range").val()
+      );
     console.log($.jStorage.index());
     });
 
   addActivity("D", 2.5);
   addActivity("E", 1);
- });
+  });
+  $("
+  
  
 </script>
 <h1>SMak</h1>
@@ -79,17 +82,18 @@ $(document).ready(function() {
 
 <div class="schedule"></div>
 <br /><br />
-<div id="test">stuff</div>
-<div id="new_activity">
+<table id="new_activity">
   <form id="activity_form">
-    Name:<input type="text" name="name" id="activity_name"></input><br />
-      Location:<input type="text" name="location" id="activity_location"></input><br />
-      Start:<input type="text" name="start" id="activity_start"></input>
-      End:<input type="text" name="end"  id="activity_end"></input><br />
-      Duration:<input type="text" name="duration" id="activity_duration"></input><br />
-      Range:<input type="text" name="range" id="activity_range"></input><br />
-  </form>
+    <tr><td>Name:</td><td><input type="text" name="name" id="activity_name"></input></td></tr>
+     <tr><td>Location:</td><td><input type="text" name="location" id="activity_location"></input></td></tr>
+      <tr><td>Start:</td><td><input type="text" name="start" id="activity_start"></input></td></tr>
+      <tr><td>End:</td><td><input type="text" name="end"  id="activity_end"></input></td></tr>
+      <tr><td>Duration:</td><td><input type="text" name="duration" id="activity_duration"></input></td></tr>
+      <tr><td>Range:</td><td><input type="text" name="range" id="activity_range"></input></td></tr>
+    </form>
+    <tr><td>
     <button id="create_activity" class="normalbutton"/>Submit</button>
-</div>
+    </td></tr>
+</table>
 </body>
 </html>
