@@ -39,13 +39,13 @@ function toggleItem(){
   }else{
     $(".selected").removeClass('selected');
   }
-  updateDoBetweenBox();
+  //updateDoBetweenBox();
 }
 
 function selectItem(){
   $(".selected:not(#"+$(this).attr("id")+")").removeClass('selected');
   $(this).addClass('selected');
-  updateDoBetweenBox();
+  //updateDoBetweenBox();
 }
 
 function updateDoBetweenBox(){
