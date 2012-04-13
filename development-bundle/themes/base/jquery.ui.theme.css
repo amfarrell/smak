@@ -228,7 +228,10 @@
 .ui-icon-grip-dotted-vertical { background-position: 0 -224px; }
 .ui-icon-grip-dotted-horizontal { background-position: -16px -224px; }
 .ui-icon-grip-solid-vertical { background-position: -32px -224px; }
-.ui-icon-grip-solid-horizontal { background-position: -48px -224px; }
+.ui-icon-grip-solid-horizontal { background-position: -48px -224px; 
+margin-left:auto;
+margin-right:auto;
+z-index:-1;}
 .ui-icon-gripsmall-diagonal-se { background-position: -64px -224px; }
 .ui-icon-grip-diagonal-se { background-position: -80px -224px; }
 

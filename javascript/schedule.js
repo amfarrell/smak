@@ -1,10 +1,36 @@
 
-var blockHeight = 20;   // vertical pixels per 15 minute chunk
+var blockHeight = 13;   // vertical pixels per 15 minute chunk
 var startTime = 9;      //hour of the day (in military time)
-var schedule = "AA  BB CCC          ";      // currently displayed schedule
-var activitiesListPos = 0; // position of the end of the activities list. (counted n 15 min blocks)
+var schedule = "                                            ";      // currently displayed schedule
+var activitiesListPos = 0; // position of the end of the activities list. (counted in 15 min blocks)
 var scheduleItemWidth = 260;  //pixels width of schdeduleItem
 var borderWidth = 5;  //pixels width of border of schdeduleItem
+
+function initActivitiesList(){
+  for (var i in $.jStorage.index()){
+    console.log($.jStorage.get(i).duration);
+    addActivity(i, $.jStorage.get(i).duration/15)
+  }
+}
+
+function addActivity(id, duration){ //duration in 15 min blocks
+  setupActivity(id, duration, ".activitiesList", activitiesListPos);
+  
+  activitiesListPos += duration
+}
+
+function drawScheduleGrid(){
+  $('.scheduleGrid').append("<table cellspacing='0'></table");
+  console.log(schedule.length);
+  for(var i=0; i<schedule.length; i++){
+    if (i%4==0){
+      var time = (startTime + i/4)%12;
+      if (time==0) time = 12;
+      $('.scheduleGrid table').append("<tr><td style='width:18px'>"+time+"</td><td style='width:278px'></td></tr>");
+    }
+  }
+  $('.scheduleGrid td').height(blockHeight*4);
+}
 
 function drawSchedule(newSchedule){
   schedule = newSchedule;
@@ -32,34 +58,20 @@ function drawSchedule(newSchedule){
   }
 }
 
-function toggleItem(){
-  if(!$(this).hasClass('selected')){
-    $(".selected").removeClass('selected');
-    $(this).addClass('selected');
-  }else{
-    $(".selected").removeClass('selected');
-  }
-  //updateDoBetweenBox();
-}
+function autoSchedule(){
+  var unscheduledActivities = new Array();
+  $(".activitiesList .item").each(function(){
+    var height = Math.round(($(this).height() + borderWidth*2) / blockHeight);
+    unscheduledActivities.push(new Array(height + 1).join(($(this).attr("id"))));
+  });
+  console.log("scheduleAll " + schedule + ", " + unscheduledActivities);
+  //scheduleAll(schedule, unscheduledActivities);
+  $(".activitiesList").html('');
 
-function selectItem(){
-  $(".selected:not(#"+$(this).attr("id")+")").removeClass('selected');
-  $(this).addClass('selected');
-  //updateDoBetweenBox();
-}
-
-function updateDoBetweenBox(){
-  if($(".selected").length){
-    $(".doBetweenContainer:not(#doBetween"+$(".selected").attr("id")+")").css("z-index",-2).fadeTo(1,0);
-    $("#doBetween" +  $(".selected").attr("id")).css("z-index",1).fadeTo(1,1);
-    console.log(".doBetween" +  $(".selected").attr("id"));
-  }else{
-    $(".doBetweenContainer").css("z-index",-2).fadeTo(1,0);
-  }
 }
 
 function setupActivity(id, duration, list, verticalPos){  //list = ".schedule" or ".activitiesList"
-  $(list).append('<div class="scheduleItem item" id='+id+'>'+id+'</div>');
+  $(list).append('<div class="scheduleItem item" id='+id+'>'+$.jStorage.get(id).name+'</div>');
     
   // Make item draggable
   $(list + " div.item:last").draggable({
@@ -91,7 +103,7 @@ function setupActivity(id, duration, list, verticalPos){  //list = ".schedule" o
         }
       }else if(list == ".schedule") {   // move from Schedule to Activities
         console.log("remove");
-        addActivity($(this).attr("id"), height/4);
+        addActivity($(this).attr("id"), height);
         $(this).remove();
         schedule = schedule.replace(new RegExp($(this).attr("id"), 'g'), " "); // remove item from schedule
       }else{  // move within Schedule
@@ -104,7 +116,7 @@ function setupActivity(id, duration, list, verticalPos){  //list = ".schedule" o
   
   // Make item resizable
   $(list + " div.item:last").resizable({
-    //containment: "#doBetween"+id,  
+    containment: ".activitiesContainer",  
     handles: "n,s",
     start: function(event, ui) {  
       $(this).after("<div class='spaceHolder' style='height:"+ ($(this).height()+borderWidth*2) +"px'></div>");
@@ -128,6 +140,8 @@ function setupActivity(id, duration, list, verticalPos){  //list = ".schedule" o
       $("#"+id).each(selectItem);
     }
   });
+  
+  //$(".ui-resizable-handle").html("<div class='ui-icon ui-icon-grip-solid-horizontal'></div>");
   
   // Set item height
   $(list + " div.item:last").height(blockHeight*duration - borderWidth*2);  // -2 to compensate for the border height
@@ -154,7 +168,7 @@ function setupActivity(id, duration, list, verticalPos){  //list = ".schedule" o
   // Add doBetweenbox
   if($("#doBetween"+id).length==0){   // if it doesn't exist already
     $(".activitiesContainer").after('<div class="doBetweenContainer" id="doBetween'+id+'"><div class="doBetween"></div></div>');
-    $("#doBetween"+id).height(blockHeight*20);
+    $("#doBetween"+id).height(blockHeight*schedule.length);
     $("#doBetween"+id).css("z-index",-2).fadeTo(1,0);
     $("#doBetween"+id).resizable({
       //containment: ".activitiesContainer",  
@@ -167,21 +181,29 @@ function setupActivity(id, duration, list, verticalPos){  //list = ".schedule" o
   }
 }
 
-function addActivity(name, duration){ //duration in hours
-  setupActivity(name, duration*4, ".activitiesList", activitiesListPos);
-  
-  activitiesListPos += duration*4
+function toggleItem(){
+  if(!$(this).hasClass('selected')){
+    $(".selected").removeClass('selected');
+    $(this).addClass('selected');
+  }else{
+    $(".selected").removeClass('selected');
+  }
+  //updateDoBetweenBox();
 }
 
-function drawScheduleGrid(){
-  $('.scheduleGrid').append("<table cellspacing='0'></table");
-  console.log(schedule.length);
-  for(var i=0; i<schedule.length; i++){
-    if (i%4==0){
-      var time = (startTime + i/4)%12;
-      if (time==0) time = 12;
-      $('.scheduleGrid table').append("<tr><td style='width:18px'>"+time+"</td><td style='width:278px'></td></tr>");
-    }
-  }
-  $('.scheduleGrid td').height(blockHeight*4);
+function selectItem(){
+  $(".selected:not(#"+$(this).attr("id")+")").removeClass('selected');
+  $(this).addClass('selected');
+  //updateDoBetweenBox();
 }
+
+function updateDoBetweenBox(){
+  if($(".selected").length){
+    $(".doBetweenContainer:not(#doBetween"+$(".selected").attr("id")+")").css("z-index",-2).fadeTo(1,0);
+    $("#doBetween" +  $(".selected").attr("id")).css("z-index",1).fadeTo(1,1);
+    console.log(".doBetween" +  $(".selected").attr("id"));
+  }else{
+    $(".doBetweenContainer").css("z-index",-2).fadeTo(1,0);
+  }
+}
+
