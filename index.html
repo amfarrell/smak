@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+  
+  <script src='./javascript/jquery-1.7.2.js'></script>
+  <script src='./javascript/jquery.json-2.3.js'></script>
+  <script src='./javascript/jquery-ui-1.8.18.js'></script>
+  <script src='./javascript/jquery.overlaps.js'></script>
+  <script src='./javascript/jstorage.js'></script>
+  <script src='./javascript/objectmodel.js'></script>
+  <script type="text/javascript" src="./javascript/schedule.js"></script>  
+  <script type="text/javascript" src="./javascript/edit_distance.js"></script>  
+  
+  <script>
+      $("#create_activity").click(function () {
+         alert($("#activity_form").serializeArray()); 
+      });
+  </script>
+  <link rel="stylesheet" type="text/css" href="styles/main.css" />
+  <link rel="stylesheet" href="development-bundle/themes/base/jquery.ui.all.css">
+</head>
+
+<body>
+<script type="text/javascript">
+
+$(document).ready(function() {
+  drawScheduleGrid();
+  drawSchedule(schedule);
+    $("#test").resizable({
+    containment: "parent",
+    grid: [50, 20],
+    handles: "n,s",
+  });
+  $("#test").resizable({
+    stop: function(event, ui) {
+      console.log($(this).height())
+    }
+  });
+  $("#create_activity").click(function() {
+    O.Activity(
+      $("#activity_name").val(),
+      $("#activity_location").val(),
+      $("#activity_start").val(),
+      $("#activity_end").val(),
+      $("#activity_duration").val(),
+      $("#activity_range").val());
+    console.log($.jStorage.index());
+    });
+
+  addActivity("D", 1);
+  addActivity("E", .5);
+  addActivity("F", .5);
+  //$('.activitiesList').sortable();
+
+ });
+ 
+</script>
+<h1>SMak</h1>
+<table class="layout" cellspacing='5'>
+
+<tr><td><h2>Activities</h2></td><td><h2>Schedule</h2></td><td><h2>Map</h2></td></tr>
+
+<tr><td valign="top">
+  <div class="activitiesContainer"></div>
+  <div class="activitiesList"></div>
+
+</td><td>
+  <div class="scheduleGrid"> 
+    <div class="schedule">  </div>
+  </div>
+  
+</td><td>
+  <div class="map"></div>
+</td>
+
+</tr></table>
+
+<br /><br />
+<div id="test">stuff</div>
+<div id="new_activity">
+  <form id="activity_form">
+    Name:<input type="text" name="name" id="activity_name"></input><br />
+      Location:<input type="text" name="location" id="activity_location"></input><br />
+      Start:<input type="text" name="start" id="activity_start"></input>
+      End:<input type="text" name="end"  id="activity_end"></input><br />
+      Duration:<input type="text" name="duration" id="activity_duration"></input><br />
+      Range:<input type="text" name="range" id="activity_range"></input><br />
+  </form>
+    <button id="create_activity" class="normalbutton"/>Submit</button>
+</div>
+</body>
+</html>
