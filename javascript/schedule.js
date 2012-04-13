@@ -84,7 +84,7 @@ function setupActivity(id, duration, list, verticalPos){  //list = ".schedule" o
       if ((list == ".schedule" && ($(this).position().left>-160)) ||  // move in schedule
           (list == ".activitiesList" && ($(this).position().left>scheduleItemWidth/2)) ){  // move from Activities to Schedule
         var positionY = Math.round(($(this).position().top)/blockHeight);
-        console.log(schedule + ", "+ id + ", "+ positionY +  ", "+ height);        
+        console.log(schedule + ", "+ id + ", "+ positionY +  ", "+ $(this).position().top+", "+ height);        
         drawSchedule(edit_distance(schedule,id, positionY,height));
         if(list == ".activitiesList"){  // move from Activities to Schedule
           $(this).remove();

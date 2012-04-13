@@ -18,6 +18,9 @@
 
 
 /* Activities column */
+.autoSchedule{
+  text-align:center;
+}
 .activitiesList{
   width: 260px;
   position: relative;
