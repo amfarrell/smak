@@ -9,6 +9,7 @@
   <script src='./javascript/jquery-1.7.2.js'></script>
   <script src='./javascript/jquery.json-2.3.js'></script>
   <script src='./javascript/jquery-ui-1.8.18.js'></script>
+  <script src='./javascript/jquery.overlaps.js'></script>
   <script src='./javascript/jstorage.js'></script>
   <script src='./javascript/objectmodel.js'></script>
   <script type="text/javascript" src="./javascript/schedule.js"></script>  
@@ -19,7 +20,7 @@
          alert($("#activity_form").serializeArray()); 
       });
   </script>
-  <link rel="stylesheet" type="text/css" href="schedule.css" />
+  <link rel="stylesheet" type="text/css" href="styles/main.css" />
   <link rel="stylesheet" href="development-bundle/themes/base/jquery.ui.all.css">
 </head>
 
@@ -29,16 +30,7 @@
 $(document).ready(function() {
   drawScheduleGrid();
   drawSchedule(schedule);
-    $("#test").resizable({
-    containment: "parent",
-    grid: [50, 20],
-    handles: "n,s",
-  });
-  $("#test").resizable({
-    stop: function(event, ui) {
-      console.log($(this).height())
-    }
-  });
+
   $("#create_activity").click(function() {
     O.Activity(
       $("#activity_name").val(),
@@ -54,16 +46,29 @@ $(document).ready(function() {
   addActivity("D", 2.5);
   addActivity("E", 1);
   });
-  $("
-  
  
 </script>
 <h1>SMak</h1>
 <table class="layout" cellspacing='5'>
 
-<tr><td><h2>Activities</h2></td><td><h2>Schedule</h2></td><td><h2>Map</h2></td></tr>
+<tr><td><h2>Add Activity</h2></td><td><h2>Activities</h2></td><td><h2>Schedule</h2></td><td><h2>Map</h2></td></tr>
 
-<tr><td valign="top">
+<tr>
+<td valign="top">
+<div id="new_activity">
+  <form id="activity_form">
+    Name:<input type="text" name="name" id="activity_name"></input><br />
+      Location:<input type="text" name="location" id="activity_location"></input><br />
+      Start:<input type="text" name="start" id="activity_start"></input>
+      End:<input type="text" name="end"  id="activity_end"></input><br />
+      Duration:<input type="text" name="duration" id="activity_duration"></input><br />
+      Range:<input type="text" name="range" id="activity_range"></input><br />
+  </form>
+    <button id="create_activity" class="normalbutton"/>Submit</button>
+</div>
+</td>
+
+<td valign="top">
   <div class="activitiesContainer"></div>
   <div class="activitiesList"></div>
 
@@ -78,22 +83,6 @@ $(document).ready(function() {
 
 </tr></table>
 
-
-
-<div class="schedule"></div>
 <br /><br />
-<table id="new_activity">
-  <form id="activity_form">
-    <tr><td>Name:</td><td><input type="text" name="name" id="activity_name"></input></td></tr>
-     <tr><td>Location:</td><td><input type="text" name="location" id="activity_location"></input></td></tr>
-      <tr><td>Start:</td><td><input type="text" name="start" id="activity_start"></input></td></tr>
-      <tr><td>End:</td><td><input type="text" name="end"  id="activity_end"></input></td></tr>
-      <tr><td>Duration:</td><td><input type="text" name="duration" id="activity_duration"></input></td></tr>
-      <tr><td>Range:</td><td><input type="text" name="range" id="activity_range"></input></td></tr>
-    </form>
-    <tr><td>
-    <button id="create_activity" class="normalbutton"/>Submit</button>
-    </td></tr>
-</table>
 </body>
 </html>

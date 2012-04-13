@@ -1,3 +1,5 @@
+/* Form */
+
 .normalbutton {
     color: white;
     background-color:#44ee44;
@@ -14,3 +16,91 @@
     border: 2px solid#226622; 
 }
 
+
+/* Activities column */
+.activitiesList{
+  width: 260px;
+  position: relative;
+}
+.activitiesContainer{
+  position:absolute;
+  width:565px;
+}
+.wrapper{
+  position: relative;
+  left:0;
+  top:0;
+}
+
+/* Schedule column */
+.schedule{
+  width: 260px;
+  position: absolute;
+  left:30px;
+}
+.scheduleGrid{
+  position:relative;
+  background: #B3E2F2;
+  width:300px;
+}
+.scheduleGrid td{
+  border:1px solid;
+  text-align:center;
+}
+.scheduleItem{
+  border:5px ridge #12576E;
+  text-align:center;
+  width: 250px;
+  
+  background:#D5F0F9;
+  margin-left:auto;
+  margin-right:auto;
+  z-index:10;
+}
+.scheduleItem:hover{
+  background:#A7B6BB;
+}
+.selected{
+  background:#FFDFD9;
+}
+.scheduleItem.selected:hover{
+  background:#BFADAA;
+}
+.doBetweenContainer{
+  width:565px;
+  position: absolute;
+  z-index:0;
+}
+.doBetween{
+  background:#3A859D;
+  position: absolute;
+  /*border: groove #12576E;
+  border-width:5px 0px;
+  top:-5px;*/
+  width:280px;
+  right:0px;
+  height:100%;
+}
+.doBetween.hover{
+  /*background:#D5F0F9;*/
+}
+
+.ui-draggable  { 
+  cursor: move; 
+}
+
+/* Map column */
+.map{
+  width: 300px;
+}
+
+
+h2{
+  text-align:center;
+}
+.layout td{
+}
+td{
+  padding:0px;
+  margin:0px;
+}
