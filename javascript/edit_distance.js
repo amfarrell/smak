@@ -11,7 +11,10 @@
 // -----------------------------------------------------------------------------
 
 var DEBUG = false
-var DISPLACEMENT_COST = 1000
+var DEBUG_INSERT = false
+var DEBUG_COST_FUNC = false
+
+var DISPLACEMENT_COST = 1
 var MOVEMENT_COST = 1
 var MOVEMENT_POLY = 4
 var ELIMINATION_COST = 10000
@@ -145,17 +148,20 @@ function add(state, id, pos_final, len) {
 // after the given activity are pushed forward.  If the activity is pushed on 
 // top of an existing activity, that activity is pushed backwards.
 function insert(state, id, pos, len, locked) {
-	//console.log("Calling insert() ~ PC: [" + state + "], Insert at: " + pos + ", ID: " + id)
+	if (DEBUG_INSERT) console.log("Calling insert() ~ PC: [" + state + "], Insert at: " + pos + ", ID: " + id)
 
 	state = state.slice()
 	var original_len = state.length
-	var locked_char = state[locked]
-	var locked_char_first = locked
-	var locked_char_last = state.lastIndexOf(state[locked])
+	if (locked > -1) {
+		var locked_char = state[locked]
+		var locked_char_first = locked
+		var locked_char_last = state.lastIndexOf(state[locked])
+	}
 
 	// are we inserting in the middle of an activity?
-	if (pos > 0 && state[pos] == state[pos-1]) {
-		var b_id = state[pos]
+	// if so, push that activity backwards
+	if (pos > 0 && state[pos] != " " && state[pos] == state[pos-1]) {
+    var b_id = state[pos]
 		var b_len = count_array_occurances(state, b_id)
 		state = array_replace(state, b_id, " ")
 		var b_state = state.slice(0, pos)
@@ -183,8 +189,9 @@ function insert(state, id, pos, len, locked) {
 	}
 
 	// check 1: did we move the locked item?
-	if (state[locked_char_first] != locked_char ||
-			state[locked_char_last] != locked_char) return [false, null]
+	if (locked != -1 && (state[locked_char_first] != locked_char) ||
+											(state[locked_char_last] != locked_char) )
+		return [false, null]
 
 	// check 2: do we need to cut off anything?
 	//assert(original_len <= state.length, "insert: length violation")
@@ -198,7 +205,7 @@ function insert(state, id, pos, len, locked) {
 		}
 		state = prefix
 	}
-
+	
 	return [true, state]
 }
 
@@ -219,7 +226,7 @@ function find_breaks(state) {
 //
 // given a starting point and a list of displacements, enumerate all state 
 // configurations after the displacements are added back.
-function get_configurations(displacements, partial_configurations, locked) {
+function get_configurations(displacements, partial_configurations, locked, start, end) {
 	if (displacements.length == 0) {
 		return partial_configurations
 	}
@@ -233,7 +240,8 @@ function get_configurations(displacements, partial_configurations, locked) {
 		for (var j = 0; j < start_points.length; j++) {
 			var new_configuration = insert(	partial_configurations[i], id, 
 																			start_points[j], len, locked)
-			//console.log("Finished insert() ~ Result: [" + new_configuration[1] + "]")
+			if (DEBUG_INSERT) console.log("Finished insert() ~ Result: [" + new_configuration[1] + "]")
+			if (DEBUG_INSERT) console.log("")
 			if (new_configuration[0])
 				new_configurations.push(new_configuration[1])
 		}
@@ -262,7 +270,7 @@ function cost_function(initial_state, configuration, exclude) {
 					if (current_new.start_pos != current_old.start_pos) {
 						displacement_cost += DISPLACEMENT_COST
 					}
-					movement_cost += Math.pow(Math.abs(current_new.start_pos - current_old.start_pos) * MOVEMENT_COST, MOVEMENT_POLY)
+					movement_cost += MOVEMENT_COST * Math.pow(Math.abs(current_new.start_pos - current_old.start_pos), MOVEMENT_POLY)
 					break;
 				}
 			}
@@ -279,15 +287,16 @@ function cost_function(initial_state, configuration, exclude) {
 	}
 	
 	var total_cost = displacement_cost + movement_cost + elimination_cost
-	console.log("Cost: from [" + initial_state + "] -> [" + configuration + "] = " + total_cost + "\t(" + displacement_cost + ", " + movement_cost + ", " + elimination_cost + ")")
+	if (DEBUG_COST_FUNC) console.log("Cost: from [" + initial_state + "] -> [" + configuration + "] = " + total_cost + "\t(" + displacement_cost + ", " + movement_cost + ", " + elimination_cost + ")")
 	return total_cost
 }
 
 // -----------------------------------------------------------------------------
-// Main Algorithm
+// Main Algorithms
 // -----------------------------------------------------------------------------
 
 function edit_distance(string, id, pos_final, len) {
+	console.log("edit_distance(\"" + string + "\", \"" + id + "\", " + pos_final + ", " + len + ")")
 	var state = string.split("")
 	var initial_state = state
 
@@ -299,24 +308,56 @@ function edit_distance(string, id, pos_final, len) {
 	add_attempt = add(state, id, pos_final, len)
 	state = add_attempt[0]
 	displaced = add_attempt[1]
-	if (displaced.length > 0) {
-		//console.log("Complex case... Displaced: " + displaced + ", state: " + state)
-		configurations = get_configurations(displaced, [state.slice()], pos_final)
-		var min_cost = Number.MAX_VALUE
-		var min_configuration = null
-		for (var i = 0; i < configurations.length; i++) {
-			if (DEBUG) console.log("Testing config: [" + configurations[i] + "]")
-			var cost = cost_function(initial_state, configurations[i], id)
-			if (cost < min_cost) {
-				if (DEBUG) console.log("Keeping configuration!")
-				min_cost = cost
-				min_configuration = configurations[i]
-			}
+
+	configurations = get_configurations(displaced, [state.slice()], pos_final)
+
+	var min_cost = Number.MAX_VALUE
+	var min_configuration = null
+	for (var i = 0; i < configurations.length; i++) {
+		if (DEBUG) console.log("Testing config: [" + configurations[i] + "]")
+		var cost = cost_function(initial_state, configurations[i], id)
+		if (cost < min_cost) {
+			if (DEBUG) console.log("Keeping configuration!")
+			min_cost = cost
+			min_configuration = configurations[i]
 		}
-		assert(min_configuration != null, "main: no final config???")
-		state = min_configuration
 	}
-	return state.join("").replace(/,/g, "")
+	assert(min_configuration != null, "main: no final config?")
+	state = min_configuration
+
+	var ret = state.join("").replace(/,/g, "")
+	console.log("edit_distance() returning: \"" + ret + "\"")
+
+	return ret
+}
+
+function constrain_bounds(string, start, stop) {
+	var state = string.split("")
+	var end_delta = state.length - stop
+
+	// push forward
+	for (var i = 0; i < start; i++) {
+		var id = state[i]
+		if (id != " ") {
+			var len = count_array_occurances(state, id)
+			state = array_replace(state, id, " ")
+			state = insert(state, id, i+1, len, -1)[1]
+		}
+	}
+	state = state.slice(start).reverse()
+
+	// push backwards
+	for (var i = 0; i < end_delta; i++) {
+		var id = state[i]
+		if (id != " ") {
+			var len = count_array_occurances(state, id)
+			state = array_replace(state, id, " ")
+			state = insert(state, id, i+1, len, -1)[1]
+		}
+	}
+	state = state.slice(end_delta).reverse()
+
+	return Array(start+1).join(" ") + state.join("").replace(/,/g, "") + Array(end_delta+1).join(" ")
 }
 
 // -----------------------------------------------------------------------------
@@ -329,9 +370,9 @@ function edit_distance(string, id, pos_final, len) {
 // Calls
 // -----------------------------------------------------------------------------
 
-//          012345678
-var init = " BBC"
-var test = edit_distance(init, "C", 1, 2)
+var init = "AA  BBCCC  "
+var test = edit_distance(init, "C", 5, 3)
+//test = constrain_bounds(init, 2, init.length)
 
-console.log("FINAL RESULT: " + pprint(init) + " -> " + pprint(test))
+//console.log("FINAL RESULT: " + pprint(init) + " -> " + pprint(test))
 

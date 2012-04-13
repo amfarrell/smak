@@ -18,13 +18,16 @@
 
 
 /* Activities column */
+.autoSchedule{
+  text-align:center;
+}
 .activitiesList{
   width: 260px;
   position: relative;
 }
 .activitiesContainer{
   position:absolute;
-  width:565px;
+  width:700px; /*fix this for resizing!  565px;*/
 }
 .wrapper{
   position: relative;

@@ -42,16 +42,22 @@ $(document).ready(function() {
       );
     console.log($.jStorage.index());
     });
-
-  addActivity("D", 2.5);
-  addActivity("E", 1);
-  });
+  
+  initActivitiesList();
+  console.log($.jStorage.index())
+ });
  
 </script>
 <h1>SMak</h1>
 <table class="layout" cellspacing='5'>
 
-<tr><td><h2>Add Activity</h2></td><td><h2>Activities</h2></td><td><h2>Schedule</h2></td><td><h2>Map</h2></td></tr>
+<tr>
+  <td><h2>Add Activity</h2></td>
+  <td><h2>Activities
+      <div class="autoSchedule"><button type="button" onclick="autoSchedule();">Auto Schedule</button></div></h2></td>
+  <td><h2>Schedule</h2></td>
+  <td><h2>Map</h2></td>
+</tr>
 
 <tr>
 <td valign="top">
