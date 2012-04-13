@@ -30,14 +30,43 @@
   text-align:center;
 }
 .scheduleItem{
-  border:1px solid;
+  border:5px ridge #12576E;
   text-align:center;
-  width: 258px;
+  width: 250px;
   
   background:#D5F0F9;
   margin-left:auto;
   margin-right:auto;
+  z-index:10;
 }
+.scheduleItem:hover{
+  background:#A7B6BB;
+}
+.selected{
+  background:#FFDFD9;
+}
+.scheduleItem.selected:hover{
+  background:#BFADAA;
+}
+.doBetweenContainer{
+  width:565px;
+  position: absolute;
+  z-index:0;
+}
+.doBetween{
+  background:#3A859D;
+  position: absolute;
+  /*border: groove #12576E;
+  border-width:5px 0px;
+  top:-5px;*/
+  width:280px;
+  right:0px;
+  height:100%;
+}
+.doBetween.hover{
+  background:#D5F0F9;
+}
+
 .ui-draggable  { 
   cursor: move; 
 }
