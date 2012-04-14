@@ -1,56 +1,106 @@
-/* Form */
+/* Overall Structure */
+#container {
 
-.normalbutton {
-    color: white;
-    background-color:#44ee44;
-    border: 2px solid#226622; 
 }
-.hoverbutton {
-    color: white;
-    background-color:#229922;
-    border: 2px solid#226622; 
+
+#activity {
+  float:left;
+  width:33%;
+  position:relative;
+  border-right:5px ridge #12576E;
 }
-.clickbutton {
-    color: white;
-    background-color:#44ee44;
-    border: 2px solid#226622; 
+#schedule {
+  float:right;
+  /*width:66%;
+   */
+  position:relative;
 }
+
+/* New Activity Form */
+
+#activity_name { 
+  width:95%;
+  position:relative;
+}
+#activity_suggest { 
+  width:100%;
+  position:relative;
+}
+#activity_time { }
+#time_form { 
+  text-align:center;
+  width:70%;
+  position:relative;
+  float:left;
+}
+#time_definite { }
+#or {
+  text-align:center;
+}
+#definite_start { 
+  width:3em;
+}
+#definite_end {
+  width:3em;
+}
+#range_duration { 
+  width:3em;
+}
+#range_start {
+  width:3em;
+}
+#range_end { 
+  width:3em;
+}
+#time_display { }
+#time_buttons {
+  width:30%;
+  text-align:center;
+  float:right;
+}
+#time_display { }
+
+#location_text {
+  float-left;
+  width:75%;
+}
+
 
 
 /* Activities column */
-.autoSchedule{
+.autoSchedule {
   text-align:center;
 }
-.activitiesList{
+.activitiesList {
   width: 260px;
   position: relative;
 }
-.activitiesContainer{
+.activitiesContainer {
   position:absolute;
   width:700px; /*fix this for resizing!  565px;*/
 }
-.wrapper{
+.wrapper {
   position: relative;
   left:0;
   top:0;
 }
 
 /* Schedule column */
-.schedule{
+.schedule {
   width: 260px;
   position: absolute;
   left:30px;
 }
-.scheduleGrid{
+.scheduleGrid {
   position:relative;
   background: #B3E2F2;
   width:300px;
 }
-.scheduleGrid td{
+.scheduleGrid td {
   border:1px solid;
   text-align:center;
 }
-.scheduleItem{
+.scheduleItem {
   border:5px ridge #12576E;
   text-align:center;
   width: 250px;
@@ -60,21 +110,21 @@
   margin-right:auto;
   z-index:10;
 }
-.scheduleItem:hover{
+.scheduleItem:hover {
   background:#A7B6BB;
 }
-.selected{
+.selected {
   background:#FFDFD9;
 }
-.scheduleItem.selected:hover{
+.scheduleItem.selected:hover {
   background:#BFADAA;
 }
-.doBetweenContainer{
+.doBetweenContainer {
   width:565px;
   position: absolute;
   z-index:0;
 }
-.doBetween{
+.doBetween {
   background:#3A859D;
   position: absolute;
   /*border: groove #12576E;
@@ -84,19 +134,15 @@
   right:0px;
   height:100%;
 }
-.doBetween.hover{
+.doBetween.hover {
   /*background:#D5F0F9;*/
 }
 
-.ui-draggable  { 
+.ui-draggable { 
   cursor: move; 
 }
 
 /* Map column */
-.map{
-  width: 300px;
-}
-
 
 h2{
   text-align:center;
