@@ -65,7 +65,7 @@ function autoSchedule(){
     unscheduledActivities.push(new Array(height + 1).join(($(this).attr("id"))));
   });
   console.log("scheduleAll " + schedule + ", " + unscheduledActivities);
-  //scheduleAll(schedule, unscheduledActivities);
+  drawSchedule(partially_schedule(schedule, unscheduledActivities));
   $(".activitiesList").html('');
 
 }
@@ -140,8 +140,7 @@ function setupActivity(id, duration, list, verticalPos){  //list = ".schedule" o
       $("#"+id).each(selectItem);
     }
   });
-  
-  //$(".ui-resizable-handle").html("<div class='ui-icon ui-icon-grip-solid-horizontal'></div>");
+  //$(list + " div.item:last .ui-resizable-handle").after("<div class='ui-icon ui-icon-grip-solid-horizontal ui-resizable-n ui-resizable-handle'></div>");
   
   // Set item height
   $(list + " div.item:last").height(blockHeight*duration - borderWidth*2);  // -2 to compensate for the border height
