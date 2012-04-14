@@ -4,7 +4,7 @@ var startTime = 9;      //hour of the day (in military time)
 var schedule = "                                            ";      // currently displayed schedule
 var activitiesListPos = 0; // position of the end of the activities list. (counted in 15 min blocks)
 var scheduleItemWidth = 260;  //pixels width of schdeduleItem
-var borderWidth = 5;  //pixels width of border of schdeduleItem
+var borderWidth = 1;  //pixels width of border of schdeduleItem
 
 function initActivitiesList(){
   for (var i in $.jStorage.index()){
@@ -64,9 +64,9 @@ function autoSchedule(){
     var height = Math.round(($(this).height() + borderWidth*2) / blockHeight);
     unscheduledActivities.push(new Array(height + 1).join(($(this).attr("id"))));
   });
-  console.log("scheduleAll " + schedule + ", " + unscheduledActivities);
-  drawSchedule(partially_schedule(schedule, unscheduledActivities));
+  console.log("partially_schedule " + schedule + ", " + unscheduledActivities);
   $(".activitiesList").html('');
+  drawSchedule(partially_schedule(schedule, unscheduledActivities));
 
 }
 
@@ -140,7 +140,8 @@ function setupActivity(id, duration, list, verticalPos){  //list = ".schedule" o
       $("#"+id).each(selectItem);
     }
   });
-  //$(list + " div.item:last .ui-resizable-handle").after("<div class='ui-icon ui-icon-grip-solid-horizontal ui-resizable-n ui-resizable-handle'></div>");
+  $(list + " div.item:last .ui-resizable-n").after("<div class='ui-icon ui-icon-grip-solid-horizontal-n'></div>");
+  $(list + " div.item:last .ui-resizable-s").after("<div class='ui-icon ui-icon-grip-solid-horizontal-s'></div>");
   
   // Set item height
   $(list + " div.item:last").height(blockHeight*duration - borderWidth*2);  // -2 to compensate for the border height
