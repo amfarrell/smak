@@ -60,20 +60,24 @@ $(document).ready(function() {
         <div id="time_definite">
           From <input id="definite_start"></input> 
           To <input id="definite_end"></input>
-        </div><div id="or">or</div>
+          <div id="add_event">  
+            <button type="button" onclick="addEvent('schedule');">Add to Schedule</button>
+          </div>
+        </div>
+        <div id="or">or</div>
         <div id="time_range">
           <input id="range_duration"></input>hours
           between <input id="range_start"></input>
           and <input id="range_end"></input>
+        <div id="add_todo">
+          <button type="button" onclick="addEvent('todo');">Add to Todo</button>
         </div>
-      </div>
-      <div id="time_buttons">
-        
-        <button type="button" onclick="addEvent('todo');">Add to Todo</button>
-        <button type="button" onclick="addEvent('schedule');">Add to Schedule</button>
+        </div>
       </div>
       <div id="time_display">
         <canvas> </canvas>
+      </div>
+      <div id="description">
       </div>
     </div>
     <div id="activity_location">

@@ -29,7 +29,7 @@
 #activity_time { }
 #time_form { 
   text-align:center;
-  width:70%;
+  width:100%;
   position:relative;
   float:left;
 }
@@ -43,6 +43,11 @@
 #definite_end {
   width:3em;
 }
+#add_event {
+  width:30%;
+  text-align:center;
+  float:right;
+}
 #range_duration { 
   width:3em;
 }
@@ -52,8 +57,7 @@
 #range_end { 
   width:3em;
 }
-#time_display { }
-#time_buttons {
+#add_todo {
   width:30%;
   text-align:center;
   float:right;
