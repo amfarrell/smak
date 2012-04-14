@@ -25,9 +25,14 @@
   width: 260px;
   position: relative;
 }
+.activitiesResizeContainer{
+  position:absolute;
+  left:0;
+  width:  565px;
+}
 .activitiesContainer{
   position:absolute;
-  width:700px; /*fix this for resizing!  565px;*/
+  width:  565px;
 }
 .wrapper{
   position: relative;
@@ -47,8 +52,12 @@
   width:300px;
 }
 .scheduleGrid td{
+  display: inline-block;
+
   border:1px solid;
   text-align:center;
+  
+
 }
 .scheduleItem{
   border:1px solid #92ADB5;

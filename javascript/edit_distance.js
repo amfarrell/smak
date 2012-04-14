@@ -17,7 +17,7 @@ var DEBUG_COST_FUNC = false
 var DISPLACEMENT_COST = 1
 var MOVEMENT_COST = 1
 var MOVEMENT_POLY = 4
-var ELIMINATION_COST = 10000
+var ELIMINATION_COST = 10000000
 
 // -----------------------------------------------------------------------------
 // Low-level Helpers

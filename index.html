@@ -28,6 +28,7 @@
 <script type="text/javascript">
 
 $(document).ready(function() {
+  initHeights();
   drawScheduleGrid();
   drawSchedule(schedule);
 
@@ -43,7 +44,6 @@ $(document).ready(function() {
     });
   
   initActivitiesList();
-  console.log($.jStorage.index())
  });
  
 </script>
@@ -74,7 +74,10 @@ $(document).ready(function() {
 </td>
 
 <td valign="top">
+  
+  <div class="activitiesResizeContainer"></div>
   <div class="activitiesContainer"></div>
+
   <div class="activitiesList"></div>
 
 </td><td>
