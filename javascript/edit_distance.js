@@ -161,7 +161,7 @@ function insert(state, id, pos, len, locked) {
 	// are we inserting in the middle of an activity?
 	// if so, push that activity backwards
 	if (pos > 0 && state[pos] != " " && state[pos] == state[pos-1]) {
-		var b_id = state[pos]
+    var b_id = state[pos]
 		var b_len = count_array_occurances(state, b_id)
 		state = array_replace(state, b_id, " ")
 		var b_state = state.slice(0, pos)
