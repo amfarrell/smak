@@ -6,9 +6,12 @@ $(document).ready(function() {
                         //upper-left corner of the map and the middle 
                         //of the bottom edge of the 11px wide pin image.
   $("#draggable").draggable({
+    helper: "original",
+    zIndex: 9999,
+    containment : "document",
     //draggable adds a listener such that when the mouse moves, the map_pin
     //follows it.
-    start: function(e) {
+    start: function(e,ui) {
       startX = e.pageX;
       startY = e.pageY;
     },
@@ -16,13 +19,17 @@ $(document).ready(function() {
       bottom:0,
       left:11, //assuming image is 22px wide.
     },
-    stop: function(e) {
+    stop: function(e,ui) {
       //Record the x,y position of the map_pin and put it there absolutely.
       var point=new google.maps.Point(e.pageX - startX + offsetX, 
                                       e.pageY - startY + offsetY);
       var ll=overlay.getProjection().fromContainerPixelToLatLng(point);
-      placeMarker(ll);
-      console.log([ll.Ya,ll.Za]);
+      //placeMarker(ll); 
+      // This should only happen when the item gets added to the schedule.
+      if (O.currentActivity.user_createdP) {
+        O.currentActivity.location = [ll.Ya,ll.Za];
+      }
+      console.log(O.currentActivity);
     //TODO: When the marker is dropped, data about location gets added to the
     // event.
     //TODO: When the marker is relocated, the event info changes. 
