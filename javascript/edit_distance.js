@@ -257,6 +257,8 @@ function cost_function(initial_state, configuration, excludes) {
 	var old_model = model_from_string(initial_state)
 	var new_model = model_from_string(configuration)
 
+	console.log(DISPLACEMENT_COST)
+
 	// calculate displacement and movement costs
 	var displacement_cost = 0
 	var movement_cost = 0
@@ -372,6 +374,8 @@ function partially_schedule(string, los) {
 	var initial_state = string.split("")
 
 	for (var j = 0; j < los.length; j++) {
+		var state_this_iteration = state.slice()
+
 		// some preprocessing
 		var excludes = Array()
 		for (var i = 0; i < los.length; i++) { excludes.push(los[i].charAt(0)) }
@@ -380,7 +384,7 @@ function partially_schedule(string, los) {
 		configurations = get_configurations([los[j]], [state.slice()], -1)
 
 		// pick the best configuration
-		state = pick_configuration(initial_state, configurations, [])
+		state = pick_configuration(state_this_iteration, configurations, [])
 	}
 
 	var ret = state.join("").replace(/,/g, "")
