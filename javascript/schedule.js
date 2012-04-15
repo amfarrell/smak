@@ -1,15 +1,24 @@
 
-var blockHeight = 13;   // vertical pixels per 15 minute chunk
+var blockHeight = 15;   // vertical pixels per 15 minute chunk
 var startTime = 9;      //hour of the day (in military time)
 var schedule = "                                            ";      // currently displayed schedule
 var activitiesListPos = 0; // position of the end of the activities list. (counted in 15 min blocks)
 var scheduleItemWidth = 260;  //pixels width of schdeduleItem
-var borderWidth = 5;  //pixels width of border of schdeduleItem
+var borderWidth = 1;  //pixels width of border of schdeduleItem
+
+function initHeights(){
+  $('.schedule').height(blockHeight*schedule.length);    
+  $('.scheduleGrid').height(blockHeight*schedule.length);  
+  $('.activitiesContainer').height(blockHeight*schedule.length);
+  $('.activitiesResizeContainer').height(blockHeight*schedule.length);
+  $('.activitiesList').height(blockHeight*schedule.length);
+}
 
 function initActivitiesList(){
   for (var i in $.jStorage.index()){
-    console.log($.jStorage.get(i).duration);
-    addActivity(i, $.jStorage.get(i).duration/15)
+    if(!$.jStorage.get(i).scheduledP){
+      addActivity(i, $.jStorage.get(i).duration/15)
+    }
   }
 }
 
@@ -21,7 +30,6 @@ function addActivity(id, duration){ //duration in 15 min blocks
 
 function drawScheduleGrid(){
   $('.scheduleGrid').append("<table cellspacing='0'></table");
-  console.log(schedule.length);
   for(var i=0; i<schedule.length; i++){
     if (i%4==0){
       var time = (startTime + i/4)%12;
@@ -29,19 +37,13 @@ function drawScheduleGrid(){
       $('.scheduleGrid table').append("<tr><td style='width:18px'>"+time+"</td><td style='width:278px'></td></tr>");
     }
   }
-  $('.scheduleGrid td').height(blockHeight*4);
+  $('.scheduleGrid td').height(blockHeight*4-2);
 }
 
 function drawSchedule(newSchedule){
   schedule = newSchedule;
-  console.log(schedule);
   var prevItem="";
-  
-  $('.schedule').height(blockHeight*schedule.length);    
-  $('.scheduleGrid').height(blockHeight*schedule.length);  
-  $('.activitiesContainer').height(blockHeight*schedule.length);
-  $('.activitiesList').height(blockHeight*schedule.length);
-  
+    
   $('.schedule').html("");    //clear schedule  
   
   for( var i=0; i<schedule.length; i++){
@@ -64,10 +66,23 @@ function autoSchedule(){
     var height = Math.round(($(this).height() + borderWidth*2) / blockHeight);
     unscheduledActivities.push(new Array(height + 1).join(($(this).attr("id"))));
   });
-  console.log("scheduleAll " + schedule + ", " + unscheduledActivities);
-  //scheduleAll(schedule, unscheduledActivities);
+  console.log("partially_schedule " + schedule + ", " + unscheduledActivities);
   $(".activitiesList").html('');
+  drawSchedule(partially_schedule(schedule, unscheduledActivities));
 
+}
+
+function updateModel(id, list){
+  var height = Math.round(($("#"+id).height() + borderWidth*2) / blockHeight);
+  var positionY = Math.round(($("#"+id).position().top)/blockHeight);
+  $.jStorage.get(id).duration = height*15;
+  if ($("#"+id).parents(".schedule").length>0){
+    $.jStorage.get(id).start = positionY
+    $.jStorage.get(id).scheduledP = true;
+  }else{
+    $.jStorage.get(id).scheduledP = false;
+  }
+  console.log($.jStorage.get(id));
 }
 
 function setupActivity(id, duration, list, verticalPos){  //list = ".schedule" or ".activitiesList"
@@ -109,6 +124,7 @@ function setupActivity(id, duration, list, verticalPos){  //list = ".schedule" o
       }else{  // move within Schedule
         $(this).css({"left":0, "top":0}); //return to original position
       }
+      updateModel(id);
       $("#"+id).each(selectItem);
       $(".hover").removeClass("hover");
     }
@@ -116,8 +132,10 @@ function setupActivity(id, duration, list, verticalPos){  //list = ".schedule" o
   
   // Make item resizable
   $(list + " div.item:last").resizable({
-    containment: ".activitiesContainer",  
+    containment: ".activitiesResizeContainer",  
     handles: "n,s",
+    minHeight: blockHeight*2 - borderWidth*2,
+    //minWidth: 258,
     start: function(event, ui) {  
       $(this).after("<div class='spaceHolder' style='height:"+ ($(this).height()+borderWidth*2) +"px'></div>");
       $(this).each(selectItem);
@@ -137,11 +155,12 @@ function setupActivity(id, duration, list, verticalPos){  //list = ".schedule" o
         });
         $(".spaceHolder").remove();
       }
+      updateModel(id);
       $("#"+id).each(selectItem);
     }
   });
-  
-  //$(".ui-resizable-handle").html("<div class='ui-icon ui-icon-grip-solid-horizontal'></div>");
+  $(list + " div.item:last .ui-resizable-n").after("<div class='ui-icon ui-icon-grip-solid-horizontal-n'></div>");
+  $(list + " div.item:last .ui-resizable-s").after("<div class='ui-icon ui-icon-grip-solid-horizontal-s'></div>");
   
   // Set item height
   $(list + " div.item:last").height(blockHeight*duration - borderWidth*2);  // -2 to compensate for the border height
@@ -170,8 +189,7 @@ function setupActivity(id, duration, list, verticalPos){  //list = ".schedule" o
     $(".activitiesContainer").after('<div class="doBetweenContainer" id="doBetween'+id+'"><div class="doBetween"></div></div>');
     $("#doBetween"+id).height(blockHeight*schedule.length);
     $("#doBetween"+id).css("z-index",-2).fadeTo(1,0);
-    $("#doBetween"+id).resizable({
-      //containment: ".activitiesContainer",  
+    $("#doBetween"+id).resizable({ 
       grid: [1, blockHeight],
       handles: "n,s",
       stop: function(event, ui) {

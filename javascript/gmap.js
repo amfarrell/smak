@@ -5,24 +5,30 @@ $(document).ready(function() {
   var offsetY = -29.26; //really, find the displacement from the 
                         //upper-left corner of the map and the middle 
                         //of the bottom edge of the 11px wide pin image.
-$("#draggable").draggable({helper: 'clone',
-start: function(e) {
-  startX = e.pageX;
-  startY = e.pageY;
-  },
-  cursorAt: {bottom:0,
-             left:11, //assuming image is 22px wide.
-            },
-  stop: function(e) {
-    var point=new google.maps.Point(e.pageX - startX + offsetX, 
-                                    e.pageY - startY + offsetY);
-    var ll=overlay.getProjection().fromContainerPixelToLatLng(point);
-    placeMarker(ll);
-    console.log([ll.Ya,ll.Za]);
-    }
+  $("#draggable").draggable({
+    //draggable adds a listener such that when the mouse moves, the map_pin
+    //follows it.
+    start: function(e) {
+      startX = e.pageX;
+      startY = e.pageY;
+    },
+    cursorAt: {
+      bottom:0,
+      left:11, //assuming image is 22px wide.
+    },
+    stop: function(e) {
+      //Record the x,y position of the map_pin and put it there absolutely.
+      var point=new google.maps.Point(e.pageX - startX + offsetX, 
+                                      e.pageY - startY + offsetY);
+      var ll=overlay.getProjection().fromContainerPixelToLatLng(point);
+      placeMarker(ll);
+      console.log([ll.Ya,ll.Za]);
+    //TODO: When the marker is dropped, data about location gets added to the
+    // event.
+    //TODO: When the marker is relocated, the event info changes. 
+      }
+  });
 });
-});
-
 
 var $map;
 var $latlng;

@@ -25,24 +25,12 @@
 <script type="text/javascript">
 
 $(document).ready(function() {
+  initHeights();
   drawScheduleGrid();
   drawSchedule(schedule);
-
-  $("#create_activity").click(function() {
-    O.Activity(
-      $("#activity_name").val(),
-      $("#activity_location").val(),
-      $("#activity_start").val(),
-      $("#activity_end").val(),
-      $("#activity_duration").val(),
-      $("#activity_range").val()
-      );
-    console.log($.jStorage.index());
-    });
-  
   initActivitiesList();
   console.log($.jStorage.index())
-  });
+});
  
 </script>
 <div id="activity">
@@ -81,13 +69,14 @@ $(document).ready(function() {
     <div id="location_form">
       Where:<span id="pin_spot">
                 <img id="draggable" src='images/map_pin.png'/>
-                <img src="images/map_pin_empty.png" id="resting_pin"/>
+                <img id="resting_pin" src="images/map_pin_empty.png"/>
             </span>
       <input id="location_text"></input>
     </div>
     <div id="map_canvas">    </div>
   </div>
 </div>
+
 
 <div id="schedule">
 <table class="layout" cellspacing='5'>
@@ -103,12 +92,15 @@ $(document).ready(function() {
     </td>
   <tr>
     <td valign="top">
+      <div class="activitiesResizeContainer"></div>
       <div class="activitiesContainer"></div>
       <div class="activitiesList"></div>
     </td><td>
       <div class="scheduleGrid"> 
-        <div class="schedule"></div>
+        <div class="schedule">  </div>
       </div>
+    </td><td>
+      <div class="map"></div>
     </td>
   </tr>
 </table>
