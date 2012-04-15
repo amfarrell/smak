@@ -8,21 +8,12 @@ body {
   height: 100%;
   margin: 0; padding: 0;
 }
-
 #activity {
   float:left;
   width:40%;
   height:100%;
   position:relative;
-  /*border-right:5px ridge #12576E;*/
 }
-/*
-#schedule {
-  float:right;
-  width:66%;
-  position:relative;
-}
-*/
 #schedule {
   /*margin-left: auto;
   margin-right: auto;*/
@@ -57,7 +48,12 @@ body {
 #definite_end {
   width:3em;
 }
-#add_event {
+#range_add_event {
+  width:30%;
+  text-align:center;
+  float:right;
+}
+#definite_add_event {
   width:30%;
   text-align:center;
   float:right;
@@ -70,11 +66,6 @@ body {
 }
 #range_end { 
   width:3em;
-}
-#add_todo {
-  width:30%;
-  text-align:center;
-  float:right;
 }
 #time_display { }
 
@@ -104,17 +95,6 @@ body {
 #range_end { 
   width:3em;
 }
-#add_todo {
-  width:30%;
-  text-align:center;
-  float:right;
-}
-#time_display { }
-
-#shelf{position:fixed; top:10px; left:500px;
-    height:100px; width:200px;
-    background:white; opacity:0.7;
-} 
 #draggable {
   position:absolute;top:10px, 
   left:10px; /*width: 30px; height: 30px;*/
@@ -145,7 +125,7 @@ body {
   top:0;
 }
 
-#resting_pin {
+#pin_slot {
   z-index:-1;
 }
 #active_pin {

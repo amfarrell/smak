@@ -44,7 +44,7 @@ $(document).ready(function() {
       <div id="time_definite">
         From <input id="definite_start"></input> 
         To <input id="definite_end"></input>
-        <div id="add_event">  
+        <div id="definite_add_event">  
           <button type="button" id="add_schedule" onclick="addEvent('schedule');">Add to Schedule</button>
         </div>
       </div>
@@ -53,23 +53,25 @@ $(document).ready(function() {
         <input id="range_duration"></input>hours
         between <input id="range_start"></input>
         and <input id="range_end"></input>
-      <div id="add_todo">
+      <div id="range_add_event">
         <button type="button"  id="add_todo" onclick="addEvent('todo');">Add to Todo</button>
       </div>
       </div>
     </div>
+<!--
     <div id="time_display">
       <canvas> </canvas>
     </div>
     <div id="description">
     </div>
+    -->
   </div>
 
   <div id="activity_location">
     <div id="location_form">
       Where:<span id="pin_spot">
                 <img id="draggable" src='images/map_pin.png'/>
-                <img id="resting_pin" src="images/map_pin_empty.png"/>
+                <img id="pin_slot" src="images/map_pin_empty.png"/>
             </span>
       <input id="location_text"></input>
     </div>

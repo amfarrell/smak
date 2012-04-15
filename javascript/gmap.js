@@ -2,40 +2,89 @@ $(document).ready(function() {
   var startX;
   var startY;
   var offsetX = 62.593; //hardcoded values for now.
-  var offsetY = -29.26; //really, find the displacement from the 
+  var offsetY = -29.26; //TODO, calculate the displacement from the 
                         //upper-left corner of the map and the middle 
                         //of the bottom edge of the 11px wide pin image.
+  var restingInSlot = true;
+  var uiOffset;
+  var snapTolerance = 35;
+  var map = $("#map_canvas")
   $("#draggable").draggable({
-    helper: "original",
-    zIndex: 9999,
-    containment : "document",
-    //draggable adds a listener such that when the mouse moves, the map_pin
-    //follows it.
-    start: function(e,ui) {
+    'helper': "original",
+    'zIndex': 9999,
+    'snap': "#pin_slot",
+    'snapMode': "inner",
+    'snapTolerance' : snapTolerance,
+    'containment' : "document",
+    //draggable adds a listener such that when the mouse moves, 
+    //the map_pin follows it.
+    'start': function(e,ui) {
       startX = e.pageX;
       startY = e.pageY;
+      uiOffset = ui.helper.offset;
     },
-    cursorAt: {
+    'cursorAt': {
       bottom:0,
       left:11, //assuming image is 22px wide.
     },
-    stop: function(e,ui) {
+    'drag': function(e,ui) {
+      var slot = $("#pin_slot")
+      var XtoleranceFudge = $("#draggable").width();
+      var YtoleranceFudge = $("#draggable").height();
+      if (e.pageX > map.offset().left && 
+          e.pageX < map.offset().left + map.width() &&
+          e.pageY > map.offset().top && 
+          e.pageY < map.offset().top + map.height()) {
+        $(this).draggable({'revert':false,'snapTolerance':snapTolerance/4});
+      } else {
+        $(this).draggable({'snapTolerance':snapTolerance});
+        if (e.pageX > slot.offset().left - snapTolerance + XtoleranceFudge && 
+            e.pageX < slot.offset().left + slot.width() + snapTolerance - XtoleranceFudge  &&
+            e.pageY > slot.offset().top - snapTolerance + YtoleranceFudge && 
+            e.pageY < slot.offset().top + slot.height() + snapTolerance - YtoleranceFudge ) {
+          $(this).draggable({'revert':false});
+        } else {
+          $(this).draggable({'revert':true});
+        }
+      }
+      if (! O.currentActivity.user_createdP) {
+        $(this).draggable({'revert':true});
+        console.log("revert true")
+      }
+    },
+    'stop': function(e,ui) {
       //Record the x,y position of the map_pin and put it there absolutely.
       var point=new google.maps.Point(e.pageX - startX + offsetX, 
                                       e.pageY - startY + offsetY);
       var ll=overlay.getProjection().fromContainerPixelToLatLng(point);
       //placeMarker(ll); 
-      // This should only happen when the item gets added to the schedule.
-      if (O.currentActivity.user_createdP) {
+      //TODO: When we add an item to the schedule or todo, put it on the map.
+      //TODO: When we put it in the schedule, draw arrows indicating event order.
+      //TODO: enforce that there is enough travel time between events.
+      if (e.pageX > map.offset().left && 
+          e.pageX < map.offset().left + map.width() &&
+          e.pageY > map.offset().top && 
+          e.pageY < map.offset().top + map.height()) {
         O.currentActivity.location = [ll.Ya,ll.Za];
+        $("#location_text").val((""+ll.Ya).substr(0,8) + ", " + (""+ll.Za).substr(0,8));
+      } else if (O.currentActivity.user_createdP) {
+        O.currentActivity.location = undefined;
+        $("#location_text").val("");
       }
-      console.log(O.currentActivity);
-    //TODO: When the marker is dropped, data about location gets added to the
-    // event.
-    //TODO: When the marker is relocated, the event info changes. 
+      //TODO: when the event marker gets moved off the map it:
+      //returns to its original position if not put in the socket
+      //or the location info gets cleared if it is put in the socket.
       }
   });
+
+  $("#location_text").keyup(function (e){
+    O.currentActivity.location = e.srcElement.value.replace(" ","").split(",");
+    console.log(O.currentActivity)
+    //TODO: check if valid time. Highlight in red if not.
+    //TODO: visualize the time in some way.
+  });
 });
+
 
 var $map;
 var $latlng;
