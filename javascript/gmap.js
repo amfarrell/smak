@@ -1,25 +1,55 @@
-google.maps.event.addDomListener(window, 'load', function gmap_initialize() {
-  var myOptions = {
-    center: new google.maps.LatLng(43.778, 11.255),
-    zoom: 14,
-    mapTypeId: google.maps.MapTypeId.ROADMAP
-  };
-  var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+$(document).ready(function() {
+$("#draggable").draggable({helper: 'clone',
+stop: function(e) {
+    var point=new google.maps.Point(e.pageX,e.pageY);
+    var ll=overlay.getProjection().fromContainerPixelToLatLng(point);
+    placeMarker(ll);
+    console.log([ll.Ya,ll.Za]);
+    }
+});
+});
 
-  $("#map_pin").mousedown(function () {
-    //Record the x,y position of the map_pin and put it there absolutely.
-    
-    //Add a listener such that when the mouse moves, the map_pin follows it.
-    
-    //replace the image map_pin.png with map_pin_empty.png
-    console.log("image");
-    
-    //When the pin is dropped, it inserts a marker into the correct location on
-    //the map, data about location gets added to the event.
-    
-    //When the marker is relocated, the event info changes. 
+
+var $map;
+var $latlng;
+var overlay;
+
+google.maps.event.addDomListener(window, 'load', function gmap_initialize() {
+  var $latlng = new google.maps.LatLng(66.5, 25.733333);
+  var myOptions = {
+    zoom: 3,
+    center: $latlng,
+    mapTypeId: google.maps.MapTypeId.ROADMAP,
+    mapTypeControlOptions: {
+      style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
+      position: google.maps.ControlPosition.TOP_LEFT 
+    },
+    zoomControl: true,
+    zoomControlOptions: {
+        style: google.maps.ZoomControlStyle.LARGE,
+        position: google.maps.ControlPosition.LEFT_TOP
+    },
+    scaleControl: true,
+    scaleControlOptions: {
+        position: google.maps.ControlPosition.TOP_LEFT
+    },
+    streetViewControl: false,//???
+
+    panControl:false,
+
+    };
+  $map = new google.maps.Map(document.getElementById("map_canvas"),
+      myOptions);
+
+  overlay = new google.maps.OverlayView();
+  overlay.draw = function() {};
+  overlay.setMap($map);
+});
+function placeMarker(location) {
+  var marker = new google.maps.Marker({
+  position: location, 
+  map: $map,
+  icon:'images/map_pin.png'
   });
 
-  //When the event is added to the schedule or the todo list, the map_pin_empty.png
-  //becomes map_pin.png again.
-});
+}

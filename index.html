@@ -5,7 +5,7 @@
 
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-  
+
   <script src='./javascript/jquery-1.7.2.js'></script>
   <script src='./javascript/jquery.json-2.3.js'></script>
   <script src='./javascript/jquery-ui-1.8.18.js'></script>
@@ -21,6 +21,7 @@
 </head>
 
 <body>
+
 <script type="text/javascript">
 
 $(document).ready(function() {
@@ -41,7 +42,7 @@ $(document).ready(function() {
   
   initActivitiesList();
   console.log($.jStorage.index())
- });
+  });
  
 </script>
 <div id="activity">
@@ -75,13 +76,19 @@ $(document).ready(function() {
     <div id="description">
     </div>
   </div>
+
   <div id="activity_location">
     <div id="location_form">
-      Where:<img src="images/map_pin.png" id="map_pin"/><input id="location_text"></input>
+      Where:<span id="pin_spot">
+                <img id="draggable" src='images/map_pin.png'/>
+                <img src="images/map_pin_empty.png" id="resting_pin"/>
+            </span>
+      <input id="location_text"></input>
     </div>
+    <div id="map_canvas">    </div>
   </div>
-  <div id="map_canvas"></div>
 </div>
+
 <div id="schedule">
 <table class="layout" cellspacing='5'>
   <tr>
