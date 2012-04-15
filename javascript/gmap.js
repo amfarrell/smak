@@ -1,7 +1,21 @@
 $(document).ready(function() {
+  var startX;
+  var startY;
+  var offsetX = 62.593; //hardcoded values for now.
+  var offsetY = -29.26; //really, find the displacement from the 
+                        //upper-left corner of the map and the middle 
+                        //of the bottom edge of the 11px wide pin image.
 $("#draggable").draggable({helper: 'clone',
-stop: function(e) {
-    var point=new google.maps.Point(e.pageX,e.pageY);
+start: function(e) {
+  startX = e.pageX;
+  startY = e.pageY;
+  },
+  cursorAt: {bottom:0,
+             left:11, //assuming image is 22px wide.
+            },
+  stop: function(e) {
+    var point=new google.maps.Point(e.pageX - startX + offsetX, 
+                                    e.pageY - startY + offsetY);
     var ll=overlay.getProjection().fromContainerPixelToLatLng(point);
     placeMarker(ll);
     console.log([ll.Ya,ll.Za]);
@@ -15,10 +29,10 @@ var $latlng;
 var overlay;
 
 google.maps.event.addDomListener(window, 'load', function gmap_initialize() {
-  var $latlng = new google.maps.LatLng(66.5, 25.733333);
+  var latlng = new google.maps.LatLng(43.781, 11.260);
   var myOptions = {
-    zoom: 3,
-    center: $latlng,
+    zoom: 14,
+    center: latlng,
     mapTypeId: google.maps.MapTypeId.ROADMAP,
     mapTypeControlOptions: {
       style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
@@ -33,7 +47,6 @@ google.maps.event.addDomListener(window, 'load', function gmap_initialize() {
     scaleControlOptions: {
         position: google.maps.ControlPosition.TOP_LEFT
     },
-    streetViewControl: false,//???
 
     panControl:false,
 

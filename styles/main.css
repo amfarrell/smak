@@ -125,6 +125,7 @@ body {
 
 #map_canvas {
   height: 100%;
+  z-index:-9;
 }
 
 /* Schedule column */
