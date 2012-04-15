@@ -257,7 +257,7 @@ function cost_function(initial_state, configuration, excludes) {
 	var old_model = model_from_string(initial_state)
 	var new_model = model_from_string(configuration)
 
-	console.log(DISPLACEMENT_COST)
+	var eliminations = new Array()
 
 	// calculate displacement and movement costs
 	var displacement_cost = 0
@@ -284,29 +284,34 @@ function cost_function(initial_state, configuration, excludes) {
 	var initial_state_set = array_unique_elements(initial_state)
 	for (var i = 0; i < initial_state_set.length; i++) {
 		if (configuration.indexOf(initial_state_set[i]) == -1 && initial_state_set[i] != " ") {
+			eliminations.push([initial_state_set[i], count_array_occurances(initial_state, initial_state_set[i])])
 			elimination_cost += ELIMINATION_COST
 		}
 	}
 	
 	var total_cost = displacement_cost + movement_cost + elimination_cost
 	if (DEBUG_COST_FUNC) console.log("Cost: from [" + initial_state + "] -> [" + configuration + "] = " + total_cost + "\t(" + displacement_cost + ", " + movement_cost + ", " + elimination_cost + ")")
-	return total_cost
+	return [total_cost, eliminations]
 }
 
 function pick_configuration(initial_state, configurations, excludes) {
 	var min_cost = Number.MAX_VALUE
 	var min_configuration = null
+	var min_eliminations = null
 	for (var i = 0; i < configurations.length; i++) {
 		if (DEBUG) console.log("Testing config: [" + configurations[i] + "]")
-		var cost = cost_function(initial_state, configurations[i], excludes)
+		var cost_bundle = cost_function(initial_state, configurations[i], excludes)
+		var cost = cost_bundle[0]
+		var eliminations = cost_bundle[1]
 		if (cost < min_cost) {
 			if (DEBUG) console.log("Keeping configuration!")
 			min_cost = cost
+			min_eliminations = eliminations
 			min_configuration = configurations[i]
 		}
 	}
 	assert(min_configuration != null, "main: no final config?")
-	return min_configuration
+	return [min_configuration, min_eliminations]
 }
 
 // -----------------------------------------------------------------------------
@@ -332,7 +337,15 @@ function edit_distance(string, id, pos_final, len) {
 	configurations = get_configurations(displaced, [state.slice()], pos_final)
 
 	// pick the best configuration
-	state = pick_configuration(initial_state, configurations, [id])
+	var state_bundle = pick_configuration(initial_state, configurations, [id])
+	var state = state_bundle[0]
+	var eliminations = state_bundle[1]
+
+	for (var i = 0; i < eliminations.length; i++) {
+		var e_id = eliminations[i][0]
+		var e_len = eliminations[i][1]
+		setupActivity(e_id, e_len, ".activitiesList", 0)
+	}
 
 	var ret = state.join("").replace(/,/g, "")
 	console.log("edit_distance() returning: \"" + ret + "\"")
@@ -384,7 +397,7 @@ function partially_schedule(string, los) {
 		configurations = get_configurations([los[j]], [state.slice()], -1)
 
 		// pick the best configuration
-		state = pick_configuration(state_this_iteration, configurations, [])
+		state = pick_configuration(state_this_iteration, configurations, [])[0]
 	}
 
 	var ret = state.join("").replace(/,/g, "")
