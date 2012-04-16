@@ -28,7 +28,11 @@ $(document).ready(function() {
   initMap();
   initModel();
   console.log(O.activities);
-  initSchedule ()
+  
+  initHeights();
+  drawScheduleGrid();
+  drawSchedule(schedule);
+  initActivitiesList();
   initInputs();
 });
  

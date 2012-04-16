@@ -1,4 +1,3 @@
-window.initSchedule = function initSchedule () {
   var blockHeight = 15;   // vertical pixels per 15 minute chunk
   var startTime = 9;      //hour of the day (in military time)
   var schedule = "                                            ";      // currently displayed schedule
@@ -235,8 +234,3 @@ window.initSchedule = function initSchedule () {
   }
 
 
-  initHeights();
-  drawScheduleGrid();
-  drawSchedule(schedule);
-  initActivitiesList();
-}
