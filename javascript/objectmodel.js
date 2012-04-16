@@ -36,6 +36,9 @@ window.initModel = function initModel () {
       },
       'select':function select(i){
         console.log("selected: "+i);
+        for (var j in window.O.activities.all()){
+          window.O.activities.deselect(j);
+        }
         var activity = $.jStorage.get(i);
         O.activities.get(i).marker.setAnimation(google.maps.Animation.BOUNCE)
       },

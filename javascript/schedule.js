@@ -6,7 +6,7 @@ window.initSchedule = function initSchedule () {
   var scheduleItemWidth = 260;  //pixels width of schdeduleItem
   var borderWidth = 1;  //pixels width of border of schdeduleItem
 
-  function initHeights(){
+  function initHeights() {
     $('.schedule').height(blockHeight*schedule.length);    
     $('.scheduleGrid').height(blockHeight*schedule.length);  
     $('.activitiesContainer').height(blockHeight*schedule.length);
@@ -14,24 +14,24 @@ window.initSchedule = function initSchedule () {
     $('.activitiesList').height(blockHeight*schedule.length);
   }
 
-  function initActivitiesList(){
-    for (var i in O.activities.all()){
-      if(!O.activities.get(i).scheduledP){
+  function initActivitiesList() {
+    for (var i in O.activities.all()) {
+      if (!O.activities.get(i).scheduledP) {
         addActivity(i, O.activities.get(i).duration/15)
+        O.activities.add(i);
       }
     }
   }
 
-  function addActivity(id, duration){ //duration in 15 min blocks
+  function addActivity(id, duration) { //duration in 15 min blocks
     setupActivity(id, duration, ".activitiesList", activitiesListPos);
-    O.activities.add(id);
     activitiesListPos += duration
   }
 
-  function drawScheduleGrid(){
+  function drawScheduleGrid() {
     $('.scheduleGrid').append("<table cellspacing='0'></table");
-    for(var i=0; i<schedule.length; i++){
-      if (i%4==0){
+    for (var i=0; i<schedule.length; i++) {
+      if (i%4==0) {
         var time = (startTime + i/4)%12;
         if (time==0) time = 12;
         $('.scheduleGrid table').append("<tr><td style='width:18px'>"+time+"</td><td style='width:278px'></td></tr>");
@@ -41,20 +41,20 @@ window.initSchedule = function initSchedule () {
     //TODO: modify length of the map so that they line up roughly.
   }
 
-  function drawSchedule(newSchedule){
+  function drawSchedule(newSchedule) {
     schedule = newSchedule;
     var prevItem="";
       
     $('.schedule').html("");    //clear schedule  
     
-    for( var i=0; i<schedule.length; i++){
+    for (var i=0; i<schedule.length; i++) {
       var item = schedule[i];
       
-      if(item != prevItem && item != " "){
+      if (item != prevItem && item != " ") {
         setupActivity(item, 1, ".schedule", i);
               
         prevItem=item;
-      }else if (item != " "){
+      } else if (item != " ") {
         var height = $(".schedule div.item:last").height();
         $(".schedule div.item:last").height(height+blockHeight);
       }
@@ -63,7 +63,7 @@ window.initSchedule = function initSchedule () {
 
   function autoSchedule(){
     var unscheduledActivities = new Array();
-    $(".activitiesList .item").each(function(){
+    $(".activitiesList .item").each(function() {
       var height = Math.round(($(this).height() + borderWidth*2) / blockHeight);
       unscheduledActivities.push(new Array(height + 1).join(($(this).attr("id"))));
     });
@@ -77,10 +77,10 @@ window.initSchedule = function initSchedule () {
     var height = Math.round(($("#"+id).height() + borderWidth*2) / blockHeight);
     var positionY = Math.round(($("#"+id).position().top)/blockHeight);
     O.activities.get(id).duration = height*15;
-    if ($("#"+id).parents(".schedule").length>0){
+    if ($("#"+id).parents(".schedule").length>0) {
       O.activities.get(id).start = positionY
       O.activities.get(id).scheduledP = true;
-    }else{
+    } else {
       O.activities.get(id).scheduledP = false;
     }
     console.log(O.activities.get(id));
@@ -96,13 +96,13 @@ window.initSchedule = function initSchedule () {
       cursor: "move",
       stack: "div.item", 
       opacity: 0.75, 
-      start:function(event,ui){
+      start:function(event,ui) {
         $(this).each(selectItem);
       },
       drag:function(){
-        if($(this).overlaps($("#doBetween" +  $(this).attr("id")+" .doBetween"))){
+        if ($(this).overlaps($("#doBetween" +  $(this).attr("id")+" .doBetween"))) {
           $("#doBetween" +  $(this).attr("id")+" .doBetween").addClass("hover");
-        }else{
+        } else {
           $("#doBetween" +  $(this).attr("id")+" .doBetween").removeClass("hover");
         }
       },
@@ -114,15 +114,15 @@ window.initSchedule = function initSchedule () {
           var positionY = Math.round(($(this).position().top)/blockHeight);
           console.log(schedule + ", "+ id + ", "+ positionY +  ", "+ $(this).position().top+", "+ height);        
           drawSchedule(edit_distance(schedule,id, positionY,height));
-          if(list == ".activitiesList"){  // move from Activities to Schedule
+          if (list == ".activitiesList") {  // move from Activities to Schedule
             $(this).remove();
           }
-        }else if(list == ".schedule") {   // move from Schedule to Activities
+        } else if (list == ".schedule") {   // move from Schedule to Activities
           console.log("remove");
           addActivity($(this).attr("id"), height);
           $(this).remove();
           schedule = schedule.replace(new RegExp($(this).attr("id"), 'g'), " "); // remove item from schedule
-        }else{  // move within Schedule
+        } else {  // move within Schedule
           $(this).css({"left":0, "top":0}); //return to original position
         }
         updateModel(id);
@@ -143,12 +143,12 @@ window.initSchedule = function initSchedule () {
       },
       stop: function(event, ui) {
         var id = $(this).attr("id");
-        if (list == ".schedule" ){
+        if (list == ".schedule" ) {
           var positionY = Math.round(($(this).position().top)/blockHeight);
           var height = Math.round(($(this).height() + borderWidth*2) / blockHeight);
           console.log(schedule + ", "+ id + ", "+ positionY +  ", "+ height);        
           drawSchedule(edit_distance(schedule,id, positionY,height));
-        }else{
+        } else {
           $(".activitiesList div.scheduleItem").css({
             "position": "relative",
             "left":0,
@@ -217,8 +217,6 @@ window.initSchedule = function initSchedule () {
 
   //No
   function selectItem(){
-    //TODO: change color of pin on map.
-    //maybe make it bounce
     $(".selected:not(#"+$(this).attr("id")+")").removeClass('selected');
     $(this).addClass('selected');
     //updateDoBetweenBox();

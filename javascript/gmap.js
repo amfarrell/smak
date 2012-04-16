@@ -27,9 +27,13 @@ window.initMap = function initMap () {
   '_map': _map,
   'placeMarker':function placeMarker(coords,title) {
      var marker = new google.maps.Marker({
-       position: new google.maps.LatLng(coords[0],coords[1]), 
-       map: _map,
-       icon:'images/map_pin_blue.png'
+       'animation':google.maps.Animation.DROP,
+       'position': new google.maps.LatLng(coords[0],coords[1]), 
+       'map': _map,
+       'icon':'images/map_pin_blue.png',
+       'title': title,
+       'draggable':true,
+       'clickable':true,
      });
      if (name)
      marker.title = name;
