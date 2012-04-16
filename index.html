@@ -5,7 +5,7 @@
 
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-  
+
   <script src='./javascript/jquery-1.7.2.js'></script>
   <script src='./javascript/jquery.json-2.3.js'></script>
   <script src='./javascript/jquery-ui-1.8.18.js'></script>
@@ -14,70 +14,95 @@
   <script src='./javascript/objectmodel.js'></script>
   <script type="text/javascript" src="./javascript/schedule.js"></script>  
   <script type="text/javascript" src="./javascript/edit_distance.js"></script>  
-  
-  <script>
-      $("#create_activity").click(function () {
-         alert($("#activity_form").serializeArray()); 
-      });
-  </script>
+  <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"> </script>
+  <script type="text/javascript" src="./javascript/gmap.js"></script>  
   <link rel="stylesheet" type="text/css" href="styles/main.css" />
   <link rel="stylesheet" href="development-bundle/themes/base/jquery.ui.all.css">
 </head>
 
 <body>
+
 <script type="text/javascript">
 
 $(document).ready(function() {
   initHeights();
   drawScheduleGrid();
   drawSchedule(schedule);
-
-  $("#create_activity").click(function() {
-    O.Activity(
-      $("#activity_name").val(),
-      $("#activity_location").val(),
-      $("#activity_start").val(),
-      $("#activity_end").val(),
-      $("#activity_duration").val(),
-      $("#activity_range").val());
-    console.log($.jStorage.index());
-    });
-  
   initActivitiesList();
- });
+  console.log($.jStorage.index())
+});
  
 </script>
-<center>
-<h1>SMak</h1>
-<table class="layout" cellspacing='5'>
-
-<tr>
-  <td><h2>Activities
-      <div class="autoSchedule"><button type="button" onclick="autoSchedule();">Auto Schedule</button></div></h2></td>
-  <td><h2>Schedule</h2></td>
-</tr>
-
-<tr>
-
-
-<td valign="top">
-  
-  <div class="activitiesResizeContainer"></div>
-  <div class="activitiesContainer"></div>
-
-  <div class="activitiesList"></div>
-
-</td><td>
-  <div class="scheduleGrid"> 
-    <div class="schedule">  </div>
+<div id="activity">
+  <h2>New Activity</h2>
+  <input id="activity_name" type="text" name="activityName"></input>
+  <div id="activity_suggest">
+    <!-- Dynamically load this with activities. -->
   </div>
-  
-</td>
+  <div id="activity_time">
+    <div id="time_form">
+      <div id="time_definite">
+        From <input id="definite_start"></input> 
+        To <input id="definite_end"></input>
+        <div id="add_event">  
+          <button type="button" id="add_schedule" onclick="addEvent('schedule');">Add to Schedule</button>
+        </div>
+      </div>
+      <div id="or">or</div>
+      <div id="time_range">
+        <input id="range_duration"></input>hours
+        between <input id="range_start"></input>
+        and <input id="range_end"></input>
+      <div id="add_todo">
+        <button type="button"  id="add_todo" onclick="addEvent('todo');">Add to Todo</button>
+      </div>
+      </div>
+    </div>
+    <div id="time_display">
+      <canvas> </canvas>
+    </div>
+    <div id="description">
+    </div>
+  </div>
 
-</tr></table>
-</center>
+  <div id="activity_location">
+    <div id="location_form">
+      Where:<span id="pin_spot">
+                <img id="draggable" src='images/map_pin.png'/>
+                <img id="resting_pin" src="images/map_pin_empty.png"/>
+            </span>
+      <input id="location_text"></input>
+    </div>
+    <div id="map_canvas">    </div>
+  </div>
+</div>
 
-<br /><br />
-
+<div id="schedule">
+<table class="layout" cellspacing='5'>
+  <tr>
+    <td><h2>Activities</h2>
+    </td>
+    <td><h2>Schedule</h2></td>
+  </tr>
+    <td><div class="autoSchedule">
+        <button type="button" onclick="autoSchedule();">Auto Schedule</button>
+      </div></td>
+    <td>
+    </td>
+  <tr>
+    <td valign="top">
+      <div class="activitiesResizeContainer"></div>
+      <div class="activitiesContainer"></div>
+      <div class="activitiesList"></div>
+    </td><td>
+      <div class="scheduleGrid"> 
+        <div class="schedule">  </div>
+      </div>
+    </td><td>
+      <div class="map"></div>
+    </td>
+  </tr>
+</table>
+</div>
 </body>
 </html>

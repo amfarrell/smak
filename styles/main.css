@@ -1,32 +1,137 @@
-/* Form */
-
-.normalbutton {
-    color: white;
-    background-color:#44ee44;
-    border: 2px solid#226622; 
+/* Overall Structure */
+html {
+  width: 100%;
+  height: 100%;
 }
-.hoverbutton {
-    color: white;
-    background-color:#229922;
-    border: 2px solid#226622; 
-}
-.clickbutton {
-    color: white;
-    background-color:#44ee44;
-    border: 2px solid#226622; 
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0; padding: 0;
 }
 
+#activity {
+  float:left;
+  width:40%;
+  height:100%;
+  position:relative;
+  /*border-right:5px ridge #12576E;*/
+}
+/*
+#schedule {
+  float:right;
+  width:66%;
+  position:relative;
+}
+*/
+#schedule {
+  /*margin-left: auto;
+  margin-right: auto;*/
+  position:relative;
+  float:left;
+}
 
-/* Activities column */
-.autoSchedule{
+/* New Activity Form */
+
+#activity_name { 
+  width:95%;
+  position:relative;
+}
+#activity_suggest { 
+  width:100%;
+  position:relative;
+}
+#activity_time { }
+#time_form { 
+  text-align:center;
+  width:100%;
+  position:relative;
+  float:left;
+}
+#time_definite { }
+#or {
   text-align:center;
 }
-.activitiesList{
+#definite_start { 
+  width:3em;
+}
+#definite_end {
+  width:3em;
+}
+#add_event {
+  width:30%;
+  text-align:center;
+  float:right;
+}
+#range_duration { 
+  width:3em;
+}
+#range_start {
+  width:3em;
+}
+#range_end { 
+  width:3em;
+}
+#add_todo {
+  width:30%;
+  text-align:center;
+  float:right;
+}
+#time_display { }
+
+#location_text {
+  float-left;
+  width:75%;
+}
+
+#activity_location { 
+  position:relative;
+  width:100%;
+  height:95%
+}
+#map_canvas {
+ width:100%; 
+ height:95%
+
+/* New Activity Form */
+
+}
+#range_duration { 
+  width:3em;
+}
+#range_start {
+  width:3em;
+}
+#range_end { 
+  width:3em;
+}
+#add_todo {
+  width:30%;
+  text-align:center;
+  float:right;
+}
+#time_display { }
+
+#shelf{position:fixed; top:10px; left:500px;
+    height:100px; width:200px;
+    background:white; opacity:0.7;
+} 
+#draggable {
+  position:absolute;top:10px, 
+  left:10px; /*width: 30px; height: 30px;*/
+  z-index:1000000000;
+}
+
+/* Activities column */
+.autoSchedule {
+  text-align:center;
+}
+.activitiesList {
   width: 260px;
   position: relative;
 }
 .activitiesResizeContainer{
   position:absolute;
+  z-index:-1;
   left:0;
   width:  565px;
 }
@@ -34,32 +139,43 @@
   position:absolute;
   width:  565px;
 }
-.wrapper{
+.wrapper {
   position: relative;
   left:0;
   top:0;
 }
 
+#resting_pin {
+  z-index:-1;
+}
+#active_pin {
+  position: absolute;
+  user-select: none;
+  z-index:9;
+}
+
+#map_canvas {
+  height: 100%;
+  z-index:-9;
+}
+
 /* Schedule column */
-.schedule{
+.schedule {
   width: 260px;
   position: absolute;
   left:30px;
 }
-.scheduleGrid{
+.scheduleGrid {
   position:relative;
   background: #B3E2F2;
   width:300px;
 }
-.scheduleGrid td{
+.scheduleGrid td {
   display: inline-block;
-
   border:1px solid;
   text-align:center;
-  
-
 }
-.scheduleItem{
+.scheduleItem {
   border:1px solid #92ADB5;
   text-align:center;
   width: 258px;
@@ -69,21 +185,21 @@
   margin-right:auto;
   z-index:10;
 }
-.scheduleItem:hover{
+.scheduleItem:hover {
   background:#A7B6BB;
 }
-.selected{
+.selected {
   background:#FFDFD9;
 }
-.scheduleItem.selected:hover{
+.scheduleItem.selected:hover {
   background:#BFADAA;
 }
-.doBetweenContainer{
+.doBetweenContainer {
   width:565px;
   position: absolute;
   z-index:0;
 }
-.doBetween{
+.doBetween {
   background:#3A859D;
   position: absolute;
   /*border: groove #12576E;
@@ -93,19 +209,15 @@
   right:0px;
   height:100%;
 }
-.doBetween.hover{
+.doBetween.hover {
   /*background:#D5F0F9;*/
 }
 
-.ui-draggable  { 
+.ui-draggable { 
   cursor: move; 
 }
 
 /* Map column */
-.map{
-  width: 300px;
-}
-
 
 h2{
   text-align:center;
