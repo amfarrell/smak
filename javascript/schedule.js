@@ -42,8 +42,10 @@ window.initSchedule = function initSchedule () {
   }
 
   function drawSchedule(newSchedule) {
+  //XXX This also returns the list of Activity IDs.
     schedule = newSchedule;
     var prevItem="";
+    var idList = [];
       
     $('.schedule').html("");    //clear schedule  
     
@@ -52,6 +54,7 @@ window.initSchedule = function initSchedule () {
       
       if (item != prevItem && item != " ") {
         setupActivity(item, 1, ".schedule", i);
+        idList.push(item)
               
         prevItem=item;
       } else if (item != " ") {
@@ -59,9 +62,10 @@ window.initSchedule = function initSchedule () {
         $(".schedule div.item:last").height(height+blockHeight);
       }
     }
+    return idList;
   }
 
-  function autoSchedule(){
+window.autoSchedule = function autoSchedule(){
     var unscheduledActivities = new Array();
     $(".activitiesList .item").each(function() {
       var height = Math.round(($(this).height() + borderWidth*2) / blockHeight);
@@ -69,8 +73,9 @@ window.initSchedule = function initSchedule () {
     });
     console.log("partially_schedule " + schedule + ", " + unscheduledActivities);
     $(".activitiesList").html('');
-    drawSchedule(partially_schedule(schedule, unscheduledActivities));
-
+    //debugger;
+    var list = drawSchedule(partially_schedule(schedule, unscheduledActivities));
+    Map.renderPath(list);
   }
 
   function updateModel(id, list){
@@ -201,9 +206,10 @@ window.initSchedule = function initSchedule () {
     }
   }
 
+  /*
+   * XXX these should take either an event or an id of the activity represented.
+   */
   function toggleItem(){
-    //TODO: change color of pin on map.
-    //maybe make it bounce
     if(!$(this).hasClass('selected')){
       $(".selected").removeClass('selected');
       $(this).addClass('selected');
@@ -214,8 +220,11 @@ window.initSchedule = function initSchedule () {
     }
     //updateDoBetweenBox();
   }
+  function deselectItem(){
+      $(".selected").removeClass('selected');
+      O.activities.deselect(this.id);
+  }
 
-  //No
   function selectItem(){
     $(".selected:not(#"+$(this).attr("id")+")").removeClass('selected');
     $(this).addClass('selected');
@@ -223,7 +232,6 @@ window.initSchedule = function initSchedule () {
     O.activities.select(this.id);
   }
 
-  //No
   function updateDoBetweenBox(){
     if($(".selected").length){
       $(".doBetweenContainer:not(#doBetween"+$(".selected").attr("id")+")").css("z-index",-2).fadeTo(1,0);

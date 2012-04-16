@@ -65,7 +65,7 @@ window.initModel = function initModel () {
     'Activity': Activity,
   };
 
-  var prebuilt = [
+  prebuilt = [
   new Activity("Breakfast", [43.784, 11.253], "13:00", "14:00", 60, ["12:00","14:30"], true, false), 
   new Activity("Dome", [43.785, 11.251], "14:15", "15:30", 180, ["13:00","17:30"], true, false), 
   new Activity("Uffizi Gallery", [43.772, 11.257], "15:45", "16:30",120, ["13:00","22:30"], true, false), 
@@ -74,11 +74,13 @@ window.initModel = function initModel () {
   new Activity("Giotto's Tower", [43.780, 11.267], "09:45", "11:00", 60, ["08:00","15:30"], true, false),
   new Activity("Dinner", [43.782, 11.257], "09:45", "11:00", 60, ["08:00","15:30"], true, false)];
 
+
   var a;
   for (a in prebuilt){
     O.activities.set(a,prebuilt[a]); 
   }
 }
+
 
 window.initInputs = function initInputs () {
   O.currentActivity = new O.Activity(undefined, undefined, undefined, undefined, undefined, [undefined,undefined], "", true, false)
@@ -235,9 +237,6 @@ window.initInputs = function initInputs () {
     //TODO: check if valid time. Highlight in red if not.
     //TODO: visualize the time in some way.
   });
-  
-  console.log(O.currentActivity);
-  console.log("object model loaded.");
 }
 /*
  * TODO: make it obvious that a user can enter either definite time for a concert
