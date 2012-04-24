@@ -619,7 +619,6 @@ $.widget("ui.mouse", {
 
 		this.element
 			.bind('mousedown.'+this.widgetName, function(event) {
-                console.log(event);
 				return self._mouseDown(event);
 			})
 			.bind('click.'+this.widgetName, function(event) {
@@ -628,12 +627,7 @@ $.widget("ui.mouse", {
 					event.stopImmediatePropagation();
 					return false;
 				}
-			})
-            .bind('touchstart.'+this.widgetName, function(event) {
-                alert(event);
-				return self._mouseDown(event);
 			});
-            
 
 		this.started = false;
 	},

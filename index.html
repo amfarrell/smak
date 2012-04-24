@@ -6,17 +6,18 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
 
-  <script src='./javascript/jquery-1.7.2.js'></script>
-  <script src='./javascript/jquery.json-2.3.js'></script>
-  <script src='./javascript/jquery-ui-1.8.18.js'></script>
-  <script src="./javascript/jquery.ui.touch-punch.js"></script>
-  <script src='./javascript/jquery.overlaps.js'></script>
-  <script src='./javascript/jstorage.js'></script>
-  <script src='./javascript/objectmodel.js'></script>
-  <script type="text/javascript" src="./javascript/schedule.js"></script>  
-  <script type="text/javascript" src="./javascript/edit_distance.js"></script>  
   <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"> </script>
   <script type="text/javascript" src="./javascript/gmap.js"></script>  
+  <script type="text/javascript" src='./javascript/jquery-1.7.2.js'></script>
+  <script type="text/javascript" src='./javascript/jquery.json-2.3.js'></script>
+  <script type="text/javascript" src='./javascript/jquery-ui-1.8.18.js'></script>
+  <script type="text/javascript" src="./javascript/jquery.ui.touch-punch.js"></script>
+  <script type="text/javascript" src='./javascript/jquery.overlaps.js'></script>
+  <script type="text/javascript" src='./javascript/jstorage.js'></script>
+  <script type="text/javascript" src='./javascript/objectmodel.js'></script>
+  <script type="text/javascript" src="./javascript/schedule.js"></script>  
+  <script type="text/javascript" src="./javascript/edit_distance.js"></script>  
+  
   <link rel="stylesheet" type="text/css" href="styles/main.css" />
   <link rel="stylesheet" href="development-bundle/themes/base/jquery.ui.all.css">
 </head>
@@ -26,26 +27,29 @@
 <script type="text/javascript">
 
 $(document).ready(function() {
+  initMap();
+  initModel();
+  
   initHeights();
   drawScheduleGrid();
   drawSchedule(schedule);
   initActivitiesList();
-  console.log($.jStorage.index())
+  initInputs();
 });
  
 </script>
-<!--<div id="activity">
+<div id="activity">
   <h2>New Activity</h2>
   <input id="activity_name" type="text" name="activityName"></input>
   <div id="activity_suggest">
-    <!-- Dynamically load this with activities. ->
+    <!-- Dynamically load this with activities. -->
   </div>
   <div id="activity_time">
     <div id="time_form">
       <div id="time_definite">
         From <input id="definite_start"></input> 
         To <input id="definite_end"></input>
-        <div id="add_event">  
+        <div id="definite_add_event">  
           <button type="button" id="add_schedule" onclick="addEvent('schedule');">Add to Schedule</button>
         </div>
       </div>
@@ -54,30 +58,32 @@ $(document).ready(function() {
         <input id="range_duration"></input>hours
         between <input id="range_start"></input>
         and <input id="range_end"></input>
-      <div id="add_todo">
+      <div id="range_add_event">
         <button type="button"  id="add_todo" onclick="addEvent('todo');">Add to Todo</button>
       </div>
       </div>
     </div>
+<!--
     <div id="time_display">
       <canvas> </canvas>
     </div>
     <div id="description">
     </div>
+    -->
   </div>
 
   <div id="activity_location">
     <div id="location_form">
       Where:<span id="pin_spot">
-                <img id="draggable" src='images/map_pin.png'/>
-                <img id="resting_pin" src="images/map_pin_empty.png"/>
+                <img id="draggable" src='images/map_pin_blue.png'/>
+                <img id="pin_slot" src="images/map_pin_empty.png"/>
             </span>
       <input id="location_text"></input>
     </div>
     <div id="map_canvas">    </div>
   </div>
 </div>
--->
+
 <div id="schedule">
 <table class="layout" cellspacing='5'>
   <tr>

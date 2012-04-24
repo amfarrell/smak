@@ -1,47 +1,5 @@
-$(document).ready(function() {
-  var startX;
-  var startY;
-  var offsetX = 62.593; //hardcoded values for now.
-  var offsetY = -29.26; //really, find the displacement from the 
-                        //upper-left corner of the map and the middle 
-                        //of the bottom edge of the 11px wide pin image.
-  $("#draggable").draggable({
-    helper: "original",
-    zIndex: 9999,
-    containment : "document",
-    //draggable adds a listener such that when the mouse moves, the map_pin
-    //follows it.
-    start: function(e,ui) {
-      startX = e.pageX;
-      startY = e.pageY;
-    },
-    cursorAt: {
-      bottom:0,
-      left:11, //assuming image is 22px wide.
-    },
-    stop: function(e,ui) {
-      //Record the x,y position of the map_pin and put it there absolutely.
-      var point=new google.maps.Point(e.pageX - startX + offsetX, 
-                                      e.pageY - startY + offsetY);
-      var ll=overlay.getProjection().fromContainerPixelToLatLng(point);
-      //placeMarker(ll); 
-      // This should only happen when the item gets added to the schedule.
-      if (O.currentActivity.user_createdP) {
-        O.currentActivity.location = [ll.Ya,ll.Za];
-      }
-      console.log(O.currentActivity);
-    //TODO: When the marker is dropped, data about location gets added to the
-    // event.
-    //TODO: When the marker is relocated, the event info changes. 
-      }
-  });
-});
+window.initMap = function initMap () {
 
-var $map;
-var $latlng;
-var overlay;
-
-google.maps.event.addDomListener(window, 'load', function gmap_initialize() {
   var latlng = new google.maps.LatLng(43.781, 11.260);
   var myOptions = {
     zoom: 14,
@@ -64,18 +22,75 @@ google.maps.event.addDomListener(window, 'load', function gmap_initialize() {
     panControl:false,
 
     };
-  $map = new google.maps.Map(document.getElementById("map_canvas"),
-      myOptions);
-
-  overlay = new google.maps.OverlayView();
-  overlay.draw = function() {};
-  overlay.setMap($map);
-});
-function placeMarker(location) {
-  var marker = new google.maps.Marker({
-  position: location, 
-  map: $map,
-  icon:'images/map_pin.png'
-  });
-
+  var _directions = new google.maps.DirectionsService();
+  var _display = new google.maps.DirectionsRenderer();
+  var _map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+  _display.setMap(_map);
+  _display.polylineOptions = {
+    'strokeColor':"#00aa11",
+    'strokeOpacity':0.5,
+    'clickable':true
+  }
+  window.Map = {
+    
+    '_map': _map,
+    'placeMarker':function placeMarker(coords,title) {
+      var marker = new google.maps.Marker({
+        'animation':google.maps.Animation.DROP,
+        'position': new google.maps.LatLng(coords[0],coords[1]), 
+        'map': _map,
+        'icon':'images/map_pin_blue.png',
+        'title': title,
+      //  'draggable':true,
+      //  'clickable':true,
+      });
+      marker.setMap(window.Map._map);
+      return marker;
+    },
+    'overlay':new google.maps.OverlayView(),
+    'directions':function directions(list) {
+      var coords = [];
+      while (list.length > 0){
+        O.activities.get(list[0]).marker.setVisible(false);
+        //Really what I want to do is suppress the markers and
+        //display my own markers.
+        coords.push({'stopover':true,'location':O.activities.get(list.shift()).coords.join(",")})
+      }
+      console.log(coords);
+      var request = {
+        'origin': coords.shift().location,
+        'destination': coords.pop().location,
+        'waypoints': coords,
+        'travelMode': google.maps.TravelMode.WALKING
+          //TODO: Modify this based on the scale at which
+          //we are operating.
+      };
+      var disp;
+      console.log(coords);
+      _directions.route(request, function render(response,status) {
+        if (status == google.maps.DirectionsStatus.OK){
+          disp = _display.setDirections(response);
+          console.log([response,status]);
+        } else {
+          console.log([response,status]);
+        }
+      });
+    },
+    'renderPath':function renderPath(list){
+      return Map.directions(list);
+      var newlist = [];
+      var origin;
+      var destination;
+      while (list.length > 1){
+        newlist.push(list.shift());
+        origin = O.activities.get(newlist[newlist.length-1]).coords.join(',');
+        destination = O.activities.get(list[list.length-1]).coords.join(',');
+        Map.directions(origin,destination);
+      }
+      newlist.push(list.shift())
+      return newlist;
+    }
+  };
+  window.Map.overlay.draw = function() {};
+  window.Map.overlay.setMap(window.Map._map);
 }
