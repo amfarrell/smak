@@ -3,7 +3,7 @@
   var schedule = "                                            ";      // currently displayed schedule
   var activitiesListPos = 0; // position of the end of the activities list. (counted in 15 min blocks)
   var scheduleItemWidth = 260;  //pixels width of schdeduleItem
-  var borderWidth = 1;  //pixels width of border of schdeduleItem
+  var borderMarginHeight = 5;  //pixels width of border and margin of schdeduleItem
 
   function initHeights() {
     $('.schedule').height(blockHeight*schedule.length);    
@@ -59,6 +59,7 @@
       } else if (item != " ") {
         var height = $(".schedule div.item:last").height();
         $(".schedule div.item:last").height(height+blockHeight);
+        updateDuration(item);
       }
     }
     return idList;
@@ -67,7 +68,7 @@
 window.autoSchedule = function autoSchedule(){
     var unscheduledActivities = new Array();
     $(".activitiesList .item").each(function() {
-      var height = Math.round(($(this).height() + borderWidth*2) / blockHeight);
+      var height = Math.round(($(this).height() + borderMarginHeight) / blockHeight);
       unscheduledActivities.push(new Array(height + 1).join(($(this).attr("id"))));
     });
     console.log("partially_schedule " + schedule + ", " + unscheduledActivities);
@@ -78,7 +79,7 @@ window.autoSchedule = function autoSchedule(){
   }
 
   function updateModel(id, list){
-    var height = Math.round(($("#"+id).height() + borderWidth*2) / blockHeight);
+    var height = Math.round(($("#"+id).height() + borderMarginHeight) / blockHeight);
     var positionY = Math.round(($("#"+id).position().top)/blockHeight);
     O.activities.get(id).duration = height*15;
     if ($("#"+id).parents(".schedule").length>0) {
@@ -89,10 +90,19 @@ window.autoSchedule = function autoSchedule(){
     }
     console.log(O.activities.get(id));
   }
-
+  
+  function updateDuration(id){
+    duration = ($("#"+id).height()+borderMarginHeight) / blockHeight
+    if (duration > 4)
+      plural = "s";
+    else
+      plural = "";
+    $("#"+id+" .duration").text((duration/4)+' Hour'+plural);
+  }
+  
   function setupActivity(id, duration, list, verticalPos){  //list = ".schedule" or ".activitiesList"
-    $(list).append('<div class="scheduleItem item" id='+id+'>'+O.activities.get(id).name+'</div>');
-      
+    $(list).append('<div class="scheduleItem item" id='+id+'>'+O.activities.get(id).name+'<br /><div class="duration"></div></div>');
+        
     // Make item draggable
     $(list + " div.item:last").draggable({
       snap: '.schedule, .activitiesList',
@@ -111,16 +121,17 @@ window.autoSchedule = function autoSchedule(){
         }
       },
       stop: function(event, ui) { 
-        var height = Math.round(($(this).height() + borderWidth*2) / blockHeight);
+        var height = Math.round(($(this).height() + borderMarginHeight) / blockHeight);
         var id = $(this).attr("id");
         if ((list == ".schedule" && ($(this).position().left>-160)) ||  // move in schedule
             (list == ".activitiesList" && ($(this).position().left>scheduleItemWidth/2)) ){  // move from Activities to Schedule
+          
           var positionY = Math.round(($(this).position().top)/blockHeight);
-          console.log(schedule + ", "+ id + ", "+ positionY +  ", "+ $(this).position().top+", "+ height);        
-          drawSchedule(edit_distance(schedule,id, positionY,height));
           if (list == ".activitiesList") {  // move from Activities to Schedule
             $(this).remove();
           }
+          console.log(schedule + ", "+ id + ", "+ positionY +  ", "+ $(this).position().top+", "+ height);        
+          drawSchedule(edit_distance(schedule,id, positionY,height));
         } else if (list == ".schedule") {   // move from Schedule to Activities
           console.log("remove");
           addActivity($(this).attr("id"), height);
@@ -139,17 +150,18 @@ window.autoSchedule = function autoSchedule(){
     $(list + " div.item:last").resizable({
       containment: ".activitiesResizeContainer",  
       handles: "n,s",
-      minHeight: blockHeight*2 - borderWidth*2,
+      grid: [1, blockHeight],
+      minHeight: blockHeight*2 - borderMarginHeight,
       //minWidth: 258,
       start: function(event, ui) {  
-        $(this).after("<div class='spaceHolder' style='height:"+ ($(this).height()+borderWidth*2) +"px'></div>");
+        $(this).after("<div class='spaceHolder' style='height:"+ ($(this).height()+borderMarginHeight) +"px'></div>");
         $(this).each(selectItem);
       },
       stop: function(event, ui) {
         var id = $(this).attr("id");
         if (list == ".schedule" ) {
           var positionY = Math.round(($(this).position().top)/blockHeight);
-          var height = Math.round(($(this).height() + borderWidth*2) / blockHeight);
+          var height = Math.round(($(this).height() + borderMarginHeight) / blockHeight);
           console.log(schedule + ", "+ id + ", "+ positionY +  ", "+ height);        
           drawSchedule(edit_distance(schedule,id, positionY,height));
         } else {
@@ -160,6 +172,7 @@ window.autoSchedule = function autoSchedule(){
           });
           $(".spaceHolder").remove();
         }
+        updateDuration(id);
         updateModel(id);
         $("#"+id).each(selectItem);
         O.map.drawpath(schedule);
@@ -169,8 +182,9 @@ window.autoSchedule = function autoSchedule(){
     $(list + " div.item:last .ui-resizable-s").after("<div class='ui-icon ui-icon-grip-solid-horizontal-s'></div>");
     
     // Set item height
-    $(list + " div.item:last").height(blockHeight*duration - borderWidth*2);  // -2 to compensate for the border height
-
+    $(list + " div.item:last").height(blockHeight*duration - borderMarginHeight);  // -2 to compensate for the border height
+    updateDuration(id);
+    
     // Make selectable
     $(list + " div.item:last").click(toggleItem);
     
