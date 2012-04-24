@@ -157,6 +157,9 @@ window.autoSchedule = function autoSchedule(){
         $(this).after("<div class='spaceHolder' style='height:"+ ($(this).height()+borderMarginHeight) +"px'></div>");
         $(this).each(selectItem);
       },
+      resize:function(event, ui) {  
+        updateDuration(id);
+      },
       stop: function(event, ui) {
         var id = $(this).attr("id");
         if (list == ".schedule" ) {
