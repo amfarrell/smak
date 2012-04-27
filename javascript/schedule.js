@@ -1,13 +1,13 @@
   var blockHeight = 15;   // vertical pixels per 15 minute chunk
-  var startTime = 9;      //hour of the day (in military time)
-  var schedule = "                                            ";      // currently displayed schedule
+  var startTime = new Date(Date.parse("9:30AM"));      //hour of the day (in military time)
+  var schedule = "                                          ";      // currently displayed schedule
   var activitiesListPos = 0; // position of the end of the activities list. (counted in 15 min blocks)
   var scheduleItemWidth = 260;  //pixels width of schdeduleItem
   var borderMarginHeight = 5;  //pixels width of border and margin of schdeduleItem
 
   function initHeights() {
     $('.schedule').height(blockHeight*schedule.length);    
-    $('.scheduleGrid').height(blockHeight*schedule.length);  
+    //$('.scheduleGrid').height(blockHeight*schedule.length);  
     $('.activitiesContainer').height(blockHeight*schedule.length);
     $('.activitiesResizeContainer').height(blockHeight*schedule.length);
     $('.activitiesList').height(blockHeight*schedule.length);
@@ -28,18 +28,50 @@
   }
 
   function drawScheduleGrid() {
+    endTime =  new Date( startTime.valueOf()).addHours(schedule.length/4);
+        
+    $('.scheduleGrid').html("Start Day at <input  onchange='changeTimes()' type='time' size='6' id='startTime' name='startTime' value='"+ startTime.toString("h:mmtt")+"'/>");
+    $('#startTime').calendricalTime();
     $('.scheduleGrid').append("<table cellspacing='0'></table");
     for (var i=0; i<schedule.length; i++) {
-      if (i%4==0) {
-        var time = (startTime + i/4)%12;
+      var time = (parseFloat(startTime.toString("h")) + startTime.toString("mm")/60 + i/4)%12;
+      if (time==Math.floor(time)) { 
         if (time==0) time = 12;
-        $('.scheduleGrid table').append("<tr><td style='width:18px'>"+time+"</td><td style='width:278px'></td></tr>");
+        if (i > schedule.length - 4){//last time block is a partial hour
+          console.log(schedule.length-i+" " + i + " " +schedule.length);
+          $('.scheduleGrid table').append("<tr><td class='gridTime' style='width:18px'>"+time+"</td><td class='gridSpace' style='width:278px'></td></tr>");
+          $('.scheduleGrid td.gridTime:last').height(blockHeight*(schedule.length-i)-2);
+          $('.scheduleGrid td.gridSpace:last').height(blockHeight*(schedule.length-i)-2);
+        }else{  //normal blocks
+          $('.scheduleGrid table').append("<tr><td class='gridTime' style='width:18px'>"+time+"</td><td class='gridSpace' style='width:278px'></td></tr>");
+          $('.scheduleGrid td.gridTime:last').height(blockHeight*4-2);
+          $('.scheduleGrid td.gridSpace:last').height(blockHeight*4-2);
+        }
+      }else if(i==0){ //first time block is a partial hour
+        $('.scheduleGrid table').append("<tr><td class='gridTime' style='width:18px'></td><td class='gridSpace' style='width:278px'></td></tr>");
+        $('.scheduleGrid td.gridTime:last').height(blockHeight*(4-(time-Math.floor(time))*4)-2);
+        $('.scheduleGrid td.gridSpace:last').height(blockHeight*(4-(time-Math.floor(time))*4)-2);
       }
     }
-    $('.scheduleGrid td').height(blockHeight*4-2);
+    //$('.scheduleGrid td').height(blockHeight*4-2);
+    $('.scheduleGrid').append("End Day at <input onchange='changeTimes()' type='time' size='6' id='endTime' name='endTime' value='"+ endTime.toString("h:mmtt")+"'/>");
+    $('#endTime').calendricalTime();
     //TODO: modify length of the map so that they line up roughly.
   }
 
+  function changeTimes(){
+    endTime =  new Date( startTime.valueOf()).addHours(schedule.length/4);
+    newStartTime = new Date(Date.parse($('#startTime').val()));
+    newEndTime = new Date(Date.parse($('#endTime').val()));
+    startDiff = parseFloat(newStartTime.toString("H")) + newStartTime.toString("mm")/60 - (parseFloat(startTime.toString("H")) + startTime.toString("mm")/60);
+    endDiff = parseFloat(newEndTime.toString("H")) + newEndTime.toString("mm")/60 - (parseFloat(endTime.toString("H")) + endTime.toString("mm")/60);
+    console.log(startDiff*4 + " " + (parseFloat(endDiff)*4 + schedule.length));
+    startTime = newStartTime;
+    schedule = constrain_bounds(schedule, startDiff*4, parseFloat(endDiff)*4 + schedule.length);
+    initHeights();
+    drawScheduleGrid();
+    drawSchedule(schedule);
+  }
   function drawSchedule(newSchedule) {
   //XXX This also returns the list of Activity IDs.
     schedule = newSchedule;
@@ -257,5 +289,12 @@ window.autoSchedule = function autoSchedule(){
       $(".doBetweenContainer").css("z-index",-2).fadeTo(1,0);
     }
   }
-
+  
+  function pad(number, length) {
+    var str = '' + number;
+    while (str.length < length) {
+        str = '0' + str;
+    }
+    return str;
+  }
 

@@ -143,21 +143,24 @@ body {
   width: 260px;
   position: absolute;
   left:30px;
+  z-index:-1;
 }
 .scheduleGrid {
   position:relative;
-  background: #D5F0F9;
   width:300px;
+  text-align:center;
 }
 .scheduleGrid td {
-  display: inline-block;
   border:1px solid #E1F5FC;
+  background: #D5F0F9;
+  display: inline-block;
   text-align:center;
 }
 .scheduleItem {
   border:1px solid #92ADB5;
   text-align:center;
   width: 258px;
+  /*display: table;*/
   
   background:#B3E2F2;
   margin-left:auto;
