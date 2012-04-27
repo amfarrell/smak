@@ -29,8 +29,9 @@
 
   function drawScheduleGrid() {
     endTime =  new Date( startTime.valueOf()).addHours(schedule.length/4);
-        
-    $('.scheduleGrid').html("Start Day at <input  onchange='changeTimes()' type='time' size='6' id='startTime' name='startTime' value='"+ startTime.toString("h:mmtt")+"'/>");
+    
+    $('.scheduleGrid').html("<div class='schedule'>  </div>");
+    $('#startTimeCell').html("Start Day at <input  onchange='changeDayStartEndTimes()' type='time' size='6' id='startTime' name='startTime' value='"+ startTime.toString("h:mmtt")+"'/>");
     $('#startTime').calendricalTime();
     $('.scheduleGrid').append("<table cellspacing='0'></table");
     for (var i=0; i<schedule.length; i++) {
@@ -54,12 +55,12 @@
       }
     }
     //$('.scheduleGrid td').height(blockHeight*4-2);
-    $('.scheduleGrid').append("End Day at <input onchange='changeTimes()' type='time' size='6' id='endTime' name='endTime' value='"+ endTime.toString("h:mmtt")+"'/>");
+    $('.scheduleGrid').append("End Day at <input onchange='changeDayStartEndTimes()' type='time' size='6' id='endTime' name='endTime' value='"+ endTime.toString("h:mmtt")+"'/>");
     $('#endTime').calendricalTime();
     //TODO: modify length of the map so that they line up roughly.
   }
 
-  function changeTimes(){
+  function changeDayStartEndTimes(){
     endTime =  new Date( startTime.valueOf()).addHours(schedule.length/4);
     newStartTime = new Date(Date.parse($('#startTime').val()));
     newEndTime = new Date(Date.parse($('#endTime').val()));
@@ -75,6 +76,7 @@
   function drawSchedule(newSchedule) {
   //XXX This also returns the list of Activity IDs.
     schedule = newSchedule;
+    console.log("drawSchedule"+ newSchedule);
     var prevItem="";
     var idList = [];
       
@@ -124,7 +126,7 @@ window.autoSchedule = function autoSchedule(){
   }
   
   function updateDuration(id){
-    duration = ($("#"+id).height()+borderMarginHeight) / blockHeight
+    duration = (Math.floor($("#"+id).height())+borderMarginHeight) / blockHeight;
     if (duration > 4)
       plural = "s";
     else
@@ -172,7 +174,7 @@ window.autoSchedule = function autoSchedule(){
         } else {  // move within Schedule
           $(this).css({"left":0, "top":0}); //return to original position
         }
-        updateModel(id);
+        //updateModel(id);
         $("#"+id).each(selectItem);
         $(".hover").removeClass("hover");
       }
@@ -208,7 +210,7 @@ window.autoSchedule = function autoSchedule(){
           $(".spaceHolder").remove();
         }
         updateDuration(id);
-        updateModel(id);
+        //updateModel(id);
         $("#"+id).each(selectItem);
         O.map.drawpath(schedule);
       }
