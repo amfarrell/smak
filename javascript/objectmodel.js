@@ -66,13 +66,13 @@ window.initModel = function initModel () {
   };
 
   prebuilt = [
-  new Activity("Breakfast", [43.784, 11.253], "13:00", "14:00", 60, ["12:00","14:30"], true, false), 
-  new Activity("Dome", [43.785, 11.251], "14:15", "15:30", 180, ["13:00","17:30"], true, false), 
-  new Activity("Uffizi Gallery", [43.772, 11.257], "15:45", "16:30",120, ["13:00","22:30"], true, false), 
-  new Activity("Accademia Gallery", [43.792, 11.257], "09:45", "11:00", 75, ["08:00","15:30"], true, false), 
-  new Activity("Piazzale Michelangelo", [43.790, 11.257], "11:15", "12:00", 75, ["11:00","16:30"], true, false),
-  new Activity("Giotto's Tower", [43.780, 11.267], "09:45", "11:00", 60, ["08:00","15:30"], true, false),
-  new Activity("Dinner", [43.782, 11.257], "09:45", "11:00", 60, ["08:00","15:30"], true, false)];
+  new Activity("Breakfast", [43.784, 11.253], "13:00", "14:00", 60, ["8:00","10:30"], true, false), 
+  new Activity("Dome", [43.785, 11.251], "14:15", "15:30", 180, ["8:00","18:00"], true, false), 
+  new Activity("Uffizi Gallery", [43.772, 11.257], "15:45", "16:30",120, ["10:00","18:00"], true, false), 
+  new Activity("Accademia Gallery", [43.792, 11.257], "09:45", "11:00", 75, ["10:00","18:00"], true, false), 
+  new Activity("Piazzale Michelangelo", [43.790, 11.257], "11:15", "12:00", 75, ["1:00","23:30"], true, false),
+  new Activity("Giotto's Tower", [43.780, 11.267], "09:45", "11:00", 60, ["10:00","18:00"], true, false),
+  new Activity("Dinner", [43.782, 11.257], "09:45", "11:00", 60, ["18:00","20:00"], true, false)];
 
 
   var a;

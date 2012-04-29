@@ -28,7 +28,7 @@
   }
 
   function drawScheduleGrid() {
-    endTime =  new Date( startTime.valueOf()).addHours(schedule.length/4);
+    var endTime =  new Date( startTime.valueOf()).addHours(schedule.length/4);
     
     $('.scheduleGrid').html("<div class='schedule'>  </div>");
     $('#startTimeCell').html("Start Day at <input  onchange='changeDayStartEndTimes()' type='time' size='6' id='startTime' name='startTime' value='"+ startTime.toString("h:mmtt")+"'/>");
@@ -61,11 +61,11 @@
   }
 
   function changeDayStartEndTimes(){
-    endTime =  new Date( startTime.valueOf()).addHours(schedule.length/4);
-    newStartTime = new Date(Date.parse($('#startTime').val()));
-    newEndTime = new Date(Date.parse($('#endTime').val()));
-    startDiff = parseFloat(newStartTime.toString("H")) + newStartTime.toString("mm")/60 - (parseFloat(startTime.toString("H")) + startTime.toString("mm")/60);
-    endDiff = parseFloat(newEndTime.toString("H")) + newEndTime.toString("mm")/60 - (parseFloat(endTime.toString("H")) + endTime.toString("mm")/60);
+    var endTime =  new Date( startTime.valueOf()).addHours(schedule.length/4);
+    var newStartTime = new Date(Date.parse($('#startTime').val()));
+    var newEndTime = new Date(Date.parse($('#endTime').val()));
+    var startDiff = parseFloat(newStartTime.toString("H")) + newStartTime.toString("mm")/60 - (parseFloat(startTime.toString("H")) + startTime.toString("mm")/60);
+    var endDiff = parseFloat(newEndTime.toString("H")) + newEndTime.toString("mm")/60 - (parseFloat(endTime.toString("H")) + endTime.toString("mm")/60);
     console.log(startDiff*4 + " " + (parseFloat(endDiff)*4 + schedule.length));
     startTime = newStartTime;
     schedule = constrain_bounds(schedule, startDiff*4, parseFloat(endDiff)*4 + schedule.length);
@@ -117,12 +117,12 @@ window.autoSchedule = function autoSchedule(){
     var positionY = Math.round(($("#"+id).position().top)/blockHeight);
     O.activities.get(id).duration = height*15;
     if ($("#"+id).parents(".schedule").length>0) {
-      O.activities.get(id).start = positionY
+      O.activities.get(id).start = positionY/4 + parseFloat(startTime.toString("H")) + startTime.toString("mm")/60
       O.activities.get(id).scheduledP = true;
     } else {
       O.activities.get(id).scheduledP = false;
     }
-    console.log(O.activities.get(id));
+    console.log("start time " + O.activities.get(id).start);
   }
   
   function updateDuration(id){
@@ -174,15 +174,14 @@ window.autoSchedule = function autoSchedule(){
         } else {  // move within Schedule
           $(this).css({"left":0, "top":0}); //return to original position
         }
-        //updateModel(id);
+        updateModel(id);
         $("#"+id).each(selectItem);
         $(".hover").removeClass("hover");
       }
     })
     
     // Make item resizable
-    $(list + " div.item:last").resizable({
-      containment: ".activitiesResizeContainer",  
+    $(list + " div.item:last").resizable({ 
       handles: "n,s",
       grid: [1, blockHeight],
       minHeight: blockHeight*2 - borderMarginHeight,
@@ -210,9 +209,9 @@ window.autoSchedule = function autoSchedule(){
           $(".spaceHolder").remove();
         }
         updateDuration(id);
-        //updateModel(id);
+        updateModel(id);
         $("#"+id).each(selectItem);
-        O.map.drawpath(schedule);
+        //O.map.drawpath(schedule);
       }
     });
     $(list + " div.item:last .ui-resizable-n").after("<div class='ui-icon ui-icon-grip-solid-horizontal-n'></div>");
@@ -236,23 +235,38 @@ window.autoSchedule = function autoSchedule(){
         "left":0,
         "top":verticalPos*blockHeight,
       });
-      $(list + " div.item:last").draggable("option", "containment", "#doBetween"+id);
+      $(list + " div.item:last").draggable("option", "containment", ".doBetween"+id);
+      $(list + " div.item:last").resizable("option", "containment", ".doBetween"+id);
     }else{
       $(list + " div.item:last").draggable("option", "containment", ".activitiesContainer");
+      $(list + " div.item:last").resizable("option", "containment", ".activitiesContainer");
     }
     
     // Add doBetweenbox
-    if($("#doBetween"+id).length==0){   // if it doesn't exist already
-      $(".activitiesContainer").after('<div class="doBetweenContainer" id="doBetween'+id+'"><div class="doBetween"></div></div>');
-      $("#doBetween"+id).height(blockHeight*schedule.length);
-      $("#doBetween"+id).css("z-index",-2).fadeTo(1,0);
-      $("#doBetween"+id).resizable({ 
-        grid: [1, blockHeight],
-        handles: "n,s",
-        stop: function(event, ui) {
-          //TODO: update doBetween times
-        }
-      });
+    if($(".doBetween"+id).length==0){   // if it doesn't exist already
+      var range = O.activities.get(id).range;
+      var boxStartTime = new Date(Date.parse(range[0]));
+      var endTime =  new Date( startTime.valueOf()).addHours(schedule.length/4);
+      var startPosition = dateToNumber(boxStartTime) - dateToNumber(startTime);  //in hours
+      if (startPosition<0) startPosition = 0;
+      if (dateToNumber(new Date(Date.parse(range[1]))) > dateToNumber(endTime)) 
+        var endPosition =  dateToNumber(endTime) - dateToNumber(startTime); // in hours
+      else 
+        var endPosition = dateToNumber(new Date(Date.parse(range[1]))) - dateToNumber(startTime); // in hours
+      
+      var boxDuration = endPosition - startPosition; // in hours
+
+      console.log(endPosition + " " +(blockHeight*boxDuration*4));
+      $(".doBetweenContainerContainer").append('<div class="doBetweenContainer doBetween'+id+'"><div class="doBetweenTop"></div><div class="doBetweenBottom"></div></div>');
+      $(".doBetween"+id).css("z-index",-2).fadeTo(1,0);
+      $(".doBetween"+id).height(blockHeight*boxDuration*4);
+      $(".doBetween"+id).css("top",startPosition*blockHeight*4);
+      
+      $(".doBetween"+id+" .doBetweenTop").height(blockHeight*startPosition*4);
+      $(".doBetween"+id+" .doBetweenTop").css("top",-blockHeight*startPosition*4);
+      
+      $(".doBetween"+id+" .doBetweenBottom").height(blockHeight*(schedule.length - endPosition*4));
+      $(".doBetween"+id+" .doBetweenBottom").css("bottom",-(blockHeight*(schedule.length - endPosition*4)));
     }
   }
 
@@ -268,7 +282,7 @@ window.autoSchedule = function autoSchedule(){
       $(".selected").removeClass('selected');
       O.activities.deselect(this.id);
     }
-    //updateDoBetweenBox();
+   updateDoBetweenBox();
   }
   function deselectItem(){
       $(".selected").removeClass('selected');
@@ -278,15 +292,15 @@ window.autoSchedule = function autoSchedule(){
   function selectItem(){
     $(".selected:not(#"+$(this).attr("id")+")").removeClass('selected');
     $(this).addClass('selected');
-    //updateDoBetweenBox();
+    updateDoBetweenBox();
     O.activities.select(this.id);
   }
 
   function updateDoBetweenBox(){
     if($(".selected").length){
-      $(".doBetweenContainer:not(#doBetween"+$(".selected").attr("id")+")").css("z-index",-2).fadeTo(1,0);
-      $("#doBetween" +  $(".selected").attr("id")).css("z-index",1).fadeTo(1,1);
-      console.log(".doBetween" +  $(".selected").attr("id"));
+      $(".doBetweenContainer:not(.doBetween"+$(".selected").attr("id")+")").css("z-index",-2).fadeTo(1,0);
+      $(".doBetween" +  $(".selected").attr("id")).css("z-index",1).fadeTo(1,1);
+      console.log(".doBetweenContainer" +  $(".selected").attr("id"));
     }else{
       $(".doBetweenContainer").css("z-index",-2).fadeTo(1,0);
     }
@@ -300,3 +314,6 @@ window.autoSchedule = function autoSchedule(){
     return str;
   }
 
+  function dateToNumber(date){ //takes date object and outputs a decimal hour time
+    return parseFloat(date.toString("H")) + date.toString("mm")/60;
+  }

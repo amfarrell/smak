@@ -176,20 +176,26 @@ body {
 .scheduleItem.selected:hover {
   background:#BFADAA;
 }
-.doBetweenContainer {
-  width:565px;
+.doBetweenContainerContainer{
+  width:582px;
   position: absolute;
+}
+.doBetweenContainer{
+  width:582px;
+  position: absolute;
+  left:0px;
   z-index:0;
 }
-.doBetween {
-  background:#3A859D;
+.doBetweenTop,.doBetweenBottom{
+  background:#A7B6BB;
   position: absolute;
   /*border: groove #12576E;
   border-width:5px 0px;
-  top:-5px;*/
-  width:280px;
+  top:-5px;
+  height:100%;*/
+  width:300px;
   right:0px;
-  height:100%;
+  opacity:0.4;
 }
 .doBetween.hover {
   /*background:#D5F0F9;*/
