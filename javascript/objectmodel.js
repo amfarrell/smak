@@ -31,6 +31,26 @@ window.initModel = function initModel () {
       alert("document hasn't been loaded. map cannot be populated.");
     },
     'activities': {
+      '_subscribers':{
+        'map':{
+          'updated':function(i,changes){console.log("the map sees that activity"+i+"now has");console.log(changes)},
+          'selected':function(i,changes){console.log("the map sees that activity"+i+"now is selected");}
+        },
+        'schedule':{
+          'updated': function(i,changes){console.log("the schedule sees that activity"+i+"now has");console.log(changes)},
+          'selected':function(i,changes){console.log("the schedule sees that activity"+i+"now is selected");}
+        }, 
+        'form':{
+          'updated':function(i,changes){console.log("the form sees that activity"+i+"now has");console.log(changes)},
+          'selected':function(i,changes){console.log("the form sees that activity"+i+"now is selected");}
+        }
+      },
+      'selected':function(view,handler){
+        O.activities._subscribers[view]['slected']=handler;
+      },
+      'updated':function(view,handler){
+        O.activities._subscribers[view]['updated']=handler;
+      },
       'all':function allActivities () {
         return $.jStorage.index();
       },
@@ -41,6 +61,11 @@ window.initModel = function initModel () {
         }
         var activity = $.jStorage.get(i);
         O.activities.get(i).marker.setAnimation(google.maps.Animation.BOUNCE)
+        for (subscriber in O.activities._subscribers){
+          if (subscriber !== view){
+            O.activities._subscribers[subscribers](i,changes);
+          }
+        }
       },
       'deselect':function deselect(i) {
         O.activities.get(i).marker.setAnimation(null)
@@ -50,6 +75,17 @@ window.initModel = function initModel () {
       },
       'set':function set(i,v){
         return $.jStorage.set(i,v);
+      },
+      'update':function update(i,view,changes){
+        var activity = O.activities.get(i)
+        for (change in changes){
+          activity[change] = changes[change]; 
+        }
+        for (subscriber in O.activities._subscribers){
+          if (subscriber !== view){
+            O.activities._subscribers[subscribers](i,changes);
+          }
+        }
       },
       'add':function add(i){
         var activity;
