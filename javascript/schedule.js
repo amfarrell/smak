@@ -23,7 +23,7 @@
   }
 
   function addActivity(id, duration) { //duration in 15 min blocks
-    setupActivity(id, duration, ".activitiesList", activitiesListPos);
+    setupActivity(id, duration, ".activitiesList", activitiesListPos, 0);
     activitiesListPos += duration
   }
 
@@ -79,6 +79,7 @@
     console.log("drawSchedule:"+ schedule);
     var prevItem="";
     var idList = [];
+    var itemNum = 1;
       
     $('.schedule').html("");    //clear schedule  
     
@@ -86,10 +87,11 @@
       var item = schedule[i];
       
       if (item != prevItem && item != " ") {
-        setupActivity(item, 1, ".schedule", i);
+        setupActivity(item, 1, ".schedule", i, itemNum);
         idList.push(item)
               
         prevItem=item;
+        itemNum +=1;
       } else if (item != " ") {
         var height = $(".schedule div.item:last").height();
         $(".schedule div.item:last").height(height+blockHeight);
@@ -151,16 +153,19 @@ window.autoSchedule = function autoSchedule(){
     // TODO: update object model with the fact that this item is unlocked
     }
   }
-  function setupActivity(id, duration, list, verticalPos){  //list = ".schedule" or ".activitiesList"
+  function setupActivity(id, duration, list, verticalPos, itemNumber){  //list = ".schedule" or ".activitiesList"
     $(list).append('<div class="scheduleItem item" id='+id+'></div>');
     
     if (list == ".schedule"){
       $(list + " div.item:last").append("<div class='lock'><img src='unlock.png' alt='unlocked' /></div>");
       $(list + " div.item:last .lock").click(toggleLock);
+      $(list + " div.item:last").append("<div class='activityName'>"+itemNumber+". "+O.activities.get(id).name+"</div>");
+    }else{
+      $(list + " div.item:last").append("<div class='activityName'>"+O.activities.get(id).name+"</div>");
     }
     $(list + " div.item:last").append("<div class='duration'></div>");
-    $(list + " div.item:last").append("<div class='activityName'>"+O.activities.get(id).name+"</div>");
     
+    $(list + " div.item:last").corner();
     
     // Make item draggable
     $(list + " div.item:last").draggable({
@@ -263,7 +268,7 @@ window.autoSchedule = function autoSchedule(){
       $(list + " div.item:last").resizable("option", "containment", ".doBetween"+id);
     }else{
       $(list + " div.item:last").draggable("option", "containment", ".activitiesContainer");
-      $(list + " div.item:last").resizable("option", "containment", ".activitiesContainer");
+      $(list + " div.item:last").resizable("option", "containment", ".activitiesResizeContainer");
     }
     
     // Add doBetweenbox

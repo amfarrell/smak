@@ -151,7 +151,7 @@ body {
 }
 .scheduleGrid td {
   border:1px solid #E1F5FC;
-  background: #D5F0F9;
+  background: #DBF2FA;
   display: inline-block;
   text-align:center;
 }
@@ -161,20 +161,20 @@ body {
   width: 258px;
   display: table;
   
-  background:#B3E2F2;
+  background:#C8ECF9;
   margin-left:auto;
   margin-right:auto;
   margin-bottom:3px;
   z-index:10;
 }
 .scheduleItem:hover:not(.ui-state-disabled) {
-  background:#92ADB5;
+  background:#B3E2F2;
 }
 .selected {
-  background:#FFDFD9;
+  background:#89D3EB;
 }
 .scheduleItem.selected:hover {
-  background:#BFADAA;
+  background:#5EC2E4;
 }
 .lock{
   position: absolute;
