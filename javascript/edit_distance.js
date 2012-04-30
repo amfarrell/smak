@@ -64,6 +64,25 @@ function array_unique_elements(array) {
 											})
 }
 
+function remove_element(arr) {
+	var what, a= arguments, L= a.length, ax;
+	while(L> 1 && arr.length){
+		  what= a[--L];
+		  while((ax= arr.indexOf(what))!= -1){
+		      arr.splice(ax, 1);
+		  }
+	}
+	return arr;
+}
+
+function translate_do_between_times(id) {
+	var global_start_time = dateToNumber(startTime)
+	var earliest_offset = (dateToNumber(new Date(Date.parse(O.activities.get(id).range[0]))) - global_start_time) * 4
+	var latest_offset = (dateToNumber(new Date(Date.parse(O.activities.get(id).range[1]))) - global_start_time) * 4
+	
+	return [earliest_offset, latest_offset]
+}
+
 // -----------------------------------------------------------------------------
 // Edit distance helpers
 // -----------------------------------------------------------------------------
@@ -224,6 +243,10 @@ function find_breaks(state) {
 	return breaks
 }
 
+// -----------------------------------------------------------------------------
+// Generate and manage candidate schedules
+// -----------------------------------------------------------------------------
+
 // the "brute force" enumeration
 //
 // given a starting point and a list of displacements, enumerate all state 
@@ -249,6 +272,42 @@ function get_configurations(displacements, partial_configurations, locked) {
 		}
 	}
 	return get_configurations(displacements, new_configurations, locked)
+}
+
+function filter_configurations(configurations) {
+	var final_configurations = new Array()
+	for (var i = 0; i < configurations.length; i++) {
+		var current_config = configurations[i].slice()
+		var unique_elements = array_unique_elements(current_config)
+		unique_elements = remove_element(unique_elements, " ")
+
+		// filter start_at violations
+		/*for (var j = 0; j < start_at.length; j++) {
+			var fid = start_at[i][0]
+			var sap = start_at[i][1]
+			var start_index = current_config.indexOf(fid)
+			if (start_index > -1 && sap != start_index) {
+				current_config = array_replace(current_config, fid, " ")
+			}
+		}*/
+
+		// filter do_between violations
+		for (var j = 0; j < unique_elements.length; j++) {
+			var fid = unique_elements[j]
+			var do_between_thresholds = translate_do_between_times(fid)
+			var start_threshold = do_between_thresholds[0]
+			var end_threshold = do_between_thresholds[1]
+			var start_index = current_config.indexOf(fid)
+			var end_index = current_config.lastIndexOf(fid)
+			if (start_index > -1 && (	start_index <= start_threshold || 
+																end_index >= end_threshold)) {
+				current_config = array_replace(current_config, fid, " ")				
+			}
+		}
+
+		final_configurations.push(current_config)
+	}
+	return final_configurations
 }
 
 // -----------------------------------------------------------------------------
@@ -320,7 +379,11 @@ function pick_configuration(initial_state, configurations, excludes) {
 // Main Algorithms
 // -----------------------------------------------------------------------------
 
+// Moving items around in the schedule
+//
 function edit_distance(string, id, pos_final, len) {
+	translate_do_between_times(id)
+
 	console.log("edit_distance(\"" + string + "\", \"" + id + "\", " + pos_final + ", " + len + ")")
 	var state = string.split("")
 	var initial_state = state
@@ -337,7 +400,8 @@ function edit_distance(string, id, pos_final, len) {
 
 	// find a set of decent configurations, given the blocks we displaced
 	configurations = get_configurations(displaced, [state.slice()], pos_final)
-
+	configurations = filter_configurations(configurations)
+	
 	// pick the best configuration
 	var state_bundle = pick_configuration(initial_state, configurations, [id])
 	var state = state_bundle[0]
@@ -355,11 +419,15 @@ function edit_distance(string, id, pos_final, len) {
 	return ret
 }
 
+// Growing and squishing the schedule
+//
 function constrain_bounds(string, start, stop) {
-	console.log("constrain_bounds(\"" + string + "\", \"" + start + "\", \"" + stop + "\")")
+	
 	var state = string.split("")
 	var orig_len = state.length
 	var end_delta = -1
+
+	console.log("constrain_bounds(\"" + string + "\", \"" + start + "\", \"" + stop + "\") ~ original length: " + orig_len)
 
 	if (start < 0) {
 		state = Array(-1 * start + 1).join(" ").split("").concat(state)
@@ -410,11 +478,13 @@ function constrain_bounds(string, start, stop) {
 	//	ret = ret + Array(end_delta+1).join(" ")
 	//}
 
-	console.log("constrain_bounds() returning: \"" + ret + "\"")
+	console.log("constrain_bounds() returning: \"" + ret + "\" ~ final length: " + ret.length)
 
 	return ret
 }
 
+// The auto schedule function
+//
 function partially_schedule(string, los) {
 	var state = string.split("")
 	var initial_state = string.split("")
@@ -439,15 +509,8 @@ function partially_schedule(string, los) {
 }
 
 // -----------------------------------------------------------------------------
-// Constraints
+// Space to put test code
 // -----------------------------------------------------------------------------
-
-var do_between = new Array()
-do_between["A"] = [0, 5]
-do_between["B"] = [3, 5]
-
-var start_at = new Array()
-start_at["C"] = [4]
 
 // -----------------------------------------------------------------------------
 // Calls
