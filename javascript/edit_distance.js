@@ -17,7 +17,7 @@ var DEBUG_COST_FUNC = false
 var DISPLACEMENT_COST = 1
 var MOVEMENT_COST = 1
 var MOVEMENT_POLY = 4
-var ELIMINATION_COST = 10000
+var ELIMINATION_COST = 10000000
 
 // -----------------------------------------------------------------------------
 // Low-level Helpers
@@ -161,7 +161,7 @@ function insert(state, id, pos, len, locked) {
 	// are we inserting in the middle of an activity?
 	// if so, push that activity backwards
 	if (pos > 0 && state[pos] != " " && state[pos] == state[pos-1]) {
-		var b_id = state[pos]
+    var b_id = state[pos]
 		var b_len = count_array_occurances(state, b_id)
 		state = array_replace(state, b_id, " ")
 		var b_state = state.slice(0, pos)
@@ -228,7 +228,7 @@ function find_breaks(state) {
 //
 // given a starting point and a list of displacements, enumerate all state 
 // configurations after the displacements are added back.
-function get_configurations(displacements, partial_configurations, locked, start, end) {
+function get_configurations(displacements, partial_configurations, locked) {
 	if (displacements.length == 0) {
 		return partial_configurations
 	}
@@ -255,16 +255,18 @@ function get_configurations(displacements, partial_configurations, locked, start
 // Cost Functions
 // -----------------------------------------------------------------------------
 
-function cost_function(initial_state, configuration, exclude) {
+function cost_function(initial_state, configuration, excludes) {
 	var old_model = model_from_string(initial_state)
 	var new_model = model_from_string(configuration)
+
+	var eliminations = new Array()
 
 	// calculate displacement and movement costs
 	var displacement_cost = 0
 	var movement_cost = 0
 	for (var i = 0; i < old_model.length; i++) {
 		var current_old = old_model[i]
-		if (current_old.id != " " && current_old.id != exclude) {
+		if (current_old.id != " " && excludes.indexOf(current_old.id) == -1) {
 			for (var j = 0; j < new_model.length; j++) {
 				var current_new = new_model[j]
 				if (current_new.id == current_old.id) {
@@ -283,14 +285,35 @@ function cost_function(initial_state, configuration, exclude) {
 	var elimination_cost = 0
 	var initial_state_set = array_unique_elements(initial_state)
 	for (var i = 0; i < initial_state_set.length; i++) {
-		if (configuration.indexOf(initial_state_set[i]) == -1) {
+		if (configuration.indexOf(initial_state_set[i]) == -1 && initial_state_set[i] != " ") {
+			eliminations.push([initial_state_set[i], count_array_occurances(initial_state, initial_state_set[i])])
 			elimination_cost += ELIMINATION_COST
 		}
 	}
 	
 	var total_cost = displacement_cost + movement_cost + elimination_cost
 	if (DEBUG_COST_FUNC) console.log("Cost: from [" + initial_state + "] -> [" + configuration + "] = " + total_cost + "\t(" + displacement_cost + ", " + movement_cost + ", " + elimination_cost + ")")
-	return total_cost
+	return [total_cost, eliminations]
+}
+
+function pick_configuration(initial_state, configurations, excludes) {
+	var min_cost = Number.MAX_VALUE
+	var min_configuration = null
+	var min_eliminations = null
+	for (var i = 0; i < configurations.length; i++) {
+		if (DEBUG) console.log("Testing config: [" + configurations[i] + "]")
+		var cost_bundle = cost_function(initial_state, configurations[i], excludes)
+		var cost = cost_bundle[0]
+		var eliminations = cost_bundle[1]
+		if (cost < min_cost) {
+			if (DEBUG) console.log("Keeping configuration!")
+			min_cost = cost
+			min_eliminations = eliminations
+			min_configuration = configurations[i]
+		}
+	}
+	assert(min_configuration != null, "main: no final config?")
+	return [min_configuration, min_eliminations]
 }
 
 // -----------------------------------------------------------------------------
@@ -306,26 +329,25 @@ function edit_distance(string, id, pos_final, len) {
 	// check that pos_init and pos_final are legal starts-of-activities
 	assert(state.length >= pos_final + len, "main: length violation")
 
+	// do the initial remove action
 	state = remove(state, id)
 	add_attempt = add(state, id, pos_final, len)
 	state = add_attempt[0]
 	displaced = add_attempt[1]
 
+	// find a set of decent configurations, given the blocks we displaced
 	configurations = get_configurations(displaced, [state.slice()], pos_final)
 
-	var min_cost = Number.MAX_VALUE
-	var min_configuration = null
-	for (var i = 0; i < configurations.length; i++) {
-		if (DEBUG) console.log("Testing config: [" + configurations[i] + "]")
-		var cost = cost_function(initial_state, configurations[i], id)
-		if (cost < min_cost) {
-			if (DEBUG) console.log("Keeping configuration!")
-			min_cost = cost
-			min_configuration = configurations[i]
-		}
+	// pick the best configuration
+	var state_bundle = pick_configuration(initial_state, configurations, [id])
+	var state = state_bundle[0]
+	var eliminations = state_bundle[1]
+
+	for (var i = 0; i < eliminations.length; i++) {
+		var e_id = eliminations[i][0]
+		var e_len = eliminations[i][1]
+		setupActivity(e_id, e_len, ".activitiesList", 0)
 	}
-	assert(min_configuration != null, "main: no final config?")
-	state = min_configuration
 
 	var ret = state.join("").replace(/,/g, "")
 	console.log("edit_distance() returning: \"" + ret + "\"")
@@ -390,6 +412,29 @@ function constrain_bounds(string, start, stop) {
 	return ret
 }
 
+function partially_schedule(string, los) {
+	var state = string.split("")
+	var initial_state = string.split("")
+
+	for (var j = 0; j < los.length; j++) {
+		var state_this_iteration = state.slice()
+
+		// some preprocessing
+		var excludes = Array()
+		for (var i = 0; i < los.length; i++) { excludes.push(los[i].charAt(0)) }
+
+		// find a set of decent configurations, given the blocks we displaced
+		configurations = get_configurations([los[j]], [state.slice()], -1)
+
+		// pick the best configuration
+		state = pick_configuration(state_this_iteration, configurations, [])[0]
+	}
+
+	var ret = state.join("").replace(/,/g, "")
+	console.log("partially_schedule() returning: \"" + ret + "\"")
+	return ret
+}
+
 // -----------------------------------------------------------------------------
 // Tests
 // -----------------------------------------------------------------------------
@@ -400,6 +445,7 @@ function constrain_bounds(string, start, stop) {
 // Calls
 // -----------------------------------------------------------------------------
 
+
 var init = "AA  BBCCC  "
 //var test = edit_distance(init, "C", 5, 3)
 var test2 = constrain_bounds(init, -2, init.length + 6)
@@ -408,5 +454,11 @@ console.log("[" + init + "]")
 console.log("[" + test2 + "]")
 console.log("Orig len: " + init.length + ", new len: " + test2.length)
 
-//console.log("FINAL RESULT: " + pprint(init) + " -> " + pprint(test))
+//var init = "AA                    BB"
+//var test = edit_distance(init, "C", 5, 3)
+//test = constrain_bounds(init, 2, init.length)
+//test = partially_schedule(init, ["C", "DD", "EEE", "FFFF"])
+
+
+console.log("FINAL RESULT: " + pprint(init) + " -> " + pprint(test))
 

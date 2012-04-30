@@ -1,107 +1,232 @@
-/* Form */
-
-.normalbutton {
-    color: white;
-    background-color:#44ee44;
-    border: 2px solid#226622; 
+/* Overall Structure */
+html {
+  width: 100%;
+  height: 100%;
 }
-.hoverbutton {
-    color: white;
-    background-color:#229922;
-    border: 2px solid#226622; 
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0; padding: 0;
 }
-.clickbutton {
-    color: white;
-    background-color:#44ee44;
-    border: 2px solid#226622; 
+#activity {
+  float:left;
+  width:40%;
+  height:100%;
+  position:relative;
+}
+#schedule {
+  /*margin-left: auto;
+  margin-right: auto;*/
+  float:left;
 }
 
+/* New Activity Form */
 
-/* Activities column */
-.autoSchedule{
+#activity_name { 
+  width:95%;
+  position:relative;
+}
+#activity_suggest { 
+  width:100%;
+  position:relative;
+}
+#activity_time { }
+#time_form { 
+  text-align:center;
+  width:100%;
+  position:relative;
+  float:left;
+}
+#time_definite { }
+#or {
   text-align:center;
 }
-.activitiesList{
+#definite_start { 
+  width:3em;
+}
+#definite_end {
+  width:3em;
+}
+#range_add_event {
+  width:30%;
+  text-align:center;
+  float:right;
+}
+#definite_add_event {
+  width:30%;
+  text-align:center;
+  float:right;
+}
+#range_duration { 
+  width:3em;
+}
+#range_start {
+  width:3em;
+}
+#range_end { 
+  width:3em;
+}
+#time_display { }
+
+#location_text {
+  float-left;
+  width:75%;
+}
+
+#activity_location { 
+  position:relative;
+  width:100%;
+  height:95%
+}
+#map_canvas {
+ width:100%; 
+ height:95%
+
+/* New Activity Form */
+
+}
+#range_duration { 
+  width:3em;
+}
+#range_start {
+  width:3em;
+}
+#range_end { 
+  width:3em;
+}
+#draggable {
+  position:absolute;top:10px, 
+  left:10px; /*width: 30px; height: 30px;*/
+  z-index:1000000000;
+}
+
+/* Activities column */
+.autoSchedule {
+  text-align:center;
+}
+.activitiesList {
   width: 260px;
   position: relative;
 }
+.activitiesResizeContainer{
+  position:absolute;
+  z-index:-1;
+  left:0;
+  width:  580px;
+}
 .activitiesContainer{
   position:absolute;
-  width:700px; /*fix this for resizing!  565px;*/
+  width:  572px;
 }
-.wrapper{
+.wrapper {
   position: relative;
   left:0;
   top:0;
 }
 
+#pin_slot {
+  z-index:-1;
+}
+#active_pin {
+  position: absolute;
+  user-select: none;
+  z-index:9;
+}
+
+#map_canvas {
+  height: 100%;
+  z-index:-9;
+}
+
 /* Schedule column */
-.schedule{
+.schedule {
   width: 260px;
   position: absolute;
   left:30px;
 }
-.scheduleGrid{
+.scheduleGrid {
   position:relative;
-  background: #B3E2F2;
   width:300px;
-}
-.scheduleGrid td{
-  border:1px solid;
   text-align:center;
 }
-.scheduleItem{
-  border:5px ridge #12576E;
+.scheduleGrid td {
+  border:1px solid #E1F5FC;
+  background: #DBF2FA;
+  display: inline-block;
   text-align:center;
-  width: 250px;
+}
+.scheduleItem {
+  border:1px solid #92ADB5;
+  text-align:center;
+  width: 258px;
+  display: table;
   
-  background:#D5F0F9;
+  background:#C8ECF9;
   margin-left:auto;
   margin-right:auto;
+  margin-bottom:3px;
   z-index:10;
 }
-.scheduleItem:hover{
-  background:#A7B6BB;
+.scheduleItem:hover:not(.ui-state-disabled) {
+  background:#B3E2F2;
 }
-.selected{
-  background:#FFDFD9;
+.selected {
+  background:#89D3EB;
 }
-.scheduleItem.selected:hover{
-  background:#BFADAA;
+.scheduleItem.selected:hover {
+  background:#5EC2E4;
+}
+.lock{
+  position: absolute;
+  cursor: pointer;
+}
+.duration{
+  position: absolute;
+  right:3px;
+}
+.activityName{
+  width:100%;
+  position: absolute;
+  top:50%;
+  height:20px;
+  margin-top:-10px;
+}
+.doBetweenContainerContainer{
+  width:582px;
+  position: absolute;
 }
 .doBetweenContainer{
-  width:565px;
+  width:582px;
   position: absolute;
+  left:0px;
   z-index:0;
 }
-.doBetween{
-  background:#3A859D;
+.doBetweenTop,.doBetweenBottom{
+  background:#A7B6BB;
   position: absolute;
   /*border: groove #12576E;
   border-width:5px 0px;
-  top:-5px;*/
-  width:280px;
+  top:-5px;
+  height:100%;*/
+  width:300px;
   right:0px;
-  height:100%;
+  opacity:0.4;
 }
-.doBetween.hover{
+.doBetween.hover {
   /*background:#D5F0F9;*/
 }
 
-.ui-draggable  { 
+.ui-draggable { 
   cursor: move; 
 }
 
 /* Map column */
-.map{
-  width: 300px;
-}
-
 
 h2{
   text-align:center;
 }
-.layout td{
+.layout{
+  text-align:center;
 }
 td{
   padding:0px;

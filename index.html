@@ -5,90 +5,114 @@
 
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-  
-  <script src='./javascript/jquery-1.7.2.js'></script>
-  <script src='./javascript/jquery.json-2.3.js'></script>
-  <script src='./javascript/jquery-ui-1.8.18.js'></script>
-  <script src='./javascript/jquery.overlaps.js'></script>
-  <script src='./javascript/jstorage.js'></script>
-  <script src='./javascript/objectmodel.js'></script>
+
+  <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"> </script>
+  <script type="text/javascript" src="./javascript/gmap.js"></script>  
+  <script type="text/javascript" src='./javascript/jquery-1.7.2.js'></script>
+  <script type="text/javascript" src='./javascript/jquery.json-2.3.js'></script>
+  <script type="text/javascript" src='./development-bundle/ui/jquery-ui-1.8.18.custom.js'></script>
+  <!--<script type="text/javascript" src='./javascript/jquery-ui-1.8.18.js'></script>-->
+  <script type="text/javascript" src="./javascript/jquery.ui.touch-punch.js"></script>
+  <script type="text/javascript" src="./javascript/jquery.calendrical.js"></script>
+  <script type="text/javascript" src='./javascript/jquery.overlaps.js'></script>
+  <script type="text/javascript" src='./javascript/jquery.corner.js'></script>
+  <script type="text/javascript" src='./javascript/jstorage.js'></script>
+  <script type="text/javascript" src="./javascript/date.js"></script>  
+  <script type="text/javascript" src='./javascript/objectmodel.js'></script>
   <script type="text/javascript" src="./javascript/schedule.js"></script>  
   <script type="text/javascript" src="./javascript/edit_distance.js"></script>  
   
-  <script>
-      $("#create_activity").click(function () {
-         alert($("#activity_form").serializeArray()); 
-      });
-  </script>
   <link rel="stylesheet" type="text/css" href="styles/main.css" />
+  <link rel="stylesheet" type="text/css" href="styles/calendrical.css" />
   <link rel="stylesheet" href="development-bundle/themes/base/jquery.ui.all.css">
 </head>
 
 <body>
+
 <script type="text/javascript">
 
 $(document).ready(function() {
+  initMap();
+  initModel();
+  
+  initHeights();
   drawScheduleGrid();
   drawSchedule(schedule);
-
-  $("#create_activity").click(function() {
-    O.Activity(
-      $("#activity_name").val(),
-      $("#activity_location").val(),
-      $("#activity_start").val(),
-      $("#activity_end").val(),
-      $("#activity_duration").val(),
-      $("#activity_range").val());
-    console.log($.jStorage.index());
-    });
-  
   initActivitiesList();
-  console.log($.jStorage.index())
- });
+  initInputs();
+});
  
 </script>
-<h1>SMak</h1>
-<table class="layout" cellspacing='5'>
-
-<tr>
-  <td><h2>Add Activity</h2></td>
-  <td><h2>Activities
-      <div class="autoSchedule"><button type="button" onclick="autoSchedule();">Auto Schedule</button></div></h2></td>
-  <td><h2>Schedule</h2></td>
-  <td><h2>Map</h2></td>
-</tr>
-
-<tr>
-<td valign="top">
-<div id="new_activity">
-  <form id="activity_form">
-    Name:<input type="text" name="name" id="activity_name"></input><br />
-      Location:<input type="text" name="location" id="activity_location"></input><br />
-      Start:<input type="text" name="start" id="activity_start"></input>
-      End:<input type="text" name="end"  id="activity_end"></input><br />
-      Duration:<input type="text" name="duration" id="activity_duration"></input><br />
-      Range:<input type="text" name="range" id="activity_range"></input><br />
-  </form>
-    <button id="create_activity" class="normalbutton"/>Submit</button>
-</div>
-</td>
-
-<td valign="top">
-  <div class="activitiesContainer"></div>
-  <div class="activitiesList"></div>
-
-</td><td>
-  <div class="scheduleGrid"> 
-    <div class="schedule">  </div>
+<div id="activity">
+  <h2>New Activity</h2>
+  <input id="activity_name" type="text" name="activityName"></input>
+  <div id="activity_suggest">
+    <!-- Dynamically load this with activities. -->
   </div>
-  
-</td><td>
-  <div class="map"></div>
-</td>
+  <div id="activity_time">
+    <div id="time_form">
+      <div id="time_definite">
+        From <input id="definite_start"></input> 
+        To <input id="definite_end"></input>
+        <div id="definite_add_event">  
+          <button type="button" id="add_schedule" onclick="addEvent('schedule');">Add to Schedule</button>
+        </div>
+      </div>
+      <div id="or">or</div>
+      <div id="time_range">
+        <input id="range_duration"></input>hours
+        between <input id="range_start"></input>
+        and <input id="range_end"></input>
+      <div id="range_add_event">
+        <button type="button"  id="add_todo" onclick="addEvent('todo');">Add to Todo</button>
+      </div>
+      </div>
+    </div>
+<!--
+    <div id="time_display">
+      <canvas> </canvas>
+    </div>
+    <div id="description">
+    </div>
+    -->
+  </div>
 
-</tr></table>
+  <div id="activity_location">
+    <div id="location_form">
+      Where:<span id="pin_spot">
+                <img id="draggable" src='images/map_pin_blue.png'/>
+                <img id="pin_slot" src="images/map_pin_empty.png"/>
+            </span>
+      <input id="location_text"></input>
+    </div>
+    <div id="map_canvas">    </div>
+  </div>
+</div>
 
-<br /><br />
-
+<div id="schedule">
+<table class="layout">
+  <tr>
+    <td><h2>Activities</h2>
+    </td>
+    <td><h2>Schedule</h2></td>
+  </tr>
+    <td><div class="autoSchedule"><button type="button" onclick="autoSchedule();">Auto Schedule</button></div></td>
+    <td id="startTimeCell"></td>
+  <tr>
+    <td valign="top" style="padding:0 10px">
+      <div class="activitiesResizeContainer"></div>
+      <div class="activitiesContainer"></div>
+      <div class="doBetweenContainerContainer"></div>
+      <div class="activitiesList"></div>
+    </td><td style="position:relative;padding:0 10px">
+      <div class="scheduleGrid"> 
+        <div class="schedule">  </div>
+      </div>
+    </td><td>
+      <div class="map"></div>
+    </td>
+  </tr>
+</table>
+</div>
 </body>
 </html>

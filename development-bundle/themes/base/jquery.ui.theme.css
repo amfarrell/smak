@@ -40,7 +40,7 @@
 .ui-state-error-text, .ui-widget-content .ui-state-error-text, .ui-widget-header .ui-state-error-text { color: #cd0a0a/*{fcError}*/; }
 .ui-priority-primary, .ui-widget-content .ui-priority-primary, .ui-widget-header .ui-priority-primary { font-weight: bold; }
 .ui-priority-secondary, .ui-widget-content .ui-priority-secondary,  .ui-widget-header .ui-priority-secondary { opacity: .7; filter:Alpha(Opacity=70); font-weight: normal; }
-.ui-state-disabled, .ui-widget-content .ui-state-disabled, .ui-widget-header .ui-state-disabled { opacity: .35; filter:Alpha(Opacity=35); background-image: none; }
+.ui-state-disabled, .ui-widget-content .ui-state-disabled, .ui-widget-header .ui-state-disabled { opacity: .75; filter:Alpha(Opacity=75); background-image: none; }
 
 /* Icons
 ----------------------------------*/
@@ -228,10 +228,10 @@
 .ui-icon-grip-dotted-vertical { background-position: 0 -224px; }
 .ui-icon-grip-dotted-horizontal { background-position: -16px -224px; }
 .ui-icon-grip-solid-vertical { background-position: -32px -224px; }
-.ui-icon-grip-solid-horizontal { background-position: -48px -224px; 
-margin-left:auto;
-margin-right:auto;
-z-index:-1;}
+.ui-icon-grip-solid-horizontal-n{ background-position: -48px -224px; 
+position: absolute;  top: -6px;left: 50%;margin-left: -8px;z-index:100;}
+.ui-icon-grip-solid-horizontal-s { background-position: -48px -224px; 
+position: absolute; bottom: -5px; left: 50%;margin-left: -8px;z-index:100;}
 .ui-icon-gripsmall-diagonal-se { background-position: -64px -224px; }
 .ui-icon-grip-diagonal-se { background-position: -80px -224px; }
 
