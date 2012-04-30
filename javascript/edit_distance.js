@@ -209,7 +209,7 @@ function insert(state, id, pos, len, locked) {
 	return [true, state]
 }
 
-// NOTE: this function was changed to do the naiive thing---the filtering was giving bad solutions
+// NOTE: this function was changed to do the naive thing---the filtering was giving bad solutions
 //
 // returns the index of the first occurance of each different character.  
 // each whitespace character is considered a different character
@@ -400,12 +400,15 @@ function constrain_bounds(string, start, stop) {
 	}
 
 	ret = state.join("").replace(/,/g, "")
-	if (start >= 0) {
-		ret = Array(start+1).join(" ") + ret
-	}
-	if (stop <= orig_len) {
-		ret = ret + Array(end_delta+1).join(" ")
-	}
+
+	// @DEPRECATED
+	// this code makes sure that the squished list is still the original length
+	//if (start >= 0) {
+	//	ret = Array(start+1).join(" ") + ret
+	//}
+	//if (stop <= orig_len) {
+	//	ret = ret + Array(end_delta+1).join(" ")
+	//}
 
 	console.log("constrain_bounds() returning: \"" + ret + "\"")
 
@@ -436,10 +439,15 @@ function partially_schedule(string, los) {
 }
 
 // -----------------------------------------------------------------------------
-// Tests
+// Constraints
 // -----------------------------------------------------------------------------
 
+var do_between = new Array()
+do_between["A"] = [0, 5]
+do_between["B"] = [3, 5]
 
+var start_at = new Array()
+start_at["C"] = [4]
 
 // -----------------------------------------------------------------------------
 // Calls
@@ -448,7 +456,7 @@ function partially_schedule(string, los) {
 
 var init = "AA  BBCCC  "
 //var test = edit_distance(init, "C", 5, 3)
-var test2 = constrain_bounds(init, -2, init.length + 6)
+var test2 = constrain_bounds(init, 1, init.length - 5)
 
 console.log("[" + init + "]")
 console.log("[" + test2 + "]")
