@@ -314,6 +314,17 @@ function filter_configurations(configurations) {
 // Cost Functions
 // -----------------------------------------------------------------------------
 
+function diff_state(initial_state, state) {
+	var eliminations = new Array()
+	var initial_state_set = array_unique_elements(initial_state)
+	for (var i = 0; i < initial_state_set.length; i++) {
+		if (state.indexOf(initial_state_set[i]) == -1 && initial_state_set[i] != " ") {
+			eliminations.push([initial_state_set[i], count_array_occurances(initial_state, initial_state_set[i])])
+		}
+	}
+	return eliminations
+}
+
 function cost_function(initial_state, configuration, excludes) {
 	var old_model = model_from_string(initial_state)
 	var new_model = model_from_string(configuration)
@@ -340,7 +351,7 @@ function cost_function(initial_state, configuration, excludes) {
 		}
 	}
 
-	// elimination cost
+	// elimination cost; TODO combine with diff_state
 	var elimination_cost = 0
 	var initial_state_set = array_unique_elements(initial_state)
 	for (var i = 0; i < initial_state_set.length; i++) {
@@ -434,6 +445,7 @@ function constrain_bounds(string, start, stop) {
 	
 	var state = string.split("")
 	var orig_len = state.length
+	var orig_state = state.slice()
 	var end_delta = -1
 
 	console.log("constrain_bounds(\"" + string + "\", \"" + start + "\", \"" + stop + "\") ~ original length: " + orig_len)
@@ -474,6 +486,19 @@ function constrain_bounds(string, start, stop) {
 		}
 
 		state = state.slice(end_delta).reverse()
+	}
+
+	// do the start_at, do_between filtering
+	var states = filter_configurations([state])
+	state = states[0]
+
+	// redraw eliminated activities
+	var eliminations = diff_state(orig_state, state)
+	for (var i = 0; i < eliminations.length; i++) {
+		var e_id = eliminations[i][0]
+		var e_len = eliminations[i][1]
+		//console.log("Eliminated: " + e_id)
+		setupActivity(e_id, e_len, ".activitiesList", 0)
 	}
 
 	ret = state.join("").replace(/,/g, "")
