@@ -460,5 +460,5 @@ console.log("Orig len: " + init.length + ", new len: " + test2.length)
 //test = partially_schedule(init, ["C", "DD", "EEE", "FFFF"])
 
 
-console.log("FINAL RESULT: " + pprint(init) + " -> " + pprint(test))
+//console.log("FINAL RESULT: " + pprint(init) + " -> " + pprint(test))
 
