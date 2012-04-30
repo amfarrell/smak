@@ -209,6 +209,8 @@ function insert(state, id, pos, len, locked) {
 	return [true, state]
 }
 
+// NOTE: this function was changed to do the naiive thing---the filtering was giving bad solutions
+//
 // returns the index of the first occurance of each different character.  
 // each whitespace character is considered a different character
 function find_breaks(state) {
@@ -332,8 +334,17 @@ function edit_distance(string, id, pos_final, len) {
 }
 
 function constrain_bounds(string, start, stop) {
+	console.log("constrain_bounds(\"" + string + "\", \"" + start + "\", \"" + stop + "\")")
 	var state = string.split("")
-	var end_delta = state.length - stop
+	var orig_len = state.length
+	var end_delta = -1
+
+	if (start < 0) {
+		state = Array(-1 * start + 1).join(" ").split("").concat(state)
+	}
+	if (stop > orig_len) {
+		state = state.concat(Array((stop - orig_len) + 1).join(" ").split(""))
+	}
 
 	// push forward
 	for (var i = 0; i < start; i++) {
@@ -344,20 +355,39 @@ function constrain_bounds(string, start, stop) {
 			state = insert(state, id, i+1, len, -1)[1]
 		}
 	}
-	state = state.slice(start).reverse()
+
+	if (start >= 0) {
+		state = state.slice(start)
+	}
 
 	// push backwards
-	for (var i = 0; i < end_delta; i++) {
-		var id = state[i]
-		if (id != " ") {
-			var len = count_array_occurances(state, id)
-			state = array_replace(state, id, " ")
-			state = insert(state, id, i+1, len, -1)[1]
-		}
-	}
-	state = state.slice(end_delta).reverse()
+	if (stop <= orig_len) {
+		state = state.reverse()
 
-	return Array(start+1).join(" ") + state.join("").replace(/,/g, "") + Array(end_delta+1).join(" ")
+		end_delta = orig_len - stop
+		for (var i = 0; i < end_delta; i++) {
+			var id = state[i]
+			if (id != " ") {
+				var len = count_array_occurances(state, id)
+				state = array_replace(state, id, " ")
+				state = insert(state, id, i+1, len, -1)[1]
+			}
+		}
+
+		state = state.slice(end_delta).reverse()
+	}
+
+	ret = state.join("").replace(/,/g, "")
+	if (start >= 0) {
+		ret = Array(start+1).join(" ") + ret
+	}
+	if (stop <= orig_len) {
+		ret = ret + Array(end_delta+1).join(" ")
+	}
+
+	console.log("constrain_bounds() returning: \"" + ret + "\"")
+
+	return ret
 }
 
 // -----------------------------------------------------------------------------
@@ -371,8 +401,12 @@ function constrain_bounds(string, start, stop) {
 // -----------------------------------------------------------------------------
 
 var init = "AA  BBCCC  "
-var test = edit_distance(init, "C", 5, 3)
-//test = constrain_bounds(init, 2, init.length)
+//var test = edit_distance(init, "C", 5, 3)
+var test2 = constrain_bounds(init, -2, init.length + 6)
+
+console.log("[" + init + "]")
+console.log("[" + test2 + "]")
+console.log("Orig len: " + init.length + ", new len: " + test2.length)
 
 //console.log("FINAL RESULT: " + pprint(init) + " -> " + pprint(test))
 
