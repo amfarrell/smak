@@ -159,7 +159,7 @@ body {
   border:1px solid #92ADB5;
   text-align:center;
   width: 258px;
-  /*display: table;*/
+  display: table;
   
   background:#B3E2F2;
   margin-left:auto;
@@ -167,7 +167,7 @@ body {
   margin-bottom:3px;
   z-index:10;
 }
-.scheduleItem:hover {
+.scheduleItem:hover:not(.ui-state-disabled) {
   background:#92ADB5;
 }
 .selected {
@@ -175,6 +175,21 @@ body {
 }
 .scheduleItem.selected:hover {
   background:#BFADAA;
+}
+.lock{
+  position: absolute;
+  cursor: pointer;
+}
+.duration{
+  position: absolute;
+  right:3px;
+}
+.activityName{
+  width:100%;
+  position: absolute;
+  top:50%;
+  height:20px;
+  margin-top:-10px;
 }
 .doBetweenContainerContainer{
   width:582px;

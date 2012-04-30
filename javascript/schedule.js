@@ -39,7 +39,7 @@
       if (time==Math.floor(time)) { 
         if (time==0) time = 12;
         if (i > schedule.length - 4){//last time block is a partial hour
-          console.log(schedule.length-i+" " + i + " " +schedule.length);
+          console.log("schedule.length "+schedule.length-i+" " + i + " " +schedule.length);
           $('.scheduleGrid table').append("<tr><td class='gridTime' style='width:18px'>"+time+"</td><td class='gridSpace' style='width:278px'></td></tr>");
           $('.scheduleGrid td.gridTime:last').height(blockHeight*(schedule.length-i)-2);
           $('.scheduleGrid td.gridSpace:last').height(blockHeight*(schedule.length-i)-2);
@@ -76,7 +76,7 @@
   function drawSchedule(newSchedule) {
   //XXX This also returns the list of Activity IDs.
     schedule = newSchedule;
-    console.log("drawSchedule"+ newSchedule);
+    console.log("drawSchedule:"+ schedule);
     var prevItem="";
     var idList = [];
       
@@ -127,6 +127,7 @@ window.autoSchedule = function autoSchedule(){
   
   function updateDuration(id){
     duration = (Math.floor($("#"+id).height())+borderMarginHeight) / blockHeight;
+    //console.log(Math.floor($("#"+id).height()));
     if (duration > 4)
       plural = "s";
     else
@@ -134,9 +135,33 @@ window.autoSchedule = function autoSchedule(){
     $("#"+id+" .duration").text((duration/4)+' Hour'+plural);
   }
   
+  function toggleLock(event){
+    if ($(this).children("img").attr("src") == 'unlock.png'){
+      $(this).html("<img src='lock.png' alt='locked' /></a>");
+      $("#" + $(this).parent(".item").attr("id")).draggable( "disable" );
+      $("#" + $(this).parent(".item").attr("id")).resizable( "disable" );
+      event.stopPropagation();    
+      deselectItem();
+    // TODO: update object model with the fact that this item is locked
+    }else{
+      $(this).html("<img src='unlock.png' alt='unlocked' /></a>");
+      $("#" + $(this).parent(".item").attr("id")).draggable( "enable" );
+      $("#" + $(this).parent(".item").attr("id")).resizable( "enable" );
+      event.stopPropagation();    
+    // TODO: update object model with the fact that this item is unlocked
+    }
+  }
   function setupActivity(id, duration, list, verticalPos){  //list = ".schedule" or ".activitiesList"
-    $(list).append('<div class="scheduleItem item" id='+id+'>'+O.activities.get(id).name+'<br /><div class="duration"></div></div>');
-        
+    $(list).append('<div class="scheduleItem item" id='+id+'></div>');
+    
+    if (list == ".schedule"){
+      $(list + " div.item:last").append("<div class='lock'><img src='unlock.png' alt='unlocked' /></div>");
+      $(list + " div.item:last .lock").click(toggleLock);
+    }
+    $(list + " div.item:last").append("<div class='duration'></div>");
+    $(list + " div.item:last").append("<div class='activityName'>"+O.activities.get(id).name+"</div>");
+    
+    
     // Make item draggable
     $(list + " div.item:last").draggable({
       snap: '.schedule, .activitiesList',
@@ -145,7 +170,7 @@ window.autoSchedule = function autoSchedule(){
       stack: "div.item", 
       opacity: 0.75, 
       start:function(event,ui) {
-        $(this).each(selectItem);
+        selectItem(id);
       },
       drag:function(){
         if ($(this).overlaps($("#doBetween" +  $(this).attr("id")+" .doBetween"))) {
@@ -163,11 +188,9 @@ window.autoSchedule = function autoSchedule(){
           var positionY = Math.round(($(this).position().top)/blockHeight);
           if (list == ".activitiesList") {  // move from Activities to Schedule
             $(this).remove();
-          }
-          console.log(schedule + ", "+ id + ", "+ positionY +  ", "+ $(this).position().top+", "+ height);        
+          }       
           drawSchedule(edit_distance(schedule,id, positionY,height));
         } else if (list == ".schedule") {   // move from Schedule to Activities
-          console.log("remove");
           addActivity($(this).attr("id"), height);
           $(this).remove();
           schedule = schedule.replace(new RegExp($(this).attr("id"), 'g'), " "); // remove item from schedule
@@ -175,7 +198,7 @@ window.autoSchedule = function autoSchedule(){
           $(this).css({"left":0, "top":0}); //return to original position
         }
         updateModel(id);
-        $("#"+id).each(selectItem);
+        selectItem(id);
         $(".hover").removeClass("hover");
       }
     })
@@ -188,7 +211,7 @@ window.autoSchedule = function autoSchedule(){
       //minWidth: 258,
       start: function(event, ui) {  
         $(this).after("<div class='spaceHolder' style='height:"+ ($(this).height()+borderMarginHeight) +"px'></div>");
-        $(this).each(selectItem);
+        selectItem(id);
       },
       resize:function(event, ui) {  
         updateDuration(id);
@@ -197,8 +220,7 @@ window.autoSchedule = function autoSchedule(){
         var id = $(this).attr("id");
         if (list == ".schedule" ) {
           var positionY = Math.round(($(this).position().top)/blockHeight);
-          var height = Math.round(($(this).height() + borderMarginHeight) / blockHeight);
-          console.log(schedule + ", "+ id + ", "+ positionY +  ", "+ height);        
+          var height = Math.round(($(this).height() + borderMarginHeight) / blockHeight);  
           drawSchedule(edit_distance(schedule,id, positionY,height));
         } else {
           $(".activitiesList div.scheduleItem").css({
@@ -210,7 +232,7 @@ window.autoSchedule = function autoSchedule(){
         }
         updateDuration(id);
         updateModel(id);
-        $("#"+id).each(selectItem);
+        selectItem(id);
         //O.map.drawpath(schedule);
       }
     });
@@ -235,6 +257,8 @@ window.autoSchedule = function autoSchedule(){
         "left":0,
         "top":verticalPos*blockHeight,
       });
+      //TODO:  disable resizable and draggable if object is locked
+      
       $(list + " div.item:last").draggable("option", "containment", ".doBetween"+id);
       $(list + " div.item:last").resizable("option", "containment", ".doBetween"+id);
     }else{
@@ -256,7 +280,6 @@ window.autoSchedule = function autoSchedule(){
       
       var boxDuration = endPosition - startPosition; // in hours
 
-      console.log(endPosition + " " +(blockHeight*boxDuration*4));
       $(".doBetweenContainerContainer").append('<div class="doBetweenContainer doBetween'+id+'"><div class="doBetweenTop"></div><div class="doBetweenBottom"></div></div>');
       $(".doBetween"+id).css("z-index",-2).fadeTo(1,0);
       $(".doBetween"+id).height(blockHeight*boxDuration*4);
@@ -285,22 +308,22 @@ window.autoSchedule = function autoSchedule(){
    updateDoBetweenBox();
   }
   function deselectItem(){
-      $(".selected").removeClass('selected');
-      O.activities.deselect(this.id);
-  }
-
-  function selectItem(){
-    $(".selected:not(#"+$(this).attr("id")+")").removeClass('selected');
-    $(this).addClass('selected');
+    console.log("deselected");
+    $(".selected").removeClass('selected');
     updateDoBetweenBox();
-    O.activities.select(this.id);
+    O.activities.deselect(this.id);
+  }
+  function selectItem(id){
+    $(".selected:not(#"+id+")").removeClass('selected');
+    $("#"+id).addClass('selected');
+    updateDoBetweenBox();
+    O.activities.select(id);
   }
 
   function updateDoBetweenBox(){
     if($(".selected").length){
       $(".doBetweenContainer:not(.doBetween"+$(".selected").attr("id")+")").css("z-index",-2).fadeTo(1,0);
       $(".doBetween" +  $(".selected").attr("id")).css("z-index",1).fadeTo(1,1);
-      console.log(".doBetweenContainer" +  $(".selected").attr("id"));
     }else{
       $(".doBetweenContainer").css("z-index",-2).fadeTo(1,0);
     }
