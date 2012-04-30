@@ -299,7 +299,7 @@ function filter_configurations(configurations) {
 			var end_threshold = do_between_thresholds[1]
 			var start_index = current_config.indexOf(fid)
 			var end_index = current_config.lastIndexOf(fid)
-			if (start_index > -1 && (	start_index <= start_threshold || 
+			if (start_index > -1 && (	start_index < start_threshold || 
 																end_index >= end_threshold)) {
 				current_config = array_replace(current_config, fid, " ")				
 			}
@@ -407,10 +407,19 @@ function edit_distance(string, id, pos_final, len) {
 	var state = state_bundle[0]
 	var eliminations = state_bundle[1]
 
+	// re-layout things that got eliminated
+	var eliminatedTarget = false
+	if (state.indexOf(id) == -1) { // corner case (hack)
+		eliminatedTarget = true
+		setupActivity(id, len, ".activitiesList", 0)
+	}
 	for (var i = 0; i < eliminations.length; i++) {
 		var e_id = eliminations[i][0]
-		var e_len = eliminations[i][1]
-		setupActivity(e_id, e_len, ".activitiesList", 0)
+		if (!(e_id == id && eliminatedTarget)) {
+			var e_len = eliminations[i][1]
+			console.log("Eliminated: " + e_id)
+			setupActivity(e_id, e_len, ".activitiesList", 0)
+		}
 	}
 
 	var ret = state.join("").replace(/,/g, "")
