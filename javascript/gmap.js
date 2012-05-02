@@ -52,10 +52,10 @@ window.initMap = function initMap () {
     'directions':function directions(list) {
       var coords = [];
       while (list.length > 0){
-        O.activities.get(list[0]).marker.setVisible(false);
+        list[0].marker.setVisible(false);
         //Really what I want to do is suppress the markers and
         //display my own markers.
-        coords.push({'stopover':true,'location':O.activities.get(list.shift()).coords.join(",")})
+        coords.push({'stopover':true,'location':list.shift().coords.join(",")})
       }
       console.log(coords);
       var request = {
@@ -78,14 +78,18 @@ window.initMap = function initMap () {
       });
     },
     'renderPath':function renderPath(list){
+      if (list.length < 2){
+        return;
+        //TODO: have it display a different colour marker.
+      }
       return Map.directions(list);
       var newlist = [];
       var origin;
       var destination;
       while (list.length > 1){
         newlist.push(list.shift());
-        origin = O.activities.get(newlist[newlist.length-1]).coords.join(',');
-        destination = O.activities.get(list[list.length-1]).coords.join(',');
+        origin = newlist[newlist.length-1].coords.join(',');
+        destination = list[list.length-1].coords.join(',');
         Map.directions(origin,destination);
       }
       newlist.push(list.shift())
@@ -112,6 +116,8 @@ window.initMap = function initMap () {
           if (newstate === "suggested"){
             // remove marker. redisplay with new number.
           } else if (newstate === "scheduled"){
+            var order = O.activities.all("ordered_schedule");
+            Map.renderPath(order);
             console.log("adding to schedule"+i)
             //change colour of marker
           }

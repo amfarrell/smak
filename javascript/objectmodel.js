@@ -74,11 +74,7 @@ window.initModel = function initModel () {
         if (['map','schedule','form'].indexOf(view) === -1){throw new Error("unknown interface "+view)};
         for (subscriber in O.activities._subscribers) {
           if (subscriber !== view) {
-            try {
-              O.activities._subscribers[subscriber][handler](i, otherdata);
-            } catch (e){
-              debugger;
-            }
+            O.activities._subscribers[subscriber][handler](i, otherdata);
           }
         }
       },
@@ -121,14 +117,14 @@ window.initModel = function initModel () {
               event2.end = "0" + event1.end
             }
             if (event1.start > event2.start){
-              if (event1.end < event2.end){
-                throw new Error("overlapping events");
-              }
+              //if (event1.end < event2.end){
+              //  throw new Error("overlapping events");
+              //}
               return 1;
             } else if (event1.start < event2.start){
-              if (event1.end > event2.end){
-                throw new Error("overlapping events");
-              }
+              //if (event1.end > event2.end){
+              //  throw new Error("overlapping events");
+              //}
               return -1;
             } else {
               throw new Error("events starting the same time");

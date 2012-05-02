@@ -109,7 +109,6 @@ window.autoSchedule = function autoSchedule(){
     });
     console.log("partially_schedule " + schedule + ", " + unscheduledActivities);
     $(".activitiesList").html('');
-    //debugger;
     //var list = drawSchedule(partially_schedule(schedule, unscheduledActivities));
     //Map.renderPath(list);
   }
@@ -119,7 +118,26 @@ window.autoSchedule = function autoSchedule(){
     var positionY = Math.round(($("#"+id).position().top)/blockHeight);
     O.activities.get(id).duration = height*15;
     if ($("#"+id).parents(".schedule").length>0) {
-      O.activities.update("schedule",id,{"start":positionY/4 + parseFloat(startTime.toString("H")) + startTime.toString("mm")/60}); 
+      var minute = Math.floor(15*(positionY%4) +  startTime.getMinutes("mm"));
+      var hour = Math.floor(positionY/4) + parseFloat(startTime.toString("H"));
+      if (minute >= 60){
+        hour = ""+(hour + Math.floor(minute/60));
+        minute = ""+ (minute%60);
+      } else {
+        hour = ""+hour
+        minute = ""+ minute
+      }
+      if (hour.length < 2){
+        hour = "0"+hour
+      }
+      if (minute.length < 2){
+        minute = "0"+minute
+      }
+      if (hour > 24){
+        //XXX What should we do?
+      }
+      O.activities.update("schedule",id,{"start":"" + hour + ":" + minute}); 
+      //XXX brittle. depends on the increments being 15min.
       O.activities.schedule("schedule",id);
     } else {
       O.activities.deschedule("schedule",id);
