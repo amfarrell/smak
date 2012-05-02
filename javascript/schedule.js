@@ -4,7 +4,11 @@
   var activitiesListPos = 0; // position of the end of the activities list. (counted in 15 min blocks)
   var scheduleItemWidth = 260;  //pixels width of schdeduleItem
   var borderMarginHeight = 5;  //pixels width of border and margin of schdeduleItem
-
+  
+  $('html').click(function() {
+    deselectItem();
+  });
+  
   function initHeights() {
     $('.schedule').height(blockHeight*schedule.length);    
     //$('.scheduleGrid').height(blockHeight*schedule.length);  
@@ -341,7 +345,7 @@ window.autoSchedule = function autoSchedule(){
   /*
    * XXX these should take either an event or an id of the activity represented.
    */
-  function toggleItem(){
+  function toggleItem(event){
     if(!$(this).hasClass('selected')){
       selectItem($(this).attr("id"));
     }else{
@@ -349,12 +353,13 @@ window.autoSchedule = function autoSchedule(){
       O.activities.deselect('schedule',this.id);
       updateDoBetweenBox();
     }
+    event.stopPropagation();
   }
   function deselectItem(){
     console.log("deselected");
     $(".selected").removeClass('selected');
     updateDoBetweenBox();
-    O.activities.deselect('schedule',this.id);
+    O.activities.deselect('schedule');
   }
   function selectItem(id){
     $(".selected:not(#"+id+")").removeClass('selected');
