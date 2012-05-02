@@ -72,6 +72,7 @@
     initHeights();
     drawScheduleGrid();
     drawSchedule(schedule);
+    updateDoBetween();
   }
   function drawSchedule(newSchedule) {
   //XXX This also returns the list of Activity IDs.
@@ -295,29 +296,40 @@ window.autoSchedule = function autoSchedule(){
     
     // Add doBetweenbox
     if($(".doBetween"+id).length==0){   // if it doesn't exist already
-      var range = O.activities.get(id).range;
-      var boxStartTime = new Date(Date.parse(range[0]));
-      var endTime =  new Date( startTime.valueOf()).addHours(schedule.length/4);
-      var startPosition = dateToNumber(boxStartTime) - dateToNumber(startTime);  //in hours
-      if (startPosition<0) startPosition = 0;
-      if (dateToNumber(new Date(Date.parse(range[1]))) > dateToNumber(endTime)) 
-        var endPosition =  dateToNumber(endTime) - dateToNumber(startTime); // in hours
-      else 
-        var endPosition = dateToNumber(new Date(Date.parse(range[1]))) - dateToNumber(startTime); // in hours
-      
-      var boxDuration = endPosition - startPosition; // in hours
-
-      $(".doBetweenContainerContainer").append('<div class="doBetweenContainer doBetween'+id+'"><div class="doBetweenTop"></div><div class="doBetweenBottom"></div></div>');
-      $(".doBetween"+id).css("z-index",-2).fadeTo(1,0);
-      $(".doBetween"+id).height(blockHeight*boxDuration*4);
-      $(".doBetween"+id).css("top",startPosition*blockHeight*4);
-      
-      $(".doBetween"+id+" .doBetweenTop").height(blockHeight*startPosition*4);
-      $(".doBetween"+id+" .doBetweenTop").css("top",-blockHeight*startPosition*4);
-      
-      $(".doBetween"+id+" .doBetweenBottom").height(blockHeight*(schedule.length - endPosition*4));
-      $(".doBetween"+id+" .doBetweenBottom").css("bottom",-(blockHeight*(schedule.length - endPosition*4)));
+      drawDoBetween(id)
     }
+  }
+  
+  function updateDoBetween(){
+    for (var i in O.activities.all()) {
+      drawDoBetween(i);
+    }
+  }
+  
+  function drawDoBetween(id){
+    var range = O.activities.get(id).range;
+    var boxStartTime = new Date(Date.parse(range[0]));
+    var endTime =  new Date( startTime.valueOf()).addHours(schedule.length/4);
+    var startPosition = dateToNumber(boxStartTime) - dateToNumber(startTime);  //in hours
+    if (startPosition<0) startPosition = 0;
+    if (dateToNumber(new Date(Date.parse(range[1]))) > dateToNumber(endTime)) 
+      var endPosition =  dateToNumber(endTime) - dateToNumber(startTime); // in hours
+    else 
+      var endPosition = dateToNumber(new Date(Date.parse(range[1]))) - dateToNumber(startTime); // in hours
+    
+    var boxDuration = endPosition - startPosition; // in hours
+    
+    $(".doBetween"+id).remove()   //remove if already exists
+    $(".doBetweenContainerContainer").append('<div class="doBetweenContainer doBetween'+id+'"><div class="doBetweenTop"></div><div class="doBetweenBottom"></div></div>');
+    $(".doBetween"+id).css("z-index",-2).fadeTo(1,0);
+    $(".doBetween"+id).height(blockHeight*boxDuration*4);
+    $(".doBetween"+id).css("top",startPosition*blockHeight*4);
+    
+    $(".doBetween"+id+" .doBetweenTop").height(blockHeight*startPosition*4);
+    $(".doBetween"+id+" .doBetweenTop").css("top",-blockHeight*startPosition*4);
+    
+    $(".doBetween"+id+" .doBetweenBottom").height(blockHeight*(schedule.length - endPosition*4));
+    $(".doBetween"+id+" .doBetweenBottom").css("bottom",-(blockHeight*(schedule.length - endPosition*4)));
   }
 
   /*
