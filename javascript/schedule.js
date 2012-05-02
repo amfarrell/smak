@@ -17,7 +17,7 @@
     for (var i in O.activities.all()) {
       if (!O.activities.get(i).scheduledP) {
         addActivity(i, O.activities.get(i).duration/15)
-        O.activities.todo(i);
+        O.activities.todo('schedule',i);
       }
     }
   }
@@ -110,8 +110,8 @@ window.autoSchedule = function autoSchedule(){
     console.log("partially_schedule " + schedule + ", " + unscheduledActivities);
     $(".activitiesList").html('');
     //debugger;
-    var list = drawSchedule(partially_schedule(schedule, unscheduledActivities));
-    Map.renderPath(list);
+    //var list = drawSchedule(partially_schedule(schedule, unscheduledActivities));
+    //Map.renderPath(list);
   }
 
   function updateModel(id, list){
@@ -119,10 +119,10 @@ window.autoSchedule = function autoSchedule(){
     var positionY = Math.round(($("#"+id).position().top)/blockHeight);
     O.activities.get(id).duration = height*15;
     if ($("#"+id).parents(".schedule").length>0) {
-      O.activities.get(id).start = positionY/4 + parseFloat(startTime.toString("H")) + startTime.toString("mm")/60
-      O.activities.get(id).scheduledP = true;
+      O.activities.update("schedule",id,{"start":positionY/4 + parseFloat(startTime.toString("H")) + startTime.toString("mm")/60}); 
+      O.activities.schedule("schedule",id);
     } else {
-      O.activities.get(id).scheduledP = false;
+      O.activities.deschedule("schedule",id);
     }
     console.log("start time " + O.activities.get(id).start);
   }
@@ -135,6 +135,8 @@ window.autoSchedule = function autoSchedule(){
     else
       plural = "";
     $("#"+id+" .duration").text((duration/4)+' Hour'+plural);
+    O.activities.update("schedule",id,{"duration":duration}); 
+    //XXX I think this is the wrong format.
   }
   
   function toggleLock(event){
@@ -326,13 +328,13 @@ window.autoSchedule = function autoSchedule(){
     updateDoBetweenBox();
     O.activities.select('schedule',id);
   }
-  //Danica, check these?
+  //XXX These do not work because they need the id.
   function unlockItem(){
-    console.log("unlocked");
+    if (this.id === undefined){throw new Error("tried to unlock but I don't know the id")};
     O.activities.lock('schedule',this.id);
   }
   function lockItem(id){
-    console.log("locked");
+    if (this.id === undefined){throw new Error("tried to lock but I don't know the id")};
     O.activities.lock('schedule',this.id);
   }
 

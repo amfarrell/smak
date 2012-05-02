@@ -1,3 +1,4 @@
+
 window.initMap = function initMap () {
 
   var latlng = new google.maps.LatLng(43.781, 11.260);
@@ -93,4 +94,149 @@ window.initMap = function initMap () {
   };
   window.Map.overlay.draw = function() {};
   window.Map.overlay.setMap(window.Map._map);
+  O.activities.commitment_changed("map",function map_select_handle(i,oldstate){
+        //var marker = window.Map.placeMarker(activity.coords,activity.name)
+        //$.jStorage.get(i).marker = marker;
+
+        var activity =  O.activities.get(i);
+        var newstate = activity.commitment;
+        if (oldstate === "suggested"){
+          //remove any temporary marker and place a new one.
+          if (newstate === "todo"){
+            activity.marker = Map.placeMarker(activity.coords, activity.title)
+          } else if (newstate === "scheduled"){
+
+            console.log("add to itinerary");
+          }
+        } else if (oldstate === "todo") {
+          if (newstate === "suggested"){
+            // remove marker. redisplay with new number.
+          } else if (newstate === "scheduled"){
+            console.log("adding to schedule"+i)
+            //change colour of marker
+          }
+        } else if (oldstate === "scheduled"){
+          if (newstate === "suggested"){
+            // remove marker. recalc order.
+          } else if (newstate === "todo"){
+            //change colour of marker, recalc order.
+          } else if (newstate === "locked"){
+            // Do nothing
+          }
+        } else if (oldstate === "locked"){
+            // Do nothing
+        }
+  });
+
+}
+
+window.initMapInput = function initMapInput () {
+
+  var map = $("#map_canvas")
+  var startX;
+  var startY;
+  var offsetX = 62.593; //hardcoded values for now.
+  var offsetY = -29.26; //TODO, calculate the displacement from the 
+                        //upper-left corner of the map and the middle 
+                        //of the bottom edge of the 11px wide pin image.
+  var snapTolerance = 35;
+  $("#draggable").draggable({
+    'helper': "original",
+    'zIndex': 9999,
+    'snap': "#pin_slot",
+    'snapMode': "inner",
+    'snapTolerance' : snapTolerance,
+    'containment' : "document",
+    //draggable adds a listener such that when the mouse moves, 
+    //the map_pin follows it.
+    'start': function(e,ui) {
+      startX = e.pageX;
+      startY = e.pageY;
+    },
+    'cursorAt': {
+      bottom:0,
+      left:11, //assuming image is 22px wide.
+    },
+    'drag': function(e,ui) {
+      var slot = $("#pin_slot")
+      var XtoleranceFudge = $("#draggable").width();
+      var YtoleranceFudge = $("#draggable").height();
+      if (e.pageX > map.offset().left && 
+          e.pageX < map.offset().left + map.width() &&
+          e.pageY > map.offset().top && 
+          e.pageY < map.offset().top + map.height()) {
+        $(this).draggable({'revert':false,'snapTolerance':snapTolerance/4});
+        console.log([e.pageX,e.pageY]);
+        console.log(map.offset().left + "-"+ (map.offset().left + map.width()))
+        console.log(map.offset().top + "-"+ (map.offset().top + map.height()))
+      } else {
+        console.log([e.pageX,e.pageY]);
+        console.log(map.offset().left + "-"+ (map.offset().left + map.width()))
+        console.log(map.offset().top + "-"+ (map.offset().top + map.height()))
+        $(this).draggable({'snapTolerance':snapTolerance});
+        if (e.pageX > slot.offset().left - snapTolerance + XtoleranceFudge && 
+            e.pageX < slot.offset().left + slot.width() + snapTolerance - XtoleranceFudge  &&
+            e.pageY > slot.offset().top - snapTolerance + YtoleranceFudge && 
+            e.pageY < slot.offset().top + slot.height() + snapTolerance - YtoleranceFudge ) {
+          $(this).draggable({'revert':false});
+        } else {
+          $(this).draggable({'revert':true});
+        }
+      }
+      if (O.currentActivity.user_createdP===false) {
+        $(this).draggable({'revert':true});
+        console.log("revert true")
+      }
+    },
+    'stop': function(e,ui) {
+      //Record the x,y position of the map_pin and put it there absolutely.
+      var point=new google.maps.Point(e.pageX - startX + offsetX, 
+                                      e.pageY - startY + offsetY);
+      var ll=Map.overlay.getProjection().fromContainerPixelToLatLng(point);
+      //placeMarker(ll); 
+      //TODO: When we add an item to the schedule or todo, put it on the map.
+      //TODO: When we put it in the schedule, draw arrows indicating event order.
+      //TODO: enforce that there is enough travel time between events.
+      if (e.pageX > map.offset().left && 
+          e.pageX < map.offset().left + map.width() &&
+          e.pageY > map.offset().top && 
+          e.pageY < map.offset().top + map.height()) {
+        O.currentActivity.coords = [ll.Ya,ll.Za];
+        $("#location_text").val((""+ll.Ya).substr(0,8) + ", " + (""+ll.Za).substr(0,8));
+      } else if (O.currentActivity.user_createdP) {
+        O.currentActivity.coords = undefined;
+        $("#location_text").val("");
+      }
+      //TODO: when the event marker gets moved off the map it:
+      //returns to its original position if not put in the socket
+      //or the location info gets cleared if it is put in the socket.
+      }
+  });
+
+  $("#location_text").keyup(function (e){
+    O.currentActivity.coords = e.srcElement.value.replace(" ","").split(",");
+    console.log(O.currentActivity)
+    //TODO: check if valid time. Highlight in red if not.
+    //TODO: visualize the time in some way.
+  });
+  O.activities.selected("map",function map_select_handle(i,changes){
+    if (O.activities.get(i).commitment === "suggested"){
+      //place a temporary marker.
+    }
+    O.activities.get(i).marker.setAnimation(google.maps.Animation.BOUNCE)
+        //This belongs in the handler
+
+  });
+  O.activities.deselected("map",function map_select_handle(i,changes){
+    O.activities.get(i).marker.setAnimation(null)
+
+    if (O.activities.get(i).commitment === "suggested"){
+    // remove the temporary marker.
+    }
+  });
+  O.activities.updated("map",function map_select_handle(i,changes){
+    
+
+  });
+
 }
