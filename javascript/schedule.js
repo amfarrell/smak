@@ -166,14 +166,12 @@ window.autoSchedule = function autoSchedule(){
       $("#" + id).resizable( "disable" );
       event.stopPropagation();    
       O.activities.lock('schedule',id);
-    // TODO: update object model with the fact that this item is locked
     }else{
       $(this).html("<img src='unlock.png' alt='unlocked' /></a>");
       $("#" + id).draggable( "enable" );
       $("#" + id).resizable( "enable" );
       event.stopPropagation();    
       O.activities.unlock('schedule',id);
-    // TODO: update object model with the fact that this item is unlocked
     }
   }
   function setupActivity(id, duration, list, verticalPos, itemNumber){  //list = ".schedule" or ".activitiesList"

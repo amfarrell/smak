@@ -187,11 +187,15 @@ body {
 }
 .grip-n{
   background-image: url(../resize_n.gif);
+  background-repeat:no-repeat;
+  background-position:bottom; 
   margin-left: -30px;
   top:-30px;
 }
 .grip-s{
   background-image: url(../resize_s.gif);
+  background-repeat:no-repeat;
+  background-position:top; 
   bottom:-30px;
 }
 .selected .ui-resizable-handle{
