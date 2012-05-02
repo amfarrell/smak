@@ -159,19 +159,20 @@ window.autoSchedule = function autoSchedule(){
   }
   
   function toggleLock(event){
+    var id = $(this).parent(".item").attr("id");
     if ($(this).children("img").attr("src") == 'unlock.png'){
       $(this).html("<img src='lock.png' alt='locked' /></a>");
-      $("#" + $(this).parent(".item").attr("id")).draggable( "disable" );
-      $("#" + $(this).parent(".item").attr("id")).resizable( "disable" );
+      $("#" + id).draggable( "disable" );
+      $("#" + id).resizable( "disable" );
       event.stopPropagation();    
-      lockItem();
+      O.activities.lock('schedule',id);
     // TODO: update object model with the fact that this item is locked
     }else{
       $(this).html("<img src='unlock.png' alt='unlocked' /></a>");
-      $("#" + $(this).parent(".item").attr("id")).draggable( "enable" );
-      $("#" + $(this).parent(".item").attr("id")).resizable( "enable" );
+      $("#" + id).draggable( "enable" );
+      $("#" + id).resizable( "enable" );
       event.stopPropagation();    
-      unlockItem();
+      O.activities.unlock('schedule',id);
     // TODO: update object model with the fact that this item is unlocked
     }
   }
@@ -362,15 +363,6 @@ window.autoSchedule = function autoSchedule(){
     $("#"+id).addClass('selected');
     updateDoBetweenBox();
     O.activities.select('schedule',id);
-  }
-  //XXX These do not work because they need the id.
-  function unlockItem(){
-    if (this.id === undefined){throw new Error("tried to unlock but I don't know the id")};
-    O.activities.lock('schedule',this.id);
-  }
-  function lockItem(id){
-    if (this.id === undefined){throw new Error("tried to lock but I don't know the id")};
-    O.activities.lock('schedule',this.id);
   }
 
   function updateDoBetweenBox(){
