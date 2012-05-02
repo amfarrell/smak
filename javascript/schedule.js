@@ -17,7 +17,7 @@
     for (var i in O.activities.all()) {
       if (!O.activities.get(i).scheduledP) {
         addActivity(i, O.activities.get(i).duration/15)
-        O.activities.add(i);
+        O.activities.todo(i);
       }
     }
   }

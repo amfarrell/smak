@@ -7,7 +7,7 @@ window.initModel = function initModel () {
 
   Activity = (function() {
 
-    function Activity(name, coords, start, end, duration, range, user_createdP, scheduledP) {
+    function Activity(name, coords, start, end, duration, range, user_createdP, scheduledState) {
       this.name = name;
       this.coords = coords;
       this.start = start;
@@ -15,7 +15,7 @@ window.initModel = function initModel () {
       this.duration = duration;
       this.range = range;
       this.user_createdP = user_createdP;
-      this.scheduledP = scheduledP;
+      this.commitment = commitment; /*suggested,todo,scheduled,locked*/
       this.description = "";
       this.id = JSON.stringify(globalIDCounter);
       globalIDCounter += 1;
@@ -33,78 +33,108 @@ window.initModel = function initModel () {
     'activities': {
       '_subscribers':{
         'map':{
-          'updated':function(i,changes){console.log("the map sees that activity"+i+"now has");console.log(changes)},
+          'updated':function(i,changes){console.log("the map sees that activity"+i+"now has");console.log(changes);},
+          'commitment':function(i,oldstate){console.log("the map sees that activity"+i+"was "+oldstate+"and is now"+O.activities.get(i).commitment);}
           'selected':function(i,changes){console.log("the map sees that activity"+i+"now is selected");}
           'deselected':function(i,changes){console.log("the map sees that activity"+i+"now is selected");}
-          'locked':function(i,changes){console.log("the map sees that activity"+i+"now is locked");}
-          'unlocked':function(i,changes){console.log("the map sees that activity"+i+"now is locked");}
         },
         'schedule':{
           'updated': function(i,changes){console.log("the schedule sees that activity"+i+"now has");console.log(changes)},
           'selected':function(i,changes){console.log("the schedule sees that activity"+i+"now is selected");}
           'deselected':function(i,changes){console.log("the schedule sees that activity"+i+"now is selected");}
-          'locked':function(i,changes){console.log("the schedule sees that activity"+i+"now is locked");}
-          'unlocked':function(i,changes){console.log("the schedule sees that activity"+i+"now is locked");}
+          'commitment':function(i,oldstate){console.log("the schedule sees that activity"+i+"was "+oldstate+"and is now"+O.activities.get(i).commitment);}
         }, 
         'form':{
           'updated':function(i,changes){console.log("the form sees that activity"+i+"now has");console.log(changes)},
           'selected':function(i,changes){console.log("the form sees that activity"+i+"now is selected");}
           'deselected':function(i,changes){console.log("the form sees that activity"+i+"now is selected");}
-          'locked':function(i,changes){console.log("the form sees that activity"+i+"now is locked");}
-          'unlocked':function(i,changes){console.log("the form sees that activity"+i+"now is locked");}
+          'commitment':function(i,oldstate){console.log("the form sees that activity"+i+"was "+oldstate+"and is now"+O.activities.get(i).commitment);}
         }
       },
-      'selected':function(view,handler){
-        O.activities._subscribers[view]['selected']=handler;
+      'selected':function(view,handler) {
+        O.activities._subscribers[view]['selected'] = handler;
       },
-      'deselected':function(view,handler){
-        O.activities._subscribers[view]['deselected']=handler;
+      'deselected':function(view,handler) {
+        O.activities._subscribers[view]['deselected'] = handler;
       },
-      'updated':function(view,handler){
-        O.activities._subscribers[view]['updated']=handler;
+      'updated':function(view,handler) {
+        O.activities._subscribers[view]['updated'] = handler;
       },
-      'locked':function(view,handler){
-        O.activities._subscribers[view]['locked']=handler;
+      'commitment_changed':function(view,handler) {
+        O.activities._subscribers[view]['commitment'] = handler;
       },
-      'unlocked':function(view,handler){
-        O.activities._subscribers[view]['unlocked']=handler;
-      },
-      '_firehandler':function _firehandler(sourceview,handler,i){
-        for (subscriber in O.activities._subscribers){
-          if (subscriber !== sourceview){
-            O.activities._subscribers[subscribers][handler](i,changes);
+      '_firehandler':function _firehandler(sourceview, handler, i, otherdata) {
+        for (subscriber in O.activities._subscribers) {
+          if (subscriber !== sourceview) {
+            O.activities._subscribers[subscribers][handler](i, otherdata);
           }
         }
       },
       'all':function allActivities () {
         return $.jStorage.index();
       },
-      'select':function select(view,i){
+      'select':function select(view,i) {
         console.log("selected: "+i);
-        for (var j in window.O.activities.all()){
+        for (var j in window.O.activities.all()) {
           window.O.activities.deselect(j);
         }
         var activity = $.jStorage.get(i);
-        O.activities._firehandler(view,'select',i);
+        O.activities._firehandler(view, 'select', i,{});
         //O.activities.get(i).marker.setAnimation(google.maps.Animation.BOUNCE)
         //This belongs in the handler
       },
       'deselect':function deselect(view,i) {
-        O.activities._firehandler(view,'deselect',i);
+        O.activities._firehandler(view, 'deselect', i,{});
         //O.activities.get(i).marker.setAnimation(null)
-      },
-      'get':function get(i){
-        return $.jStorage.get(i);
-      },
-      'set':function set(i,v){
-        return $.jStorage.set(i,v);
       },
       'update':function update(i,view,changes){
         var activity = O.activities.get(i)
         for (change in changes){
           activity[change] = changes[change]; 
         }
-        O.activities._firehandler(view,'update',i);
+        O.activities._firehandler(view, 'update', i, changes);
+      },
+      'recommit':function recommit(i, view, newstate){
+        var activity = O.activities.get(i);
+        var oldstate = activity.commitment;
+        var allowed_newstates;
+        if (oldstate === 'suggested') {
+          allowed_newstates = ["todo","scheduled"];
+        } else if (oldstate === 'todo'){
+          allowed_newstates = ["suggested","scheduled"];
+        } else if (oldstate === 'scheduled'){
+          allowed_newstates = ["suggested","todo","locked"];
+        } else if (oldstate === 'locked'){
+          allowed_newstates = ["scheduled"];
+        } else {
+          throw new Error("Activity "+i+" trying to transition from undefined state "+newstate);
+        }
+        if (allowed_newstates.indexOf(newstate) === -1){
+          throw new Error("Activity "+i+" trying to transition to illegal state "+newstate+" from state "+newstate);
+        }
+        activity.commitment = newstate; 
+        O.activities._firehandler(view,'commitment',i,oldstate);
+      },
+      'lock': function lock(i, view){
+        O.activities.recommit(i,view,'locked');
+      },
+      'unlock': function lock(i, view){
+        O.activities.recommit(i,view,'scheduled');
+      },
+      'delete': function lock(i, view){
+        O.activities.recommit(i,view,'suggested');
+      },
+      'deschedule': function lock(i, view){
+        O.activities.recommit(i,view,'todo');
+      },
+      'todo': function lock(i, view){
+        O.activities.recommit(i,view,'todo');
+      },
+      'get':function get(i){
+        return $.jStorage.get(i);
+      },
+      'set':function set(i, v){
+        return $.jStorage.set(i, v);
       },
       'add':function add(i){
         var activity;
@@ -113,8 +143,8 @@ window.initModel = function initModel () {
         } else {
           activity = $.jStorage.get(i)
         }
-        var marker = window.Map.placeMarker(activity.coords,activity.name)
-        $.jStorage.get(i).marker = marker;
+        //var marker = window.Map.placeMarker(activity.coords,activity.name)
+        //$.jStorage.get(i).marker = marker;
       }
     },
     'Activity': Activity,
