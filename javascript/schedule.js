@@ -71,8 +71,8 @@
     schedule = constrain_bounds(schedule, startDiff*4, parseFloat(endDiff)*4 + schedule.length);
     initHeights();
     drawScheduleGrid();
-    drawSchedule(schedule);
     updateDoBetween();
+    drawSchedule(schedule);
   }
   function drawSchedule(newSchedule) {
   //XXX This also returns the list of Activity IDs.
@@ -164,7 +164,6 @@ window.autoSchedule = function autoSchedule(){
       $("#" + $(this).parent(".item").attr("id")).draggable( "disable" );
       $("#" + $(this).parent(".item").attr("id")).resizable( "disable" );
       event.stopPropagation();    
-      deselectItem(); //I thought we weren't changing the selection state?
       lockItem();
     // TODO: update object model with the fact that this item is locked
     }else{
@@ -225,15 +224,20 @@ window.autoSchedule = function autoSchedule(){
         } else {  // move within Schedule
           $(this).css({"left":0, "top":0}); //return to original position
         }
-        updateModel(id);
         selectItem(id);
+        updateModel(id);
         $(".hover").removeClass("hover");
       }
     })
     
+    $(list + " div.item:last").append("<div class='grip-n ui-resizable-handle ui-resizable-n' id='grip-n"+id+"'></div>");
+    $(list + " div.item:last").append("<div class='grip-s ui-resizable-handle ui-resizable-s' id='grip-s"+id+"'></div>");
+    
     // Make item resizable
     $(list + " div.item:last").resizable({ 
-      handles: "n,s",
+      //handles: "n,s",
+      handles: {n: "#grip-n"+id,
+                s: "#grip-s"+id},
       grid: [1, blockHeight],
       minHeight: blockHeight*2 - borderMarginHeight,
       //minWidth: 258,
@@ -259,13 +263,15 @@ window.autoSchedule = function autoSchedule(){
           $(".spaceHolder").remove();
         }
         updateDuration(id);
-        updateModel(id);
         selectItem(id);
+        updateModel(id);
         //O.map.drawpath(schedule);
       }
     });
     $(list + " div.item:last .ui-resizable-n").after("<div class='ui-icon ui-icon-grip-solid-horizontal-n'></div>");
     $(list + " div.item:last .ui-resizable-s").after("<div class='ui-icon ui-icon-grip-solid-horizontal-s'></div>");
+    //$(list + " div.item:last .ui-resizable-n").html("<div class='grip-n'></div>");
+    //$(list + " div.item:last .ui-resizable-s").html("<div class='grip-s'></div>");
     
     // Set item height
     $(list + " div.item:last").height(blockHeight*duration - borderMarginHeight);  // -2 to compensate for the border height
@@ -278,6 +284,11 @@ window.autoSchedule = function autoSchedule(){
     $(list + " div.item:last").css({
         "z-index":10,
     });
+    
+    // Add doBetweenbox
+    if($(".doBetween"+id).length==0){   // if it doesn't exist already
+      drawDoBetween(id)
+    }
     
     if (list==".schedule"){
       $(list + " div.item:last").css({// Set item to it's current absolute position
@@ -294,10 +305,6 @@ window.autoSchedule = function autoSchedule(){
       $(list + " div.item:last").resizable("option", "containment", ".activitiesResizeContainer");
     }
     
-    // Add doBetweenbox
-    if($(".doBetween"+id).length==0){   // if it doesn't exist already
-      drawDoBetween(id)
-    }
   }
   
   function updateDoBetween(){
@@ -337,14 +344,12 @@ window.autoSchedule = function autoSchedule(){
    */
   function toggleItem(){
     if(!$(this).hasClass('selected')){
-      $(".selected").removeClass('selected');
-      $(this).addClass('selected');
-      O.activities.select('schedule',this.id);
+      selectItem($(this).attr("id"));
     }else{
       $(".selected").removeClass('selected');
       O.activities.deselect('schedule',this.id);
+      updateDoBetweenBox();
     }
-   updateDoBetweenBox();
   }
   function deselectItem(){
     console.log("deselected");

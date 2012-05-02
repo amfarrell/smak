@@ -170,11 +170,36 @@ body {
 .scheduleItem:hover:not(.ui-state-disabled) {
   background:#B3E2F2;
 }
-.selected {
+.scheduleItem.selected {
   background:#89D3EB;
+  z-index:200!important;
 }
 .scheduleItem.selected:hover {
   background:#5EC2E4;
+}
+.scheduleItem .ui-resizable-handle{
+  position: absolute;
+  margin-left: -30px;
+  left: 50%;
+  width:60px;
+  height:30px;
+  display:none !important;
+}
+.grip-n{
+  background-image: url(../resize_n.gif);
+  margin-left: -30px;
+  top:-30px;
+}
+.grip-s{
+  background-image: url(../resize_s.gif);
+  bottom:-30px;
+}
+.selected .ui-resizable-handle{
+  display:block !important;
+  z-index:100;
+}
+.selected .ui-icon{
+  display:none;
 }
 .lock{
   position: absolute;
