@@ -35,40 +35,63 @@ window.initModel = function initModel () {
         'map':{
           'updated':function(i,changes){console.log("the map sees that activity"+i+"now has");console.log(changes)},
           'selected':function(i,changes){console.log("the map sees that activity"+i+"now is selected");}
+          'deselected':function(i,changes){console.log("the map sees that activity"+i+"now is selected");}
+          'locked':function(i,changes){console.log("the map sees that activity"+i+"now is locked");}
+          'unlocked':function(i,changes){console.log("the map sees that activity"+i+"now is locked");}
         },
         'schedule':{
           'updated': function(i,changes){console.log("the schedule sees that activity"+i+"now has");console.log(changes)},
           'selected':function(i,changes){console.log("the schedule sees that activity"+i+"now is selected");}
+          'deselected':function(i,changes){console.log("the schedule sees that activity"+i+"now is selected");}
+          'locked':function(i,changes){console.log("the schedule sees that activity"+i+"now is locked");}
+          'unlocked':function(i,changes){console.log("the schedule sees that activity"+i+"now is locked");}
         }, 
         'form':{
           'updated':function(i,changes){console.log("the form sees that activity"+i+"now has");console.log(changes)},
           'selected':function(i,changes){console.log("the form sees that activity"+i+"now is selected");}
+          'deselected':function(i,changes){console.log("the form sees that activity"+i+"now is selected");}
+          'locked':function(i,changes){console.log("the form sees that activity"+i+"now is locked");}
+          'unlocked':function(i,changes){console.log("the form sees that activity"+i+"now is locked");}
         }
       },
       'selected':function(view,handler){
-        O.activities._subscribers[view]['slected']=handler;
+        O.activities._subscribers[view]['selected']=handler;
+      },
+      'deselected':function(view,handler){
+        O.activities._subscribers[view]['deselected']=handler;
       },
       'updated':function(view,handler){
         O.activities._subscribers[view]['updated']=handler;
       },
+      'locked':function(view,handler){
+        O.activities._subscribers[view]['locked']=handler;
+      },
+      'unlocked':function(view,handler){
+        O.activities._subscribers[view]['unlocked']=handler;
+      },
+      '_firehandler':function _firehandler(sourceview,handler,i){
+        for (subscriber in O.activities._subscribers){
+          if (subscriber !== sourceview){
+            O.activities._subscribers[subscribers][handler](i,changes);
+          }
+        }
+      },
       'all':function allActivities () {
         return $.jStorage.index();
       },
-      'select':function select(i){
+      'select':function select(view,i){
         console.log("selected: "+i);
         for (var j in window.O.activities.all()){
           window.O.activities.deselect(j);
         }
         var activity = $.jStorage.get(i);
-        O.activities.get(i).marker.setAnimation(google.maps.Animation.BOUNCE)
-        for (subscriber in O.activities._subscribers){
-          if (subscriber !== view){
-            O.activities._subscribers[subscribers](i,changes);
-          }
-        }
+        O.activities._firehandler(view,'select',i);
+        //O.activities.get(i).marker.setAnimation(google.maps.Animation.BOUNCE)
+        //This belongs in the handler
       },
-      'deselect':function deselect(i) {
-        O.activities.get(i).marker.setAnimation(null)
+      'deselect':function deselect(view,i) {
+        O.activities._firehandler(view,'deselect',i);
+        //O.activities.get(i).marker.setAnimation(null)
       },
       'get':function get(i){
         return $.jStorage.get(i);
@@ -81,11 +104,7 @@ window.initModel = function initModel () {
         for (change in changes){
           activity[change] = changes[change]; 
         }
-        for (subscriber in O.activities._subscribers){
-          if (subscriber !== view){
-            O.activities._subscribers[subscribers](i,changes);
-          }
-        }
+        O.activities._firehandler(view,'update',i);
       },
       'add':function add(i){
         var activity;

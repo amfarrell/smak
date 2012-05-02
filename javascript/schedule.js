@@ -143,13 +143,15 @@ window.autoSchedule = function autoSchedule(){
       $("#" + $(this).parent(".item").attr("id")).draggable( "disable" );
       $("#" + $(this).parent(".item").attr("id")).resizable( "disable" );
       event.stopPropagation();    
-      deselectItem();
+      deselectItem(); //I thought we weren't changing the selection state?
+      lockItem();
     // TODO: update object model with the fact that this item is locked
     }else{
       $(this).html("<img src='unlock.png' alt='unlocked' /></a>");
       $("#" + $(this).parent(".item").attr("id")).draggable( "enable" );
       $("#" + $(this).parent(".item").attr("id")).resizable( "enable" );
       event.stopPropagation();    
+      unlockItem();
     // TODO: update object model with the fact that this item is unlocked
     }
   }
@@ -305,10 +307,10 @@ window.autoSchedule = function autoSchedule(){
     if(!$(this).hasClass('selected')){
       $(".selected").removeClass('selected');
       $(this).addClass('selected');
-      O.activities.select(this.id);
+      O.activities.select('schedule',this.id);
     }else{
       $(".selected").removeClass('selected');
-      O.activities.deselect(this.id);
+      O.activities.deselect('schedule',this.id);
     }
    updateDoBetweenBox();
   }
@@ -316,13 +318,22 @@ window.autoSchedule = function autoSchedule(){
     console.log("deselected");
     $(".selected").removeClass('selected');
     updateDoBetweenBox();
-    O.activities.deselect(this.id);
+    O.activities.deselect('schedule',this.id);
   }
   function selectItem(id){
     $(".selected:not(#"+id+")").removeClass('selected');
     $("#"+id).addClass('selected');
     updateDoBetweenBox();
-    O.activities.select(id);
+    O.activities.select('schedule',id);
+  }
+  //Danica, check these?
+  function unlockItem(){
+    console.log("unlocked");
+    O.activities.lock('schedule',this.id);
+  }
+  function lockItem(id){
+    console.log("locked");
+    O.activities.lock('schedule',this.id);
   }
 
   function updateDoBetweenBox(){
