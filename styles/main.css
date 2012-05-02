@@ -151,7 +151,7 @@ body {
 }
 .scheduleGrid td {
   border:1px solid #E1F5FC;
-  background: #D5F0F9;
+  background: #DBF2FA;
   display: inline-block;
   text-align:center;
 }
@@ -159,37 +159,58 @@ body {
   border:1px solid #92ADB5;
   text-align:center;
   width: 258px;
-  /*display: table;*/
+  display: table;
   
-  background:#B3E2F2;
+  background:#C8ECF9;
   margin-left:auto;
   margin-right:auto;
   margin-bottom:3px;
   z-index:10;
 }
-.scheduleItem:hover {
-  background:#92ADB5;
+.scheduleItem:hover:not(.ui-state-disabled) {
+  background:#B3E2F2;
 }
 .selected {
-  background:#FFDFD9;
+  background:#89D3EB;
 }
 .scheduleItem.selected:hover {
-  background:#BFADAA;
+  background:#5EC2E4;
 }
-.doBetweenContainer {
-  width:565px;
+.lock{
   position: absolute;
+  cursor: pointer;
+}
+.duration{
+  position: absolute;
+  right:3px;
+}
+.activityName{
+  width:100%;
+  position: absolute;
+  top:50%;
+  height:20px;
+  margin-top:-10px;
+}
+.doBetweenContainerContainer{
+  width:582px;
+  position: absolute;
+}
+.doBetweenContainer{
+  width:582px;
+  position: absolute;
+  left:0px;
   z-index:0;
 }
-.doBetween {
-  background:#3A859D;
+.doBetweenTop,.doBetweenBottom{
+  background:#A7B6BB;
   position: absolute;
   /*border: groove #12576E;
   border-width:5px 0px;
-  top:-5px;*/
-  width:280px;
+  top:-5px;
+  height:100%;*/
+  width:300px;
   right:0px;
-  height:100%;
+  opacity:0.4;
 }
 .doBetween.hover {
   /*background:#D5F0F9;*/

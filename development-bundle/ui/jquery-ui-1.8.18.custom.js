@@ -2841,7 +2841,7 @@ $.ui.plugin.add("resizable", "containment", {
 			var element = $(ce), p = [];
 			$([ "Top", "Right", "Left", "Bottom" ]).each(function(i, name) { p[i] = num(element.css("padding" + name)); });
 
-			self.containerOffset = element.offset();
+			self.containerOffset = element.position();
 			self.containerPosition = element.position();
 			self.containerSize = { height: (element.innerHeight() - p[3]), width: (element.innerWidth() - p[1]) };
 

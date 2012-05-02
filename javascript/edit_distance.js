@@ -64,6 +64,25 @@ function array_unique_elements(array) {
 											})
 }
 
+function remove_element(arr) {
+	var what, a= arguments, L= a.length, ax;
+	while(L> 1 && arr.length){
+		  what= a[--L];
+		  while((ax= arr.indexOf(what))!= -1){
+		      arr.splice(ax, 1);
+		  }
+	}
+	return arr;
+}
+
+function translate_do_between_times(id) {
+	var global_start_time = dateToNumber(startTime)
+	var earliest_offset = (dateToNumber(new Date(Date.parse(O.activities.get(id).range[0]))) - global_start_time) * 4
+	var latest_offset = (dateToNumber(new Date(Date.parse(O.activities.get(id).range[1]))) - global_start_time) * 4
+	
+	return [earliest_offset, latest_offset]
+}
+
 // -----------------------------------------------------------------------------
 // Edit distance helpers
 // -----------------------------------------------------------------------------
@@ -209,6 +228,8 @@ function insert(state, id, pos, len, locked) {
 	return [true, state]
 }
 
+// NOTE: this function was changed to do the naive thing---the filtering was giving bad solutions
+//
 // returns the index of the first occurance of each different character.  
 // each whitespace character is considered a different character
 function find_breaks(state) {
@@ -221,6 +242,10 @@ function find_breaks(state) {
 	}
 	return breaks
 }
+
+// -----------------------------------------------------------------------------
+// Generate and manage candidate schedules
+// -----------------------------------------------------------------------------
 
 // the "brute force" enumeration
 //
@@ -249,9 +274,56 @@ function get_configurations(displacements, partial_configurations, locked) {
 	return get_configurations(displacements, new_configurations, locked)
 }
 
+function filter_configurations(configurations) {
+	var final_configurations = new Array()
+	for (var i = 0; i < configurations.length; i++) {
+		var current_config = configurations[i].slice()
+		var unique_elements = array_unique_elements(current_config)
+		unique_elements = remove_element(unique_elements, " ")
+
+		// filter start_at violations
+		/*for (var j = 0; j < start_at.length; j++) {
+			var fid = start_at[i][0]
+			var sap = start_at[i][1]
+			var start_index = current_config.indexOf(fid)
+			if (start_index > -1 && sap != start_index) {
+				current_config = array_replace(current_config, fid, " ")
+			}
+		}*/
+
+		// filter do_between violations
+		for (var j = 0; j < unique_elements.length; j++) {
+			var fid = unique_elements[j]
+			var do_between_thresholds = translate_do_between_times(fid)
+			var start_threshold = do_between_thresholds[0]
+			var end_threshold = do_between_thresholds[1]
+			var start_index = current_config.indexOf(fid)
+			var end_index = current_config.lastIndexOf(fid)
+			if (start_index > -1 && (	start_index < start_threshold || 
+																end_index >= end_threshold)) {
+				current_config = array_replace(current_config, fid, " ")				
+			}
+		}
+
+		final_configurations.push(current_config)
+	}
+	return final_configurations
+}
+
 // -----------------------------------------------------------------------------
 // Cost Functions
 // -----------------------------------------------------------------------------
+
+function diff_state(initial_state, state) {
+	var eliminations = new Array()
+	var initial_state_set = array_unique_elements(initial_state)
+	for (var i = 0; i < initial_state_set.length; i++) {
+		if (state.indexOf(initial_state_set[i]) == -1 && initial_state_set[i] != " ") {
+			eliminations.push([initial_state_set[i], count_array_occurances(initial_state, initial_state_set[i])])
+		}
+	}
+	return eliminations
+}
 
 function cost_function(initial_state, configuration, excludes) {
 	var old_model = model_from_string(initial_state)
@@ -279,7 +351,7 @@ function cost_function(initial_state, configuration, excludes) {
 		}
 	}
 
-	// elimination cost
+	// elimination cost; TODO combine with diff_state
 	var elimination_cost = 0
 	var initial_state_set = array_unique_elements(initial_state)
 	for (var i = 0; i < initial_state_set.length; i++) {
@@ -318,7 +390,11 @@ function pick_configuration(initial_state, configurations, excludes) {
 // Main Algorithms
 // -----------------------------------------------------------------------------
 
+// Moving items around in the schedule
+//
 function edit_distance(string, id, pos_final, len) {
+	translate_do_between_times(id)
+
 	console.log("edit_distance(\"" + string + "\", \"" + id + "\", " + pos_final + ", " + len + ")")
 	var state = string.split("")
 	var initial_state = state
@@ -335,16 +411,26 @@ function edit_distance(string, id, pos_final, len) {
 
 	// find a set of decent configurations, given the blocks we displaced
 	configurations = get_configurations(displaced, [state.slice()], pos_final)
-
+	configurations = filter_configurations(configurations)
+	
 	// pick the best configuration
 	var state_bundle = pick_configuration(initial_state, configurations, [id])
 	var state = state_bundle[0]
 	var eliminations = state_bundle[1]
 
+	// re-layout things that got eliminated
+	var eliminatedTarget = false
+	if (state.indexOf(id) == -1) { // corner case (hack)
+		eliminatedTarget = true
+		setupActivity(id, len, ".activitiesList", 0)
+	}
 	for (var i = 0; i < eliminations.length; i++) {
 		var e_id = eliminations[i][0]
-		var e_len = eliminations[i][1]
-		setupActivity(e_id, e_len, ".activitiesList", 0)
+		if (!(e_id == id && eliminatedTarget)) {
+			var e_len = eliminations[i][1]
+			console.log("Eliminated: " + e_id)
+			setupActivity(e_id, e_len, ".activitiesList", 0)
+		}
 	}
 
 	var ret = state.join("").replace(/,/g, "")
@@ -353,9 +439,23 @@ function edit_distance(string, id, pos_final, len) {
 	return ret
 }
 
+// Growing and squishing the schedule
+//
 function constrain_bounds(string, start, stop) {
+	
 	var state = string.split("")
-	var end_delta = state.length - stop
+	var orig_len = state.length
+	var orig_state = state.slice()
+	var end_delta = -1
+
+	console.log("constrain_bounds(\"" + string + "\", \"" + start + "\", \"" + stop + "\") ~ original length: " + orig_len)
+
+	if (start < 0) {
+		state = Array(-1 * start + 1).join(" ").split("").concat(state)
+	}
+	if (stop > orig_len) {
+		state = state.concat(Array((stop - orig_len) + 1).join(" ").split(""))
+	}
 
 	// push forward
 	for (var i = 0; i < start; i++) {
@@ -366,22 +466,59 @@ function constrain_bounds(string, start, stop) {
 			state = insert(state, id, i+1, len, -1)[1]
 		}
 	}
-	state = state.slice(start).reverse()
+
+	if (start >= 0) {
+		state = state.slice(start)
+	}
 
 	// push backwards
-	for (var i = 0; i < end_delta; i++) {
-		var id = state[i]
-		if (id != " ") {
-			var len = count_array_occurances(state, id)
-			state = array_replace(state, id, " ")
-			state = insert(state, id, i+1, len, -1)[1]
-		}
-	}
-	state = state.slice(end_delta).reverse()
+	if (stop <= orig_len) {
+		state = state.reverse()
 
-	return Array(start+1).join(" ") + state.join("").replace(/,/g, "") + Array(end_delta+1).join(" ")
+		end_delta = orig_len - stop
+		for (var i = 0; i < end_delta; i++) {
+			var id = state[i]
+			if (id != " ") {
+				var len = count_array_occurances(state, id)
+				state = array_replace(state, id, " ")
+				state = insert(state, id, i+1, len, -1)[1]
+			}
+		}
+
+		state = state.slice(end_delta).reverse()
+	}
+
+	// do the start_at, do_between filtering
+	var states = filter_configurations([state])
+	state = states[0]
+
+	// redraw eliminated activities
+	var eliminations = diff_state(orig_state, state)
+	for (var i = 0; i < eliminations.length; i++) {
+		var e_id = eliminations[i][0]
+		var e_len = eliminations[i][1]
+		//console.log("Eliminated: " + e_id)
+		setupActivity(e_id, e_len, ".activitiesList", 0)
+	}
+
+	ret = state.join("").replace(/,/g, "")
+
+	// @DEPRECATED
+	// this code makes sure that the squished list is still the original length
+	//if (start >= 0) {
+	//	ret = Array(start+1).join(" ") + ret
+	//}
+	//if (stop <= orig_len) {
+	//	ret = ret + Array(end_delta+1).join(" ")
+	//}
+
+	console.log("constrain_bounds() returning: \"" + ret + "\" ~ final length: " + ret.length)
+
+	return ret
 }
 
+// The auto schedule function
+//
 function partially_schedule(string, los) {
 	var state = string.split("")
 	var initial_state = string.split("")
@@ -406,19 +543,27 @@ function partially_schedule(string, los) {
 }
 
 // -----------------------------------------------------------------------------
-// Tests
+// Space to put test code
 // -----------------------------------------------------------------------------
-
-
 
 // -----------------------------------------------------------------------------
 // Calls
 // -----------------------------------------------------------------------------
 
-var init = "AA                    BB"
+
+var init = "AA  BBCCC  "
+//var test = edit_distance(init, "C", 5, 3)
+var test2 = constrain_bounds(init, 1, init.length - 5)
+
+console.log("[" + init + "]")
+console.log("[" + test2 + "]")
+console.log("Orig len: " + init.length + ", new len: " + test2.length)
+
+//var init = "AA                    BB"
 //var test = edit_distance(init, "C", 5, 3)
 //test = constrain_bounds(init, 2, init.length)
-test = partially_schedule(init, ["C", "DD", "EEE", "FFFF"])
+//test = partially_schedule(init, ["C", "DD", "EEE", "FFFF"])
 
-console.log("FINAL RESULT: " + pprint(init) + " -> " + pprint(test))
+
+//console.log("FINAL RESULT: " + pprint(init) + " -> " + pprint(test))
 
