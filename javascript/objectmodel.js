@@ -135,15 +135,16 @@ window.initModel = function initModel () {
           return $.jStorage.index();
         }
       },
+      'selected_activity':undefined,
       'select':function select(view,i) {
         console.log("selected: "+i);
-        for (var j in window.O.activities.all()) {
-          window.O.activities.deselect(view,j);
-        }
-        var activity = $.jStorage.get(i);
+        //debugger;
+        O.activities.selected_activity = $.jStorage.get(i);
         O.activities._firehandler(view, 'select', i,{});
       },
-      'deselect':function deselect(view,i) {
+      'deselect':function deselect(view) {
+        i = O.activities.selected_activity.id;
+        O.activities.selected_activity = undefined;
         O.activities._firehandler(view, 'deselect', i,{});
       },
       'update':function update(view,i,changes){
@@ -160,7 +161,8 @@ window.initModel = function initModel () {
         var activity = O.activities.get(i);
         var oldstate = activity.commitment;
         if (oldstate === newstate){
-          throw new Error("Activity "+i+" trying not actually changing state but staying at "+newstate);
+          return;
+          throw new Error("Activity "+i+" trying not actually changing state but staying at "+newstate)
         }
         var allowed_newstates;
         if (oldstate === 'suggested') {
@@ -175,7 +177,7 @@ window.initModel = function initModel () {
           throw new Error("Activity "+i+" trying to transition from undefined state "+newstate);
         }
         if (allowed_newstates.indexOf(newstate) === -1){
-          throw new Error("Activity "+i+" trying to transition to illegal state "+newstate+" from state "+newstate);
+          throw new Error("Activity "+i+" trying to transition to illegal state "+newstate+" from state "+oldstate);
         }
         activity.commitment = newstate; 
         O.activities._firehandler(view,'commitment',i,oldstate);

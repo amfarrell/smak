@@ -1,4 +1,9 @@
 
+var pythag = function pythag(pointA,pointB){
+  var x = pointA.lat-pointB.lat
+  var y = pointA.lng-pointB.lng
+  return Math.sqrt(Math.pow(x,2) + Math.pow(y,2))
+}
 window.initMap = function initMap () {
 
   var latlng = new google.maps.LatLng(43.781, 11.260);
@@ -24,6 +29,7 @@ window.initMap = function initMap () {
 
     };
   var _directions = new google.maps.DirectionsService();
+  var _distance = new google.maps.DistanceMatrixService();
   var _display = new google.maps.DirectionsRenderer();
   var _map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
   _display.setMap(_map);
@@ -35,15 +41,25 @@ window.initMap = function initMap () {
   window.Map = {
     
     '_map': _map,
-    'placeMarker':function placeMarker(coords,title) {
+    'placeMarker':function placeMarker(activity) {
+      console.log("marker placed for");
+      console.log(activity);
       var marker = new google.maps.Marker({
         'animation':google.maps.Animation.DROP,
-        'position': new google.maps.LatLng(coords[0],coords[1]), 
-        'map': _map,
-        'icon':'images/map_pin_blue.png',
-        'title': title,
+        'position': new google.maps.LatLng(activity.coords[0],activity.coords[1]), 
+        'icon':'images/blue-dot.png',
+        'title': activity.title,
       //  'draggable':true,
-      //  'clickable':true,
+        'clickable':true,
+      });
+      if (activity.id == 1){
+        debugger;
+      }
+      google.maps.event.addListener(marker, 'mouseover', function select_pin() {
+        //XXX This does not yet work...
+        marker.icon = 'images/red-dot.png';
+        marker.setAnimation(google.maps.Animation.BOUNCE)
+        O.activities.select("map",activity.id);
       });
       marker.setMap(window.Map._map);
       return marker;
@@ -94,6 +110,25 @@ window.initMap = function initMap () {
       }
       newlist.push(list.shift())
       return newlist;
+    },
+    'traveltime':function travelTime(event1,event2){
+      //Takes a list of N events and returns a list of N-1 travel times in minutes.
+      /*
+      var traveltime = 0;
+      debugger;
+        {
+          origins: [google.maps.LatLng(event1.coords[0],event1.coords[1])],
+          destinations: [google.maps.LatLng(event2.coords[0],event1.coords[1])],
+          travelMode: google.maps.TravelMode.WALKING,
+          avoidHighways: true,
+          avoidTolls: false
+        }, function callback(response, status) {
+          debugger;
+        // See Parsing the Results for
+        // the basics of a callback function.
+      });
+      */
+      return 1;
     }
   };
   window.Map.overlay.draw = function() {};
@@ -107,7 +142,7 @@ window.initMap = function initMap () {
         if (oldstate === "suggested"){
           //remove any temporary marker and place a new one.
           if (newstate === "todo"){
-            activity.marker = Map.placeMarker(activity.coords, activity.title)
+            activity.marker = Map.placeMarker(activity)
           } else if (newstate === "scheduled"){
 
             console.log("add to itinerary");
@@ -134,6 +169,11 @@ window.initMap = function initMap () {
         }
   });
 
+  debugger;
+  google.maps.event.addListener(_map, 'mouseover', function select_pin() {
+    //XXX This does not yet work...
+    console.log("map moused over");
+  });
 }
 
 window.initMapInput = function initMapInput () {
