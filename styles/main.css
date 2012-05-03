@@ -198,12 +198,15 @@ body {
   background-position:top; 
   bottom:-30px;
 }
-.selected .ui-resizable-handle{
+.selected:not(.ui-draggable-dragging) .ui-resizable-handle{
   display:block !important;
   z-index:100;
 }
 .selected .ui-icon{
   display:none;
+}
+.outsideDoBetween{
+  background: red !important;
 }
 .lock{
   position: absolute;
@@ -212,6 +215,10 @@ body {
 .duration{
   position: absolute;
   right:3px;
+}
+.times{
+  position: absolute;
+  left:30px;
 }
 .activityName{
   width:100%;
@@ -233,18 +240,10 @@ body {
 .doBetweenTop,.doBetweenBottom{
   background:#A7B6BB;
   position: absolute;
-  /*border: groove #12576E;
-  border-width:5px 0px;
-  top:-5px;
-  height:100%;*/
   width:300px;
   right:0px;
-  opacity:0.4;
+  opacity:0.7;
 }
-.doBetween.hover {
-  /*background:#D5F0F9;*/
-}
-
 .ui-draggable { 
   cursor: move; 
 }

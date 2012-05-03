@@ -70,7 +70,6 @@
     var newEndTime = new Date(Date.parse($('#endTime').val()));
     var startDiff = parseFloat(newStartTime.toString("H")) + newStartTime.toString("mm")/60 - (parseFloat(startTime.toString("H")) + startTime.toString("mm")/60);
     var endDiff = parseFloat(newEndTime.toString("H")) + newEndTime.toString("mm")/60 - (parseFloat(endTime.toString("H")) + endTime.toString("mm")/60);
-    console.log(startDiff*4 + " " + (parseFloat(endDiff)*4 + schedule.length));
     startTime = newStartTime;
     schedule = constrain_bounds(schedule, startDiff*4, parseFloat(endDiff)*4 + schedule.length);
     initHeights();
@@ -101,6 +100,7 @@
         var height = $(".schedule div.item:last").height();
         $(".schedule div.item:last").height(height+blockHeight);
         updateDuration(item);
+        updateTimes(item);
       }
     }
     return idList;
@@ -147,19 +147,76 @@ window.autoSchedule = function autoSchedule(){
     } else {
       O.activities.deschedule("schedule",id);
     }
-    console.log("start time " + O.activities.get(id).start);
   }
   
   function updateDuration(id){
-    duration = (Math.floor($("#"+id).height())+borderMarginHeight) / blockHeight;
-    //console.log(Math.floor($("#"+id).height()));
-    if (duration > 4)
-      plural = "s";
-    else
-      plural = "";
-    $("#"+id+" .duration").text((duration/4)+' Hour'+plural);
-    O.activities.update("schedule",id,{"duration":duration}); 
+    var duration = (Math.floor($("#"+id).height())+borderMarginHeight) / blockHeight;
+    if(duration<4){
+      $("#"+id+" .duration").text("");
+    }else{
+      if (duration > 4)
+        plural = "s";
+      else
+        plural = "";
+      $("#"+id+" .duration").text((duration/4)+' Hour'+plural);
+    }
+      //O.activities.update("schedule",id,{"duration":duration}); 
     //XXX I think this is the wrong format.
+  }
+  
+  function getStartTime(id){
+    var positionY = Math.round(($("#"+id).position().top)/blockHeight);
+    var minute = Math.floor(15*(positionY%4) +  startTime.getMinutes("mm"));
+    var hour = Math.floor(positionY/4) + parseFloat(startTime.toString("H"));
+    if (minute >= 60){
+      hour = ""+(hour + Math.floor(minute/60));
+      minute = ""+ (minute%60);
+    } else {
+      hour = ""+hour
+      minute = ""+ minute
+    }
+    if (minute.length < 2){
+      minute = "0"+minute
+    }
+    if (hour > 24){
+      //XXX What should we do?
+    }
+    return hour + ":" + minute;
+  }
+  
+  function getEndTime(id){
+    var height = Math.round(($("#"+id).height() + borderMarginHeight) / blockHeight);
+    var positionY = Math.round(($("#"+id).position().top)/blockHeight) + height;
+    var minute = Math.floor(15*(positionY%4) +  startTime.getMinutes("mm"));
+    var hour = Math.floor(positionY/4) + parseFloat(startTime.toString("H"));
+    if (minute >= 60){
+      hour = ""+(hour + Math.floor(minute/60));
+      minute = ""+ (minute%60);
+    } else {
+      hour = ""+hour
+      minute = ""+ minute
+    }
+    if (minute.length < 2){
+      minute = "0"+minute
+    }
+    if (hour > 24){
+      //XXX What should we do?
+    }
+    return hour + ":" + minute;
+  }
+  
+  function updateTimes(id){
+    var duration = (Math.floor($("#"+id).height())+borderMarginHeight) / blockHeight;
+    if (($("#"+id).parents(".schedule").length>0 && $("#"+id).position().left>-160) ||  // move within schedule
+       ($("#"+id).parents(".schedule").length==0 && ($("#"+id).position().left>scheduleItemWidth/2)) ){  // move from Activities to Schedule
+          if(duration<4){   // if the activity is too short, hide the times
+            $("#"+id+" .times").text("");
+          }else{
+            $("#"+id+" .times").text(getStartTime(id) + " - " + getEndTime(id));
+          }
+    }else{    // if the activity is hovering over the activities list, hide the times
+      $("#"+id+" .times").text("");
+    }
   }
   
   function toggleLock(event){
@@ -188,6 +245,7 @@ window.autoSchedule = function autoSchedule(){
     }else{
       $(list + " div.item:last").append("<div class='activityName'>"+O.activities.get(id).name+"</div>");
     }
+      $(list + " div.item:last").append("<div class='times'></div>");
     $(list + " div.item:last").append("<div class='duration'></div>");
     
     $(list + " div.item:last").corner();
@@ -203,10 +261,12 @@ window.autoSchedule = function autoSchedule(){
         selectItem(id);
       },
       drag:function(){
-        if ($(this).overlaps($("#doBetween" +  $(this).attr("id")+" .doBetween"))) {
-          $("#doBetween" +  $(this).attr("id")+" .doBetween").addClass("hover");
+        updateTimes(id);
+        if ($(this).overlaps($(".doBetween" +  $(this).attr("id")+" .doBetweenTop")) ||
+            $(this).overlaps($(".doBetween" +  $(this).attr("id")+" .doBetweenBottom"))) {
+          $(this).addClass("outsideDoBetween");
         } else {
-          $("#doBetween" +  $(this).attr("id")+" .doBetween").removeClass("hover");
+          $(this).removeClass("outsideDoBetween");
         }
       },
       stop: function(event, ui) { 
@@ -214,22 +274,27 @@ window.autoSchedule = function autoSchedule(){
         var id = $(this).attr("id");
         if ((list == ".schedule" && ($(this).position().left>-160)) ||  // move in schedule
             (list == ".activitiesList" && ($(this).position().left>scheduleItemWidth/2)) ){  // move from Activities to Schedule
-          
-          var positionY = Math.round(($(this).position().top)/blockHeight);
-          if (list == ".activitiesList") {  // move from Activities to Schedule
-            $(this).remove();
-          }       
-          drawSchedule(edit_distance(schedule,id, positionY,height));
+          if (!$(this).overlaps($(".doBetween" +  $(this).attr("id")+" .doBetweenTop")) && // if moved to a location in the doBetween times
+              !$(this).overlaps($(".doBetween" +  $(this).attr("id")+" .doBetweenBottom"))) {
+                  var positionY = Math.round(($(this).position().top)/blockHeight);
+                  if (list == ".activitiesList") {  // move from Activities to Schedule
+                    $(this).remove();
+                  }       
+                  drawSchedule(edit_distance(schedule,id, positionY,height));
+          }else{
+            $(this).css({"left":0, "top":0}); //return to original position
+          }
         } else if (list == ".schedule") {   // move from Schedule to Activities
           addActivity($(this).attr("id"), height);
           $(this).remove();
           schedule = schedule.replace(new RegExp($(this).attr("id"), 'g'), " "); // remove item from schedule
-        } else {  // move within Schedule
+        } else {  // move within Activities
           $(this).css({"left":0, "top":0}); //return to original position
         }
+        $(this).removeClass("outsideDoBetween");
+        updateTimes(id);
         selectItem(id);
-        updateModel(id);
-        $(".hover").removeClass("hover");
+        updateModel(id); //We get errors if we don't change state (
       }
     })
     
@@ -250,6 +315,7 @@ window.autoSchedule = function autoSchedule(){
       },
       resize:function(event, ui) {  
         updateDuration(id);
+        updateTimes(id);
       },
       stop: function(event, ui) {
         var id = $(this).attr("id");
@@ -266,6 +332,7 @@ window.autoSchedule = function autoSchedule(){
           $(".spaceHolder").remove();
         }
         updateDuration(id);
+        updateTimes(id);
         selectItem(id);
         updateModel(id);
         //O.map.drawpath(schedule);
@@ -307,6 +374,8 @@ window.autoSchedule = function autoSchedule(){
       $(list + " div.item:last").draggable("option", "containment", ".activitiesContainer");
       $(list + " div.item:last").resizable("option", "containment", ".activitiesResizeContainer");
     }
+    updateModel(id);
+    updateTimes(id);
     
   }
   
@@ -356,7 +425,6 @@ window.autoSchedule = function autoSchedule(){
     event.stopPropagation();
   }
   function deselectItem(){
-    console.log("deselected");
     $(".selected").removeClass('selected');
     updateDoBetweenBox();
     O.activities.deselect('schedule');

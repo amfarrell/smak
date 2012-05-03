@@ -160,7 +160,7 @@ window.initModel = function initModel () {
         var activity = O.activities.get(i);
         var oldstate = activity.commitment;
         if (oldstate === newstate){
-          throw new Error("Activity "+i+" trying not actually changing state but staying at "+newstate);
+          return;
         }
         var allowed_newstates;
         if (oldstate === 'suggested') {
