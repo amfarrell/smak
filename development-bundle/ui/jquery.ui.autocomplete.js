@@ -401,10 +401,11 @@ $.widget( "ui.autocomplete", {
 	},
 
 	_renderItem: function( ul, item) {
-		return $( "<li></li>" )
+    var html = $( "<li></li>" )
 			.data( "item.autocomplete", item )
-			.append( $( "<a></a>" ).text( item.label ) )
+			.append(  item.label )
 			.appendTo( ul );
+    return html;
 	},
 
 	_move: function( direction, event ) {

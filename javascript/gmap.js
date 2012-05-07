@@ -234,7 +234,6 @@ window.initMap = function initMap () {
       });
     },
     'make_suggestion':function make_suggestion(place){
-      debugger;
       var activity = O.google_suggestions[place.id];
       if (activity){
         if (activity.commitment !== "suggested"){
@@ -242,10 +241,12 @@ window.initMap = function initMap () {
         }
       } else {
         activity =  new O.Activity(place.name,[place.geometry.location.lat,place.geometry.location.lng],undefined,undefined,60,["10:00","20:00"],false,"suggested");
+        O.activities.set(activity.id,activity);
         O.google_suggestions[place.id] = activity;
       }
-       // new O.Activity(
-      return activity.name
+      var html = "<div class='suggestion' id='suggestion_"+activity.id+"'>"+activity.name+" <button onclick='O.activities.todo(\"form\","+activity.id+")'>todo</button></div>";
+      //note that the correct thing to do here is actually to have the item be draggable.
+      return html
     },
     'traveltime':function travelTime(event1,event2){
       //Takes a list of N events and returns a list of N-1 travel times in minutes.

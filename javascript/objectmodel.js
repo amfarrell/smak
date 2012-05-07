@@ -209,7 +209,8 @@ window.initModel = function initModel () {
         }
       },
       'todo': function todo(view, i){
-        if (O.activities.get(i).commiement === 'suggested'){
+        console.log("new activity added todo" + i);
+        if (O.activities.get(i).commitment === 'suggested'){
           O.activities.recommit(view,i,'todo');
         }
       },
