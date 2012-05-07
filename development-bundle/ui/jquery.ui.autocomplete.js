@@ -398,7 +398,6 @@ $.widget( "ui.autocomplete", {
 
 	_renderMenu: function( ul, items ) {
 		var self = this;
-    self._renderForm(ul);
 		$.each( items, function( index, item ) {
 			self._renderItem( ul, item );
 		});

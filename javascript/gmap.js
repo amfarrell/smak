@@ -240,7 +240,7 @@ window.initMap = function initMap () {
           return false;
         }
       } else {
-        activity =  new O.Activity(place.name,[place.geometry.location.lat,place.geometry.location.lng],undefined,undefined,60,["10:00","20:00"],false,"suggested");
+        activity =  new O.Activity(place.name,[place.geometry.location.lat,place.geometry.location.lng],undefined,undefined,60,[undefined,undefined],false,"suggested");
         O.activities.set(activity.id,activity);
         O.google_suggestions[place.id] = activity;
       }
@@ -407,7 +407,7 @@ window.initMapInput = function initMapInput () {
     if (O.activities.get(i).commitment === "suggested"){
       //place a temporary marker.
     }
-    O.activities.get(i).marker.setAnimation(google.maps.Animation.BOUNCE)
+    //O.activities.get(i).marker.setAnimation(google.maps.Animation.BOUNCE)
         //This belongs in the handler
 
   });

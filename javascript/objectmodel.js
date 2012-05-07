@@ -18,6 +18,7 @@ window.initModel = function initModel () {
       this.commitment = commitment; /*suggested,todo,scheduled,locked*/
       this.description = "";
       this.id = JSON.stringify(globalIDCounter);
+      this.displayid = "";
       this.nextevent = undefined;
       this.prevevent = undefined;
       globalIDCounter += 1;
