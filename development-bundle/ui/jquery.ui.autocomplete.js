@@ -392,8 +392,12 @@ $.widget( "ui.autocomplete", {
 			this.element.outerWidth()
 		) );
 	},
+  _renderForm: function(ul){
+  // We need to figure out some way to reach into forms.js and render that form.
+ },
 
 	_renderMenu: function( ul, items ) {
+    self._renderForm(ul);
 		var self = this;
 		$.each( items, function( index, item ) {
 			self._renderItem( ul, item );
