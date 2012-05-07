@@ -32,6 +32,7 @@ window.initMap = function initMap () {
   var _distance = new google.maps.DistanceMatrixService();
   var _display = new google.maps.DirectionsRenderer();
   var _map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+  var _places = new google.maps.places.PlacesService(_map);
   _display.setMap(_map);
   _display.polylineOptions = {
     'strokeColor':"#00aa11",
@@ -52,9 +53,6 @@ window.initMap = function initMap () {
       //  'draggable':true,
         'clickable':true,
       });
-      if (activity.id == 1){
-        debugger;
-      }
       google.maps.event.addListener(marker, 'mouseover', function select_pin() {
         //XXX This does not yet work...
         marker.icon = 'images/red-dot.png';
@@ -110,6 +108,127 @@ window.initMap = function initMap () {
       }
       newlist.push(list.shift())
       return newlist;
+    },
+    'getbounds':function getbounds(){ //TODO: make this dynamic.
+      return new google.maps.LatLngBounds(new google.maps.LatLng(43.7646, 11.2238), //sw
+           new google.maps.LatLng(43.7928, 11.2897));//ne
+    },
+    'getplaces':function getplaces(term,response){
+      _places.search({  
+        'bounds':window.Map.getbounds(),
+      //  'location':google.maps.LatLng(43.7763, 11.2580),
+      //  'radius':2273.80,
+        "keyword":term.term, //TODO: experiment with search results to see if this is actually what we want. 
+        'types':['natural_feature', //TODO figure out if I picked the right types. 
+//                'accounting',
+                'airport',
+                'amusement_park',
+                'aquarium',
+                'art_gallery',
+//                'atm',
+                'bakery',
+//                'bank',
+                'bar',
+                'beauty_salon',
+//                'bicycle_store',
+                'book_store',
+                'bowling_alley',
+                'bus_station',
+                'cafe',
+                'campground',
+//                'car_dealer',
+                'car_rental',
+//                'car_repair',
+//                'car_wash',
+                'casino',
+                'cemetery',
+                'church',
+//                'city_hall',
+                'clothing_store',
+//                'convenience_store',
+//                'courthouse',
+//                'dentist',
+                'department_store',
+//                'doctor',
+//                'electrician',
+//                'electronics_store',
+                'embassy',
+                'establishment',
+//                'finance',
+//                'fire_station',
+                'florist',
+                'food',
+//                'funeral_home',
+//                'furniture_store',
+//                'gas_station',
+//                'general_contractor',
+//                'geocode',
+//                'grocery_or_supermarket',
+//                'gym',
+//                'hair_care',
+//                'hardware_store',
+                'health',
+                'hindu_temple',
+//                'home_goods_store',
+                'hospital',
+//                'insurance_agency',
+                'jewelry_store',
+                'laundry',
+//                'lawyer',
+                'library',
+                'liquor_store',
+//                'local_government_office',
+//                'locksmith',
+                'lodging',
+                'meal_delivery',
+                'meal_takeaway',
+                'mosque',
+                'movie_rental',
+                'movie_theater',
+//                'moving_company',
+                'museum',
+                'night_club',
+//                'painter',
+                'park',
+                'parking',
+//                'pet_store',
+//                'pharmacy',
+//                'physiotherapist',
+                'place_of_worship',
+//                'plumber',
+//                'police',
+                'post_office',
+//                'real_estate_agency',
+                'restaurant',
+//                'roofing_contractor',
+//                'rv_park',
+                'school',
+                'shoe_store',
+                'shopping_mall',
+                'spa',
+                'stadium',
+//                'storage',
+                'store',
+                'subway_station',
+                'synagogue',
+                'taxi_stand',
+                'train_station',
+                'travel_agency',
+                'university',
+                'veterinary_care',
+                'zoo']
+      
+      },function handleplaces(results, status){
+        var newresults = []
+        if (status == google.maps.places.PlacesServiceStatus.OK){
+          for (var i=0;i<results.length;i++){
+            newresults.push(results[i].name);
+          }
+          response(newresults);
+        } else {
+          response([]);
+        }
+      });
     },
     'traveltime':function travelTime(event1,event2){
       //Takes a list of N events and returns a list of N-1 travel times in minutes.
@@ -169,7 +288,6 @@ window.initMap = function initMap () {
         }
   });
 
-  debugger;
   google.maps.event.addListener(_map, 'mouseover', function select_pin() {
     //XXX This does not yet work...
     console.log("map moused over");
@@ -259,12 +377,14 @@ window.initMapInput = function initMapInput () {
       }
   });
 
+  /*
   $("#location_text").keyup(function (e){
     O.currentActivity.coords = e.srcElement.value.replace(" ","").split(",");
     console.log(O.currentActivity)
     //TODO: check if valid time. Highlight in red if not.
     //TODO: visualize the time in some way.
   });
+  */
   O.activities.selected("map",function map_select_handle(i,changes){
     if (O.activities.get(i).commitment === "suggested"){
       //place a temporary marker.

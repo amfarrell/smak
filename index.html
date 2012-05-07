@@ -6,10 +6,11 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
 
-  <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"> </script>
+  <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?libraries=places&sensor=false"> </script>
   <script type="text/javascript" src='./javascript/jquery-1.7.2.js'></script>
   <script type="text/javascript" src='./javascript/jquery.json-2.3.js'></script>
   <script type="text/javascript" src='./development-bundle/ui/jquery-ui-1.8.18.custom.js'></script>
+  <script type="text/javascript" src="./development-bundle/ui/jquery.ui.autocomplete.js"></script>
   <!--<script type="text/javascript" src='./javascript/jquery-ui-1.8.18.js'></script>-->
   <script type="text/javascript" src="./javascript/jquery.ui.touch-punch.js"></script>
   <script type="text/javascript" src="./javascript/jquery.calendrical.js"></script>
@@ -52,6 +53,7 @@ $(document).ready(function() {
     <!-- Dynamically load this with activities. -->
   </div>
   <div id="activity_time">
+  <!--
     <div id="time_form">
       <div id="time_definite">
         From <input id="definite_start"></input> 
@@ -70,7 +72,6 @@ $(document).ready(function() {
       </div>
       </div>
     </div>
-<!--
     <div id="time_display">
       <canvas> </canvas>
     </div>

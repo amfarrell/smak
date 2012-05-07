@@ -14,7 +14,10 @@
   }
 
   function initActivitiesList() {
-    for (var i in O.activities.all()) {
+    for (var i in O.activities.all("todo")) {
+      if (i > 7){
+        break;
+      }
       if (!O.activities.get(i).scheduledP) {
         addActivity(i, O.activities.get(i).duration/15)
         O.activities.todo('schedule',i);

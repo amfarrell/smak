@@ -40,7 +40,7 @@ $.widget( "ui.autocomplete", {
 
 		this.element
 			.addClass( "ui-autocomplete-input" )
-			.attr( "autocomplete", "off" )
+			//.attr( "autocomplete", "off" )
 			// TODO verify these actually work as intended
 			.attr({
 				role: "textbox",
@@ -48,6 +48,7 @@ $.widget( "ui.autocomplete", {
 				"aria-haspopup": "true"
 			})
 			.bind( "keydown.autocomplete", function( event ) {
+
 				if ( self.options.disabled || self.element.propAttr( "readOnly" ) ) {
 					return;
 				}

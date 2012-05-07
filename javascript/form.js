@@ -1,4 +1,18 @@
 window.initForm = function initForm () {
+  
+  $("#activity_name").autocomplete({
+    'minLength':3,
+    'source':O.getplaces
+  });
+  
+  function initSuggestedList() {
+    for (var i in O.activities.all("suggested")) {
+      addSuggestion(O.activties.get(i));
+    }
+  }
+
+
+  /*
   $("#activity_name").keyup(function (e){
     if (e.which === 40) {
       //Down: highlight the first suggestion, or move to the next one.
@@ -66,5 +80,5 @@ window.initForm = function initForm () {
   });
 
 
-  O.currentActivity = new O.Activity(undefined, undefined, undefined, undefined, undefined, [undefined,undefined], "", true, false)
+  */
 }
