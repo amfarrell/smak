@@ -182,22 +182,34 @@ window.initModel = function initModel () {
         O.activities._firehandler(view,'commitment',i,oldstate);
       },
       'lock': function lock(view, i){
-        O.activities.recommit(view,i,'locked');
+        if (O.activities.get(i).commiement === 'scheduled'){
+          O.activities.recommit(view,i,'locked');
+        }
       },
       'unlock': function unlock(view, i){
-        O.activities.recommit(view,i,'scheduled');
+        if (O.activities.get(i).commiement === 'locked'){
+          O.activities.recommit(view,i,'scheduled');
+        }{
       },
       'delete': function del(view, i){
-        O.activities.recommit(view,i,'suggested');
+        if (O.activities.get(i).commiement !== 'locked'){
+          O.activities.recommit(view,i,'suggested');
+        }
       },
       'deschedule': function deschedule(view, i){
-        O.activities.recommit(view,i,'todo');
+        if (O.activities.get(i).commiement === 'scheduled'){
+          O.activities.recommit(view,i,'todo');
+        }
       },
       'schedule': function deschedule(view, i){
-        O.activities.recommit(view,i,'scheduled');
+        if (O.activities.get(i).commiement !== 'locked'){
+          O.activities.recommit(view,i,'scheduled');
+        }
       },
       'todo': function todo(view, i){
-        O.activities.recommit(view,i,'todo');
+        if (O.activities.get(i).commiement === 'suggested'){
+          O.activities.recommit(view,i,'todo');
+        }
       },
       'get':function get(i){
         return $.jStorage.get(i);
