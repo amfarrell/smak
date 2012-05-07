@@ -222,13 +222,30 @@ window.initMap = function initMap () {
         var newresults = []
         if (status == google.maps.places.PlacesServiceStatus.OK){
           for (var i=0;i<results.length;i++){
-            newresults.push(results[i].name);
+            var suggestion_html = Map.make_suggestion(results[i])
+            if (suggestion_html){
+              newresults.push(suggestion_html);
+            }
           }
           response(newresults);
         } else {
           response([]);
         }
       });
+    },
+    'make_suggestion':function make_suggestion(place){
+      debugger;
+      var activity = O.google_suggestions[place.id];
+      if (activity){
+        if (activity.commitment !== "suggested"){
+          return false;
+        }
+      } else {
+        activity =  new O.Activity(place.name,[place.geometry.location.lat,place.geometry.location.lng],undefined,undefined,60,["10:00","20:00"],false,"suggested");
+        O.google_suggestions[place.id] = activity;
+      }
+       // new O.Activity(
+      return activity.name
     },
     'traveltime':function travelTime(event1,event2){
       //Takes a list of N events and returns a list of N-1 travel times in minutes.

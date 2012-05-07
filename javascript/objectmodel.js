@@ -142,9 +142,11 @@ window.initModel = function initModel () {
         O.activities._firehandler(view, 'select', i,{});
       },
       'deselect':function deselect(view) {
-        i = O.activities.selected_activity.id;
-        O.activities.selected_activity = undefined;
-        O.activities._firehandler(view, 'deselect', i,{});
+        if (O.activities.selected_activity){
+          i = O.activities.selected_activity.id;
+          O.activities.selected_activity = undefined;
+          O.activities._firehandler(view, 'deselect', i,{});
+        }
       },
       'update':function update(view,i,changes){
         console.log(i);
@@ -189,7 +191,7 @@ window.initModel = function initModel () {
       'unlock': function unlock(view, i){
         if (O.activities.get(i).commiement === 'locked'){
           O.activities.recommit(view,i,'scheduled');
-        }{
+        }
       },
       'delete': function del(view, i){
         if (O.activities.get(i).commiement !== 'locked'){
@@ -234,6 +236,7 @@ window.initModel = function initModel () {
       }
     },
     'Activity': Activity,
+    'google_suggestions':{},
   };
 
   var prebuilt = [
