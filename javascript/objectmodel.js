@@ -185,27 +185,27 @@ window.initModel = function initModel () {
         O.activities._firehandler(view,'commitment',i,oldstate);
       },
       'lock': function lock(view, i){
-        if (O.activities.get(i).commiement === 'scheduled'){
+        if (O.activities.get(i).commitment === 'scheduled'){
           O.activities.recommit(view,i,'locked');
         }
       },
       'unlock': function unlock(view, i){
-        if (O.activities.get(i).commiement === 'locked'){
+        if (O.activities.get(i).commitment === 'locked'){
           O.activities.recommit(view,i,'scheduled');
         }
       },
       'delete': function del(view, i){
-        if (O.activities.get(i).commiement !== 'locked'){
+        if (O.activities.get(i).commitment !== 'locked'){
           O.activities.recommit(view,i,'suggested');
         }
       },
       'deschedule': function deschedule(view, i){
-        if (O.activities.get(i).commiement === 'scheduled'){
+        if (O.activities.get(i).commiment === 'scheduled'){
           O.activities.recommit(view,i,'todo');
         }
       },
       'schedule': function schedule(view, i){
-        if (O.activities.get(i).commiement !== 'locked'){
+        if (O.activities.get(i).commitment !== 'locked'){
           O.activities.recommit(view,i,'scheduled');
         }
       },
