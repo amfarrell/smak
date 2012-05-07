@@ -4,7 +4,11 @@
   var activitiesListPos = 0; // position of the end of the activities list. (counted in 15 min blocks)
   var scheduleItemWidth = 260;  //pixels width of schdeduleItem
   var borderMarginHeight = 5;  //pixels width of border and margin of schdeduleItem
-
+  
+  $('html').click(function() {
+    deselectItem();
+  });
+  
   function initHeights() {
     $('.schedule').height(blockHeight*schedule.length);    
     //$('.scheduleGrid').height(blockHeight*schedule.length);  
@@ -74,6 +78,7 @@
     schedule = constrain_bounds(schedule, startDiff*4, parseFloat(endDiff)*4 + schedule.length);
     initHeights();
     drawScheduleGrid();
+    updateDoBetween();
     drawSchedule(schedule);
   }
   function drawSchedule(newSchedule) {
@@ -161,21 +166,19 @@ window.autoSchedule = function autoSchedule(){
   }
   
   function toggleLock(event){
+    var id = $(this).parent(".item").attr("id");
     if ($(this).children("img").attr("src") == 'unlock.png'){
       $(this).html("<img src='lock.png' alt='locked' /></a>");
-      $("#" + $(this).parent(".item").attr("id")).draggable( "disable" );
-      $("#" + $(this).parent(".item").attr("id")).resizable( "disable" );
+      $("#" + id).draggable( "disable" );
+      $("#" + id).resizable( "disable" );
       event.stopPropagation();    
-      deselectItem(); //I thought we weren't changing the selection state?
-      lockItem();
-    // TODO: update object model with the fact that this item is locked
+      O.activities.lock('schedule',id);
     }else{
       $(this).html("<img src='unlock.png' alt='unlocked' /></a>");
-      $("#" + $(this).parent(".item").attr("id")).draggable( "enable" );
-      $("#" + $(this).parent(".item").attr("id")).resizable( "enable" );
+      $("#" + id).draggable( "enable" );
+      $("#" + id).resizable( "enable" );
       event.stopPropagation();    
-      unlockItem();
-    // TODO: update object model with the fact that this item is unlocked
+      O.activities.unlock('schedule',id);
     }
   }
   function setupActivity(id, duration, list, verticalPos, itemNumber){  //list = ".schedule" or ".activitiesList"
@@ -227,15 +230,20 @@ window.autoSchedule = function autoSchedule(){
         } else {  // move within Schedule
           $(this).css({"left":0, "top":0}); //return to original position
         }
-        updateModel(id);
         selectItem(id);
+        updateModel(id);
         $(".hover").removeClass("hover");
       }
     })
     
+    $(list + " div.item:last").append("<div class='grip-n ui-resizable-handle ui-resizable-n' id='grip-n"+id+"'></div>");
+    $(list + " div.item:last").append("<div class='grip-s ui-resizable-handle ui-resizable-s' id='grip-s"+id+"'></div>");
+    
     // Make item resizable
     $(list + " div.item:last").resizable({ 
-      handles: "n,s",
+      //handles: "n,s",
+      handles: {n: "#grip-n"+id,
+                s: "#grip-s"+id},
       grid: [1, blockHeight],
       minHeight: blockHeight*2 - borderMarginHeight,
       //minWidth: 258,
@@ -261,13 +269,15 @@ window.autoSchedule = function autoSchedule(){
           $(".spaceHolder").remove();
         }
         updateDuration(id);
-        updateModel(id);
         selectItem(id);
+        updateModel(id);
         //O.map.drawpath(schedule);
       }
     });
     $(list + " div.item:last .ui-resizable-n").after("<div class='ui-icon ui-icon-grip-solid-horizontal-n'></div>");
     $(list + " div.item:last .ui-resizable-s").after("<div class='ui-icon ui-icon-grip-solid-horizontal-s'></div>");
+    //$(list + " div.item:last .ui-resizable-n").html("<div class='grip-n'></div>");
+    //$(list + " div.item:last .ui-resizable-s").html("<div class='grip-s'></div>");
     
     // Set item height
     $(list + " div.item:last").height(blockHeight*duration - borderMarginHeight);  // -2 to compensate for the border height
@@ -280,6 +290,11 @@ window.autoSchedule = function autoSchedule(){
     $(list + " div.item:last").css({
         "z-index":10,
     });
+    
+    // Add doBetweenbox
+    if($(".doBetween"+id).length==0){   // if it doesn't exist already
+      drawDoBetween(id)
+    }
     
     if (list==".schedule"){
       $(list + " div.item:last").css({// Set item to it's current absolute position
@@ -296,67 +311,64 @@ window.autoSchedule = function autoSchedule(){
       $(list + " div.item:last").resizable("option", "containment", ".activitiesResizeContainer");
     }
     
-    // Add doBetweenbox
-    if($(".doBetween"+id).length==0){   // if it doesn't exist already
-      var range = O.activities.get(id).range;
-      var boxStartTime = new Date(Date.parse(range[0]));
-      var endTime =  new Date( startTime.valueOf()).addHours(schedule.length/4);
-      var startPosition = dateToNumber(boxStartTime) - dateToNumber(startTime);  //in hours
-      if (startPosition<0) startPosition = 0;
-      if (dateToNumber(new Date(Date.parse(range[1]))) > dateToNumber(endTime)) 
-        var endPosition =  dateToNumber(endTime) - dateToNumber(startTime); // in hours
-      else 
-        var endPosition = dateToNumber(new Date(Date.parse(range[1]))) - dateToNumber(startTime); // in hours
-      
-      var boxDuration = endPosition - startPosition; // in hours
-
-      $(".doBetweenContainerContainer").append('<div class="doBetweenContainer doBetween'+id+'"><div class="doBetweenTop"></div><div class="doBetweenBottom"></div></div>');
-      $(".doBetween"+id).css("z-index",-2).fadeTo(1,0);
-      $(".doBetween"+id).height(blockHeight*boxDuration*4);
-      $(".doBetween"+id).css("top",startPosition*blockHeight*4);
-      
-      $(".doBetween"+id+" .doBetweenTop").height(blockHeight*startPosition*4);
-      $(".doBetween"+id+" .doBetweenTop").css("top",-blockHeight*startPosition*4);
-      
-      $(".doBetween"+id+" .doBetweenBottom").height(blockHeight*(schedule.length - endPosition*4));
-      $(".doBetween"+id+" .doBetweenBottom").css("bottom",-(blockHeight*(schedule.length - endPosition*4)));
+  }
+  
+  function updateDoBetween(){
+    for (var i in O.activities.all()) {
+      drawDoBetween(i);
     }
+  }
+  
+  function drawDoBetween(id){
+    var range = O.activities.get(id).range;
+    var boxStartTime = new Date(Date.parse(range[0]));
+    var endTime =  new Date( startTime.valueOf()).addHours(schedule.length/4);
+    var startPosition = dateToNumber(boxStartTime) - dateToNumber(startTime);  //in hours
+    if (startPosition<0) startPosition = 0;
+    if (dateToNumber(new Date(Date.parse(range[1]))) > dateToNumber(endTime)) 
+      var endPosition =  dateToNumber(endTime) - dateToNumber(startTime); // in hours
+    else 
+      var endPosition = dateToNumber(new Date(Date.parse(range[1]))) - dateToNumber(startTime); // in hours
+    
+    var boxDuration = endPosition - startPosition; // in hours
+    
+    $(".doBetween"+id).remove()   //remove if already exists
+    $(".doBetweenContainerContainer").append('<div class="doBetweenContainer doBetween'+id+'"><div class="doBetweenTop"></div><div class="doBetweenBottom"></div></div>');
+    $(".doBetween"+id).css("z-index",-2).fadeTo(1,0);
+    $(".doBetween"+id).height(blockHeight*boxDuration*4);
+    $(".doBetween"+id).css("top",startPosition*blockHeight*4);
+    
+    $(".doBetween"+id+" .doBetweenTop").height(blockHeight*startPosition*4);
+    $(".doBetween"+id+" .doBetweenTop").css("top",-blockHeight*startPosition*4);
+    
+    $(".doBetween"+id+" .doBetweenBottom").height(blockHeight*(schedule.length - endPosition*4));
+    $(".doBetween"+id+" .doBetweenBottom").css("bottom",-(blockHeight*(schedule.length - endPosition*4)));
   }
 
   /*
    * XXX these should take either an event or an id of the activity represented.
    */
-  function toggleItem(){
+  function toggleItem(event){
     if(!$(this).hasClass('selected')){
-      $(".selected").removeClass('selected');
-      $(this).addClass('selected');
-      O.activities.select('schedule',this.id);
+      selectItem($(this).attr("id"));
     }else{
       $(".selected").removeClass('selected');
       O.activities.deselect('schedule',this.id);
+      updateDoBetweenBox();
     }
-   updateDoBetweenBox();
+    event.stopPropagation();
   }
   function deselectItem(){
     console.log("deselected");
     $(".selected").removeClass('selected');
     updateDoBetweenBox();
-    O.activities.deselect('schedule',this.id);
+    O.activities.deselect('schedule');
   }
   function selectItem(id){
     $(".selected:not(#"+id+")").removeClass('selected');
     $("#"+id).addClass('selected');
     updateDoBetweenBox();
     O.activities.select('schedule',id);
-  }
-  //XXX These do not work because they need the id.
-  function unlockItem(){
-    if (this.id === undefined){throw new Error("tried to unlock but I don't know the id")};
-    O.activities.lock('schedule',this.id);
-  }
-  function lockItem(id){
-    if (this.id === undefined){throw new Error("tried to lock but I don't know the id")};
-    O.activities.lock('schedule',this.id);
   }
 
   function updateDoBetweenBox(){
