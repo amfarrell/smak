@@ -397,8 +397,8 @@ $.widget( "ui.autocomplete", {
  },
 
 	_renderMenu: function( ul, items ) {
-    self._renderForm(ul);
 		var self = this;
+    self._renderForm(ul);
 		$.each( items, function( index, item ) {
 			self._renderItem( ul, item );
 		});
