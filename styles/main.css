@@ -6,12 +6,12 @@ html {
 body {
   width: 100%;
   height: 100%;
-  margin: 0; padding: 0;
+  margin: 10px; padding: 0;
 }
 #activity {
   float:left;
-  width:40%;
-  height:100%;
+  width:450px;
+  height:700px;
   position:relative;
 }
 #schedule {
@@ -20,6 +20,10 @@ body {
   float:left;
 }
 
+#title{
+  position: absolute;
+  float:left;
+}
 /* New Activity Form */
 
 #activity_name { 
@@ -79,12 +83,12 @@ body {
   height:95%
 }
 #map_canvas {
- width:100%; 
- height:95%
+ width:450px; 
+ height:500px;
+  z-index:-9;
+}
 
 /* New Activity Form */
-
-}
 #range_duration { 
   width:3em;
 }
@@ -102,21 +106,22 @@ body {
 
 /* Activities column */
 .autoSchedule {
+  /*background: #105870;*/
   text-align:center;
 }
 .activitiesList {
-  width: 260px;
+  width: 210px;
   position: relative;
 }
 .activitiesResizeContainer{
   position:absolute;
   z-index:-1;
   left:0;
-  width:  580px;
+  width:  480px;
 }
 .activitiesContainer{
   position:absolute;
-  width:  572px;
+  width:  472px;
 }
 .wrapper {
   position: relative;
@@ -133,20 +138,16 @@ body {
   z-index:9;
 }
 
-#map_canvas {
-  height: 100%;
-  z-index:-9;
-}
 
 /* Schedule column */
 .schedule {
-  width: 260px;
+  width: 210px;
   position: absolute;
   left:30px;
 }
 .scheduleGrid {
   position:relative;
-  width:300px;
+  width:250px;
   text-align:center;
 }
 .scheduleGrid td {
@@ -158,7 +159,7 @@ body {
 .scheduleItem {
   border:1px solid #92ADB5;
   text-align:center;
-  width: 258px;
+  width: 208px;
   display: table;
   
   background:#C8ECF9;
@@ -220,6 +221,12 @@ body {
   position: absolute;
   left:30px;
 }
+.outsideDoBetween .error{
+  display:block !important;
+}
+.error{
+  font-size:70%;
+}
 .activityName{
   width:100%;
   position: absolute;
@@ -228,11 +235,11 @@ body {
   margin-top:-10px;
 }
 .doBetweenContainerContainer{
-  width:582px;
+  width:482px;
   position: absolute;
 }
 .doBetweenContainer{
-  width:582px;
+  width:482px;
   position: absolute;
   left:0px;
   z-index:0;
@@ -240,7 +247,7 @@ body {
 .doBetweenTop,.doBetweenBottom{
   background:#A7B6BB;
   position: absolute;
-  width:300px;
+  width:250px;
   right:0px;
   opacity:0.7;
 }

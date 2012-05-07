@@ -18,7 +18,8 @@
   <script type="text/javascript" src='./javascript/jquery.overlaps.js'></script>
   <script type="text/javascript" src='./javascript/jquery.corner.js'></script>
   <script type="text/javascript" src='./javascript/jstorage.js'></script>
-  <script type="text/javascript" src="./javascript/date.js"></script>  
+  <script type="text/javascript" src="./javascript/date.js"></script> 
+  <script type="text/javascript" src='./javascript/iscroll.js'></script> 
   <script type="text/javascript" src='./javascript/objectmodel.js'></script>
   <script type="text/javascript" src="./javascript/gmap.js"></script>  
   <script type="text/javascript" src="./javascript/form.js"></script>  
@@ -47,8 +48,12 @@ $(document).ready(function() {
 
 
 });
- 
+document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+document.addEventListener('DOMContentLoaded', function () { setTimeout(loaded, 200); }, false);
+
 </script>
+<img class="title" src="images/smak_title.gif" alt="SMAK" />
+
 <div id="activity">
   <h2>New Activity</h2>
   <input id="activity_name" type="text" name="activityName"></input>
@@ -98,9 +103,8 @@ $(document).ready(function() {
 <div id="schedule">
 <table class="layout">
   <tr>
-    <td><h2>Activities</h2>
-    </td>
-    <td><h2>Schedule</h2></td>
+    <td>Activities</td>
+    <td>Schedule</td>
   </tr>
     <td><div class="autoSchedule"><button type="button" onclick="autoSchedule();">Schedule these activities</button></div></td>
     <td id="startTimeCell"></td>
@@ -115,7 +119,7 @@ $(document).ready(function() {
         <div class="schedule">  </div>
       </div>
     </td><td>
-      <div class="map"></div>
+      <div class="debug"></div>
     </td>
   </tr>
 </table>

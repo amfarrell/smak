@@ -192,7 +192,7 @@ window.initModel = function initModel () {
       'deschedule': function deschedule(view, i){
         O.activities.recommit(view,i,'todo');
       },
-      'schedule': function deschedule(view, i){
+      'schedule': function schedule(view, i){
         O.activities.recommit(view,i,'scheduled');
       },
       'todo': function todo(view, i){

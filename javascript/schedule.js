@@ -5,10 +5,12 @@
   var scheduleItemWidth = 260;  //pixels width of schdeduleItem
   var borderMarginHeight = 5;  //pixels width of border and margin of schdeduleItem
   
-  $('html').click(function() {
+  $('html').bind('click tap',function() {
     deselectItem();
   });
   
+  updated('schedule',function scheduleUpdate(i,changes){});
+
   function initHeights() {
     $('.schedule').height(blockHeight*schedule.length);    
     //$('.scheduleGrid').height(blockHeight*schedule.length);  
@@ -18,6 +20,7 @@
   }
 
   function initActivitiesList() {
+    $(".autoSchedule").corner();
     for (var i in O.activities.all()) {
       if (!O.activities.get(i).scheduledP) {
         addActivity(i, O.activities.get(i).duration/15)
@@ -35,7 +38,7 @@
     var endTime =  new Date( startTime.valueOf()).addHours(schedule.length/4);
     
     $('.scheduleGrid').html("<div class='schedule'>  </div>");
-    $('#startTimeCell').html("Start Day at <input  onchange='changeDayStartEndTimes()' type='time' size='6' id='startTime' name='startTime' value='"+ startTime.toString("h:mmtt")+"'/>");
+    $('#startTimeCell').html("Start Day at <input  onchange='changeDayStartEndTimes()' type='time' size='8' id='startTime' name='startTime' value='"+ startTime.toString("h:mmtt")+"'/>");
     $('#startTime').calendricalTime();
     $('.scheduleGrid').append("<table cellspacing='0'></table");
     for (var i=0; i<schedule.length; i++) {
@@ -44,22 +47,22 @@
         if (time==0) time = 12;
         if (i > schedule.length - 4){//last time block is a partial hour
           console.log("schedule.length "+schedule.length-i+" " + i + " " +schedule.length);
-          $('.scheduleGrid table').append("<tr><td class='gridTime' style='width:18px'>"+time+"</td><td class='gridSpace' style='width:278px'></td></tr>");
+          $('.scheduleGrid table').append("<tr><td class='gridTime' style='width:18px'>"+time+"</td><td class='gridSpace' style='width:228px'></td></tr>");
           $('.scheduleGrid td.gridTime:last').height(blockHeight*(schedule.length-i)-2);
           $('.scheduleGrid td.gridSpace:last').height(blockHeight*(schedule.length-i)-2);
         }else{  //normal blocks
-          $('.scheduleGrid table').append("<tr><td class='gridTime' style='width:18px'>"+time+"</td><td class='gridSpace' style='width:278px'></td></tr>");
+          $('.scheduleGrid table').append("<tr><td class='gridTime' style='width:18px'>"+time+"</td><td class='gridSpace' style='width:228px'></td></tr>");
           $('.scheduleGrid td.gridTime:last').height(blockHeight*4-2);
           $('.scheduleGrid td.gridSpace:last').height(blockHeight*4-2);
         }
       }else if(i==0){ //first time block is a partial hour
-        $('.scheduleGrid table').append("<tr><td class='gridTime' style='width:18px'></td><td class='gridSpace' style='width:278px'></td></tr>");
+        $('.scheduleGrid table').append("<tr><td class='gridTime' style='width:18px'></td><td class='gridSpace' style='width:228px'></td></tr>");
         $('.scheduleGrid td.gridTime:last').height(blockHeight*(4-(time-Math.floor(time))*4)-2);
         $('.scheduleGrid td.gridSpace:last').height(blockHeight*(4-(time-Math.floor(time))*4)-2);
       }
     }
     //$('.scheduleGrid td').height(blockHeight*4-2);
-    $('.scheduleGrid').append("End Day at <input onchange='changeDayStartEndTimes()' type='time' size='6' id='endTime' name='endTime' value='"+ endTime.toString("h:mmtt")+"'/>");
+    $('.scheduleGrid').append("End Day at <input onchange='changeDayStartEndTimes()' type='time' size='8' id='endTime' name='endTime' value='"+ endTime.toString("h:mmtt")+"'/>");
     $('#endTime').calendricalTime();
     //TODO: modify length of the map so that they line up roughly.
   }
@@ -97,7 +100,7 @@
         prevItem=item;
         itemNum +=1;
       } else if (item != " ") {
-        var height = $(".schedule div.item:last").height();
+        var height = Math.round(($(".schedule div.item:last").height()+borderMarginHeight)/blockHeight) * blockHeight - borderMarginHeight; // remove rounding errors
         $(".schedule div.item:last").height(height+blockHeight);
         updateDuration(item);
         updateTimes(item);
@@ -119,8 +122,8 @@ window.autoSchedule = function autoSchedule(){
   }
 
   function updateModel(id, list){
-    var height = Math.round(($("#"+id).height() + borderMarginHeight) / blockHeight);
-    var positionY = Math.round(($("#"+id).position().top)/blockHeight);
+    var height = getDuration(id);
+    var positionY = getPositionY(id);
     O.activities.get(id).duration = height*15;
     if ($("#"+id).parents(".schedule").length>0) {
       var minute = Math.floor(15*(positionY%4) +  startTime.getMinutes("mm"));
@@ -150,7 +153,7 @@ window.autoSchedule = function autoSchedule(){
   }
   
   function updateDuration(id){
-    var duration = (Math.floor($("#"+id).height())+borderMarginHeight) / blockHeight;
+    var duration = getDuration(id);
     if(duration<4){
       $("#"+id+" .duration").text("");
     }else{
@@ -165,7 +168,7 @@ window.autoSchedule = function autoSchedule(){
   }
   
   function getStartTime(id){
-    var positionY = Math.round(($("#"+id).position().top)/blockHeight);
+    var positionY = getPositionY(id);
     var minute = Math.floor(15*(positionY%4) +  startTime.getMinutes("mm"));
     var hour = Math.floor(positionY/4) + parseFloat(startTime.toString("H"));
     if (minute >= 60){
@@ -178,15 +181,16 @@ window.autoSchedule = function autoSchedule(){
     if (minute.length < 2){
       minute = "0"+minute
     }
-    if (hour > 24){
-      //XXX What should we do?
+    hour = hour%12;
+    if (hour == 0){
+      hour = 12;
     }
     return hour + ":" + minute;
   }
   
   function getEndTime(id){
-    var height = Math.round(($("#"+id).height() + borderMarginHeight) / blockHeight);
-    var positionY = Math.round(($("#"+id).position().top)/blockHeight) + height;
+    var height = getDuration(id);
+    var positionY = getPositionY(id) + height;
     var minute = Math.floor(15*(positionY%4) +  startTime.getMinutes("mm"));
     var hour = Math.floor(positionY/4) + parseFloat(startTime.toString("H"));
     if (minute >= 60){
@@ -199,14 +203,15 @@ window.autoSchedule = function autoSchedule(){
     if (minute.length < 2){
       minute = "0"+minute
     }
-    if (hour > 24){
-      //XXX What should we do?
+    hour = hour%12;
+    if (hour == 0){
+      hour = 12;
     }
     return hour + ":" + minute;
   }
   
   function updateTimes(id){
-    var duration = (Math.floor($("#"+id).height())+borderMarginHeight) / blockHeight;
+    var duration = getDuration(id);
     if (($("#"+id).parents(".schedule").length>0 && $("#"+id).position().left>-160) ||  // move within schedule
        ($("#"+id).parents(".schedule").length==0 && ($("#"+id).position().left>scheduleItemWidth/2)) ){  // move from Activities to Schedule
           if(duration<4){   // if the activity is too short, hide the times
@@ -237,19 +242,7 @@ window.autoSchedule = function autoSchedule(){
   }
   function setupActivity(id, duration, list, verticalPos, itemNumber){  //list = ".schedule" or ".activitiesList"
     $(list).append('<div class="scheduleItem item" id='+id+'></div>');
-    
-    if (list == ".schedule"){
-      $(list + " div.item:last").append("<div class='lock'><img src='unlock.png' alt='unlocked' /></div>");
-      $(list + " div.item:last .lock").click(toggleLock);
-      $(list + " div.item:last").append("<div class='activityName'>"+itemNumber+". "+O.activities.get(id).name+"</div>");
-    }else{
-      $(list + " div.item:last").append("<div class='activityName'>"+O.activities.get(id).name+"</div>");
-    }
-      $(list + " div.item:last").append("<div class='times'></div>");
-    $(list + " div.item:last").append("<div class='duration'></div>");
-    
-    $(list + " div.item:last").corner();
-    
+        
     // Make item draggable
     $(list + " div.item:last").draggable({
       snap: '.schedule, .activitiesList',
@@ -270,13 +263,13 @@ window.autoSchedule = function autoSchedule(){
         }
       },
       stop: function(event, ui) { 
-        var height = Math.round(($(this).height() + borderMarginHeight) / blockHeight);
         var id = $(this).attr("id");
+        var height = getDuration(id);
         if ((list == ".schedule" && ($(this).position().left>-160)) ||  // move in schedule
             (list == ".activitiesList" && ($(this).position().left>scheduleItemWidth/2)) ){  // move from Activities to Schedule
           if (!$(this).overlaps($(".doBetween" +  $(this).attr("id")+" .doBetweenTop")) && // if moved to a location in the doBetween times
               !$(this).overlaps($(".doBetween" +  $(this).attr("id")+" .doBetweenBottom"))) {
-                  var positionY = Math.round(($(this).position().top)/blockHeight);
+                  var positionY = getPositionY(id);
                   if (list == ".activitiesList") {  // move from Activities to Schedule
                     $(this).remove();
                   }       
@@ -320,8 +313,8 @@ window.autoSchedule = function autoSchedule(){
       stop: function(event, ui) {
         var id = $(this).attr("id");
         if (list == ".schedule" ) {
-          var positionY = Math.round(($(this).position().top)/blockHeight);
-          var height = Math.round(($(this).height() + borderMarginHeight) / blockHeight);  
+          var positionY = getPositionY(id);
+          var height = getDuration(id);
           drawSchedule(edit_distance(schedule,id, positionY,height));
         } else {
           $(".activitiesList div.scheduleItem").css({
@@ -345,7 +338,6 @@ window.autoSchedule = function autoSchedule(){
     
     // Set item height
     $(list + " div.item:last").height(blockHeight*duration - borderMarginHeight);  // -2 to compensate for the border height
-    updateDuration(id);
     
     // Make selectable
     $(list + " div.item:last").click(toggleItem);
@@ -360,23 +352,40 @@ window.autoSchedule = function autoSchedule(){
       drawDoBetween(id)
     }
     
-    if (list==".schedule"){
+    if (list == ".schedule"){
+      if(O.activities.get(id).commitment == "locked"){
+        $(list + " div.item:last").append("<div class='lock'><img src='lock.png' alt='locked' /></div>");
+        $("#" + id).draggable( "disable" );
+        $("#" + id).resizable( "disable" );
+      }else
+        $(list + " div.item:last").append("<div class='lock'><img src='unlock.png' alt='unlocked' /></div>");
+      $(list + " div.item:last .lock").click(toggleLock);
+      var letter = String.fromCharCode(64+itemNumber);
+      $(list + " div.item:last").append("<div class='activityName'><img src='Google Maps Markers/darkgreen_Marker"+letter+".png' alt='"+letter+"'/>"+O.activities.get(id).name+"</div>");
+     
       $(list + " div.item:last").css({// Set item to it's current absolute position
         "position": "absolute",
         "left":0,
         "top":verticalPos*blockHeight,
       });
-      //TODO:  disable resizable and draggable if object is locked
       
       $(list + " div.item:last").draggable("option", "containment", ".doBetween"+id);
       $(list + " div.item:last").resizable("option", "containment", ".doBetween"+id);
-    }else{
+    }else{    // activitiesList 
+      $(list + " div.item:last").append("<div class='activityName'>"+O.activities.get(id).name+"</div>");
       $(list + " div.item:last").draggable("option", "containment", ".activitiesContainer");
       $(list + " div.item:last").resizable("option", "containment", ".activitiesResizeContainer");
     }
+    $(list + " div.item:last").append("<div class='times'></div>");
+    $(list + " div.item:last").append("<div class='duration'></div>");
+    $(list + " div.item:last .activityName").append("<div class='error'>Can not be placed outside do between times</div>");
+    $(".error").hide();
+    
+    $(list + " div.item:last").corner();
+    
+    updateDuration(id);
     updateModel(id);
     updateTimes(id);
-    
   }
   
   function updateDoBetween(){
@@ -453,6 +462,14 @@ window.autoSchedule = function autoSchedule(){
     return str;
   }
 
+  function getDuration(id){ // gets the duration (in # of 15 minute blocks) of the item from the size of the box
+    return Math.round(($("#"+id).height() + borderMarginHeight) / blockHeight);
+  }
+  
+  function getPositionY(id){ // gets the position (in # of 15 minute blocks from start) of the item from the location of the box
+    return Math.round(($("#"+id).position().top)/blockHeight);
+  }
   function dateToNumber(date){ //takes date object and outputs a decimal hour time
     return parseFloat(date.toString("H")) + date.toString("mm")/60;
   }
+

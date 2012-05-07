@@ -229,7 +229,7 @@ window.initMapInput = function initMapInput () {
     if (O.activities.get(i).commitment === "suggested"){
       //place a temporary marker.
     }
-    O.activities.get(i).marker.setAnimation(google.maps.Animation.BOUNCE)
+    //O.activities.get(i).marker.setAnimation(google.maps.Animation.BOUNCE)
         //This belongs in the handler
 
   });
