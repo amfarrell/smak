@@ -9,7 +9,7 @@
     deselectItem();
   });
   
-  updated('schedule',function scheduleUpdate(i,changes){});
+  //updated('schedule',function scheduleUpdate(i,changes){});
 
   function initHeights() {
     $('.schedule').height(blockHeight*schedule.length);    
@@ -20,8 +20,11 @@
   }
 
   function initActivitiesList() {
-    $(".autoSchedule").corner();
+    console.log(O.activities.all());
     for (var i in O.activities.all()) {
+      if (i > 6){
+        break;
+      }
       if (!O.activities.get(i).scheduledP) {
         addActivity(i, O.activities.get(i).duration/15)
         O.activities.todo('schedule',i);

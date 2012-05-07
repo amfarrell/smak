@@ -8,10 +8,11 @@
   <title>SMak</title>
   <link rel="shortcut icon" href="smak-icon.png" /> 
 
-  <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"> </script>
+  <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?libraries=places&sensor=false"> </script>
   <script type="text/javascript" src='./javascript/jquery-1.7.2.js'></script>
   <script type="text/javascript" src='./javascript/jquery.json-2.3.js'></script>
   <script type="text/javascript" src='./development-bundle/ui/jquery-ui-1.8.18.custom.js'></script>
+  <script type="text/javascript" src="./development-bundle/ui/jquery.ui.autocomplete.js"></script>
   <!--<script type="text/javascript" src='./javascript/jquery-ui-1.8.18.js'></script>-->
   <script type="text/javascript" src="./javascript/jquery.ui.touch-punch.js"></script>
   <script type="text/javascript" src="./javascript/jquery.calendrical.js"></script>
@@ -48,8 +49,8 @@ $(document).ready(function() {
 
 
 });
-document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
-document.addEventListener('DOMContentLoaded', function () { setTimeout(loaded, 200); }, false);
+//document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+//document.addEventListener('DOMContentLoaded', function () { setTimeout(loaded, 200); }, false);
 
 </script>
 <img class="title" src="images/smak_title.gif" alt="SMAK" />
@@ -61,6 +62,7 @@ document.addEventListener('DOMContentLoaded', function () { setTimeout(loaded, 2
     <!-- Dynamically load this with activities. -->
   </div>
   <div id="activity_time">
+  <!--
     <div id="time_form">
       <div id="time_definite">
         From <input id="definite_start"></input> 
@@ -79,7 +81,6 @@ document.addEventListener('DOMContentLoaded', function () { setTimeout(loaded, 2
       </div>
       </div>
     </div>
-<!--
     <div id="time_display">
       <canvas> </canvas>
     </div>
@@ -91,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function () { setTimeout(loaded, 2
   <div id="activity_location">
     <div id="location_form">
       Where:<span id="pin_spot">
-                <img id="draggable" src='images/map_pin_blue.png'/>
+                <img id="draggable" src='images/blue-dot.png'/>
                 <img id="pin_slot" src="images/map_pin_empty.png"/>
             </span>
       <input id="location_text"></input>

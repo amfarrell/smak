@@ -361,6 +361,8 @@
                     });
                 element.after(div); 
                 
+                var myScroll = new iScroll('calendricalTimePopup');
+
                 var selected = parseDate(element.val(), options);
                 if (!selected.getFullYear()) selected = getToday();
                 
@@ -494,7 +496,7 @@
                     return;
                 }
                 if (!div) return;
-                div.remove();
+                //div.remove();
                 div = null;
             });
         });

@@ -50,6 +50,7 @@
   width: 80px;
   height: 130px;
   overflow: auto;
+  -webkit-overflow-scrolling: touch;
   z-index:100;  }
   .calendricalTimePopup ul {
     margin: 0;
