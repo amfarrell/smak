@@ -41,7 +41,7 @@
     var endTime =  new Date( startTime.valueOf()).addHours(schedule.length/4);
     
     $('.scheduleGrid').html("<div class='schedule'>  </div>");
-    $('#startTimeCell').html("Start Day at <input  onchange='changeDayStartEndTimes()' type='time' size='8' id='startTime' name='startTime' value='"+ startTime.toString("h:mmtt")+"'/>");
+    $('#startTimeCell').html("Start Day at <input readonly='readonly' onchange='changeDayStartEndTimes()' type='time' size='8' id='startTime' name='startTime' value='"+ startTime.toString("h:mmtt")+"'/>");
     $('#startTime').calendricalTime();
     $('.scheduleGrid').append("<table cellspacing='0'></table");
     for (var i=0; i<schedule.length; i++) {
@@ -65,7 +65,7 @@
       }
     }
     //$('.scheduleGrid td').height(blockHeight*4-2);
-    $('.scheduleGrid').append("End Day at <input onchange='changeDayStartEndTimes()' type='time' size='8' id='endTime' name='endTime' value='"+ endTime.toString("h:mmtt")+"'/>");
+    $('.scheduleGrid').append("End Day at <input readonly='readonly' onchange='changeDayStartEndTimes()' type='time' size='8' id='endTime' name='endTime' value='"+ endTime.toString("h:mmtt")+"'/>");
     $('#endTime').calendricalTime();
     //TODO: modify length of the map so that they line up roughly.
   }
@@ -109,6 +109,7 @@
         updateTimes(item);
       }
     }
+    Map.renderPath(idList);
     return idList;
   }
 
