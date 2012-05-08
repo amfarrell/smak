@@ -6,12 +6,12 @@ html {
 body {
   width: 100%;
   height: 100%;
-  margin: 0; padding: 0;
+  margin: 10px; padding: 0;
 }
 #activity {
   float:left;
-  width:40%;
-  height:100%;
+  width:450px;
+  height:700px;
   position:relative;
 }
 #schedule {
@@ -20,6 +20,10 @@ body {
   float:left;
 }
 
+#title{
+  position: absolute;
+  float:left;
+}
 /* New Activity Form */
 
 #activity_name { 
@@ -79,12 +83,12 @@ body {
   height:95%
 }
 #map_canvas {
- width:100%; 
- height:95%
+ width:450px; 
+ height:500px;
+  z-index:-9;
+}
 
 /* New Activity Form */
-
-}
 #range_duration { 
   width:3em;
 }
@@ -102,21 +106,22 @@ body {
 
 /* Activities column */
 .autoSchedule {
+  /*background: #105870;*/
   text-align:center;
 }
 .activitiesList {
-  width: 260px;
+  width: 210px;
   position: relative;
 }
 .activitiesResizeContainer{
   position:absolute;
   z-index:-1;
   left:0;
-  width:  580px;
+  width:  480px;
 }
 .activitiesContainer{
   position:absolute;
-  width:  572px;
+  width:  472px;
 }
 .wrapper {
   position: relative;
@@ -133,20 +138,16 @@ body {
   z-index:9;
 }
 
-#map_canvas {
-  height: 100%;
-  z-index:-9;
-}
 
 /* Schedule column */
 .schedule {
-  width: 260px;
+  width: 210px;
   position: absolute;
   left:30px;
 }
 .scheduleGrid {
   position:relative;
-  width:300px;
+  width:250px;
   text-align:center;
 }
 .scheduleGrid td {
@@ -158,7 +159,7 @@ body {
 .scheduleItem {
   border:1px solid #92ADB5;
   text-align:center;
-  width: 258px;
+  width: 208px;
   display: table;
   
   background:#C8ECF9;
@@ -170,11 +171,43 @@ body {
 .scheduleItem:hover:not(.ui-state-disabled) {
   background:#B3E2F2;
 }
-.selected {
+.scheduleItem.selected {
   background:#89D3EB;
+  z-index:200!important;
 }
 .scheduleItem.selected:hover {
   background:#5EC2E4;
+}
+.scheduleItem .ui-resizable-handle{
+  position: absolute;
+  margin-left: -30px;
+  left: 50%;
+  width:60px;
+  height:30px;
+  display:none !important;
+}
+.grip-n{
+  background-image: url(../resize_n.gif);
+  background-repeat:no-repeat;
+  background-position:bottom; 
+  margin-left: -30px;
+  top:-30px;
+}
+.grip-s{
+  background-image: url(../resize_s.gif);
+  background-repeat:no-repeat;
+  background-position:top; 
+  bottom:-30px;
+}
+.selected:not(.ui-draggable-dragging) .ui-resizable-handle{
+  display:block !important;
+  z-index:100;
+}
+.selected .ui-icon{
+  display:none;
+}
+.outsideDoBetween{
+  background: red !important;
 }
 .lock{
   position: absolute;
@@ -184,6 +217,16 @@ body {
   position: absolute;
   right:3px;
 }
+.times{
+  position: absolute;
+  left:30px;
+}
+.outsideDoBetween .error{
+  display:block !important;
+}
+.error{
+  font-size:70%;
+}
 .activityName{
   width:100%;
   position: absolute;
@@ -192,11 +235,11 @@ body {
   margin-top:-10px;
 }
 .doBetweenContainerContainer{
-  width:582px;
+  width:482px;
   position: absolute;
 }
 .doBetweenContainer{
-  width:582px;
+  width:482px;
   position: absolute;
   left:0px;
   z-index:0;
@@ -204,18 +247,10 @@ body {
 .doBetweenTop,.doBetweenBottom{
   background:#A7B6BB;
   position: absolute;
-  /*border: groove #12576E;
-  border-width:5px 0px;
-  top:-5px;
-  height:100%;*/
-  width:300px;
+  width:250px;
   right:0px;
-  opacity:0.4;
+  opacity:0.7;
 }
-.doBetween.hover {
-  /*background:#D5F0F9;*/
-}
-
 .ui-draggable { 
   cursor: move; 
 }

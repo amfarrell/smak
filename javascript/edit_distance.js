@@ -695,7 +695,7 @@ function partially_schedule(string, los) {
 // -----------------------------------------------------------------------------
 
 
-var init = "AA  BBCCC  "
+/*var init = "AA  BBCCC  "
 //var test = edit_distance(init, "C", 5, 3)
 var test2 = constrain_bounds(init, 1, init.length - 5)
 
@@ -710,4 +710,4 @@ console.log("Orig len: " + init.length + ", new len: " + test2.length)
 
 
 //console.log("FINAL RESULT: " + pprint(init) + " -> " + pprint(test))
-
+*/

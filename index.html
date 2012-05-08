@@ -5,18 +5,21 @@
 
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+  <title>SMak</title>
+  <link rel="shortcut icon" href="smak-icon.png" /> 
 
-  <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"> </script>
+  <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?libraries=places&sensor=false"> </script>
   <script type="text/javascript" src='./javascript/jquery-1.7.2.js'></script>
   <script type="text/javascript" src='./javascript/jquery.json-2.3.js'></script>
   <script type="text/javascript" src='./development-bundle/ui/jquery-ui-1.8.18.custom.js'></script>
+  <script type="text/javascript" src="./development-bundle/ui/jquery.ui.autocomplete.js"></script>
   <!--<script type="text/javascript" src='./javascript/jquery-ui-1.8.18.js'></script>-->
   <script type="text/javascript" src="./javascript/jquery.ui.touch-punch.js"></script>
   <script type="text/javascript" src="./javascript/jquery.calendrical.js"></script>
   <script type="text/javascript" src='./javascript/jquery.overlaps.js'></script>
   <script type="text/javascript" src='./javascript/jquery.corner.js'></script>
   <script type="text/javascript" src='./javascript/jstorage.js'></script>
-  <script type="text/javascript" src="./javascript/date.js"></script>  
+  <script type="text/javascript" src="./javascript/date.js"></script> 
   <script type="text/javascript" src='./javascript/objectmodel.js'></script>
   <script type="text/javascript" src="./javascript/gmap.js"></script>  
   <script type="text/javascript" src="./javascript/form.js"></script>  
@@ -24,8 +27,7 @@
   <script type="text/javascript" src="./javascript/edit_distance.js"></script>  
   
   <link rel="stylesheet" type="text/css" href="styles/main.css" />
-  <link rel="stylesheet" type="text/css" href="styles/calendrical.css" />
-  <link rel="stylesheet" href="development-bundle/themes/base/jquery.ui.all.css">
+  <link rel="stylesheet" type="text/css" href="styles/calendrical.css" />  <link rel="stylesheet" href="development-bundle/themes/base/jquery.ui.all.css">
 </head>
 
 <body>
@@ -42,9 +44,12 @@ $(document).ready(function() {
   drawSchedule(schedule);
   initActivitiesList();
   initMapInput();
+
+
 });
- 
 </script>
+<img class="title" src="images/smak_title.gif" alt="SMAK" />
+
 <div id="activity">
   <h2>New Activity</h2>
   <input id="activity_name" type="text" name="activityName"></input>
@@ -52,6 +57,7 @@ $(document).ready(function() {
     <!-- Dynamically load this with activities. -->
   </div>
   <div id="activity_time">
+  <!--
     <div id="time_form">
       <div id="time_definite">
         From <input id="definite_start"></input> 
@@ -70,7 +76,6 @@ $(document).ready(function() {
       </div>
       </div>
     </div>
-<!--
     <div id="time_display">
       <canvas> </canvas>
     </div>
@@ -82,7 +87,7 @@ $(document).ready(function() {
   <div id="activity_location">
     <div id="location_form">
       Where:<span id="pin_spot">
-                <img id="draggable" src='images/map_pin_blue.png'/>
+                <img id="draggable" src='images/blue-dot.png'/>
                 <img id="pin_slot" src="images/map_pin_empty.png"/>
             </span>
       <input id="location_text"></input>
@@ -94,11 +99,10 @@ $(document).ready(function() {
 <div id="schedule">
 <table class="layout">
   <tr>
-    <td><h2>Activities</h2>
-    </td>
-    <td><h2>Schedule</h2></td>
+    <td>Activities</td>
+    <td>Schedule</td>
   </tr>
-    <td><div class="autoSchedule"><button type="button" onclick="autoSchedule();">Auto Schedule</button></div></td>
+    <td><div class="autoSchedule"><button type="button" onclick="autoSchedule();">Schedule these activities</button></div></td>
     <td id="startTimeCell"></td>
   <tr>
     <td valign="top" style="padding:0 10px">
@@ -110,9 +114,7 @@ $(document).ready(function() {
       <div class="scheduleGrid"> 
         <div class="schedule">  </div>
       </div>
-    </td><td>
-      <div class="map"></div>
-    </td>
+    </td><td></td>
   </tr>
 </table>
 </div>

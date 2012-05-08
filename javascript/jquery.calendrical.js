@@ -326,7 +326,7 @@
                 //Scroll the dropdown box so that scrollTo item is in
                 //the middle
                 element[0].scrollTop =
-                    scrollTo[0].offsetTop - scrollTo.height() * 2;
+                    scrollTo[0].offsetTop - scrollTo.height() * 5;
             }, 0);
         }
         element.empty().append(ul);
@@ -488,7 +488,7 @@
                 }
                 
                 renderTimeSelect(div, renderOptions);
-            }).blur(function() {
+            }).blur(function removeDiv() {
                 if (within){
                     if (div) element.focus();
                     return;

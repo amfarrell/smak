@@ -40,7 +40,7 @@ $.widget( "ui.autocomplete", {
 
 		this.element
 			.addClass( "ui-autocomplete-input" )
-			.attr( "autocomplete", "off" )
+			//.attr( "autocomplete", "off" )
 			// TODO verify these actually work as intended
 			.attr({
 				role: "textbox",
@@ -48,6 +48,7 @@ $.widget( "ui.autocomplete", {
 				"aria-haspopup": "true"
 			})
 			.bind( "keydown.autocomplete", function( event ) {
+
 				if ( self.options.disabled || self.element.propAttr( "readOnly" ) ) {
 					return;
 				}
@@ -391,6 +392,9 @@ $.widget( "ui.autocomplete", {
 			this.element.outerWidth()
 		) );
 	},
+  _renderForm: function(ul){
+  // We need to figure out some way to reach into forms.js and render that form.
+ },
 
 	_renderMenu: function( ul, items ) {
 		var self = this;
@@ -400,10 +404,11 @@ $.widget( "ui.autocomplete", {
 	},
 
 	_renderItem: function( ul, item) {
-		return $( "<li></li>" )
+    var html = $( "<li></li>" )
 			.data( "item.autocomplete", item )
-			.append( $( "<a></a>" ).text( item.label ) )
+			.append(  item.label )
 			.appendTo( ul );
+    return html;
 	},
 
 	_move: function( direction, event ) {
