@@ -127,7 +127,7 @@ window.initModel = function initModel () {
               //}
               return -1;
             } else {
-              throw new Error("events starting the same time");
+              //throw new Error("events starting the same time");
             }
           });
           return queriedevents;
@@ -160,7 +160,7 @@ window.initModel = function initModel () {
         var activity = O.activities.get(i);
         var oldstate = activity.commitment;
         if (oldstate === newstate){
-          throw new Error("Activity "+i+" trying not actually changing state but staying at "+newstate);
+          //throw new Error("Activity "+i+" trying not actually changing state but staying at "+newstate);
         }
         var allowed_newstates;
         if (oldstate === 'suggested') {
@@ -172,10 +172,10 @@ window.initModel = function initModel () {
         } else if (oldstate === 'locked'){
           allowed_newstates = ["scheduled"];
         } else {
-          throw new Error("Activity "+i+" trying to transition from undefined state "+newstate);
+          //throw new Error("Activity "+i+" trying to transition from undefined state "+newstate);
         }
         if (allowed_newstates.indexOf(newstate) === -1){
-          throw new Error("Activity "+i+" trying to transition to illegal state "+newstate+" from state "+newstate);
+         // throw new Error("Activity "+i+" trying to transition to illegal state "+newstate+" from state "+newstate);
         }
         activity.commitment = newstate; 
         O.activities._firehandler(view,'commitment',i,oldstate);

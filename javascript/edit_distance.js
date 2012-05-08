@@ -14,10 +14,11 @@ var DEBUG = false
 var DEBUG_INSERT = false
 var DEBUG_COST_FUNC = false
 
+var DISTANCE_COST = 		1000
 var DISPLACEMENT_COST = 1
-var MOVEMENT_COST = 1
-var MOVEMENT_POLY = 4
-var ELIMINATION_COST = 10000000
+var MOVEMENT_COST = 		1
+var MOVEMENT_POLY = 		4
+var ELIMINATION_COST = 	10000000
 
 // -----------------------------------------------------------------------------
 // Low-level Helpers
@@ -58,12 +59,25 @@ function array_replace(array, from, to) {
 	return array
 }
 
+function array_average(array) {
+	if (array.length == 0) return 0
+	var sum = 0
+	for (var i = 0; i < array.length; i++) {
+		sum += array[i]
+	}
+	return sum / array.length
+}
+
+// returns a set representation of the array (no duplicate elements)
+//
 function array_unique_elements(array) {
 	return array.filter(function(itm,i,a) {
     										return i==a.indexOf(itm);
 											})
 }
 
+// remove an element from an array by value
+//
 function remove_element(arr) {
 	var what, a= arguments, L= a.length, ax;
 	while(L> 1 && arr.length){
@@ -81,6 +95,30 @@ function translate_do_between_times(id) {
 	var latest_offset = (dateToNumber(new Date(Date.parse(O.activities.get(id).range[1]))) - global_start_time) * 4
 	
 	return [earliest_offset, latest_offset]
+}
+
+// given the id for two locations, return the travel time (in 15 minute 
+// increments) between the two locations (that is, the number of space that 
+// should be left between from and to)
+//
+var ATOMIC_DISTANCE = 0.0030 // TODO a hack while we work out walking distance
+function distance(from, to) {
+	
+	// Euclidean distance
+	var from_coords = O.activities.get(from).coords
+	var to_coords = O.activities.get(to).coords
+	
+	var from_x = from_coords[0]
+	var from_y = from_coords[1]
+
+	var to_x = to_coords[0]
+	var to_y = to_coords[1]
+
+	var euc_distance = Math.sqrt(Math.pow(from_x - to_x, 2) + Math.pow(from_y - to_y, 2))
+
+	var walking_distance_scaled = Math.ceil(euc_distance / ATOMIC_DISTANCE)
+
+	return walking_distance_scaled
 }
 
 // -----------------------------------------------------------------------------
@@ -119,11 +157,6 @@ function model_from_string(input) {
 // Movement Primitives (act on arrays of strings)
 // -----------------------------------------------------------------------------
 
-function is_ok() {
-		// check 1: make sure the activity blocks are contiguous
-	// TODO
-}
-
 // removes 'id' from the state (assumes that ID only appears once) and replaces 
 // it with white space
 function remove(state, id) {
@@ -146,10 +179,23 @@ function add(state, id, pos_final, len) {
 	state = state.slice()
 	var displaced = new Array()
 	for (var i = pos_final; i < pos_final + len; i++) {
-		if (state[i] != " " && displaced.indexOf(state[i]) == -1) 
+		if (state[i] != " " && displaced.indexOf(state[i]) == -1)
 			displaced.push(state[i])
 		state.splice(i, 1, id)
 	}
+
+	// check travel time for the next activity after pos_final + len TTV
+	/*for (var i = pos_final + len; i < state.length; i++) {
+		if (state[i] != " ") {
+			var travel_time_end = pos_final + len + distance(id, state[i]);
+			if (displaced.indexOf(state[i]) == -1 &&
+					travel_time_end >= state.indexOf(state[i])) {
+				// we found the next activity... check travel time
+				displaced.push(state[i])
+				console.log("TT VIOLATION: Initial add")
+			}
+		}
+	}*/
 
 	// pull out items that we pushed into displaced from the state vector 
 	// (resolves partial collisions)
@@ -163,11 +209,24 @@ function add(state, id, pos_final, len) {
 	return [state, displaced_expanded]
 }
 
+// given the state and a current index, return the two "currently selected" elements
+function find_next_id(state, index) {
+	for (var i = index; i < state.length; i++) {
+		if (state[i] != " ") return state[i]
+	}
+	return " "
+}
+
+function slack(state, start_id, end_id) {
+	if (end_id == " ") return 1000 // makes things easier
+	return additional_gap = state.lastIndexOf(start_id) - state.indexOf(end_id) - distance(start_id, end_id)
+}
+
 // insert a new character of some length between two activities.  Activities 
 // after the given activity are pushed forward.  If the activity is pushed on 
 // top of an existing activity, that activity is pushed backwards.
 function insert(state, id, pos, len, locked) {
-	if (DEBUG_INSERT) console.log("Calling insert() ~ PC: [" + state + "], Insert at: " + pos + ", ID: " + id)
+	if (DEBUG_INSERT) console.log("Calling insert()  ~ PC:     [" + state + "], Insert at: " + pos + ", ID: " + id)
 
 	state = state.slice()
 	var original_len = state.length
@@ -196,12 +255,33 @@ function insert(state, id, pos, len, locked) {
 	// insert the new item
 	for (var i = 0; i < len; i++) state.splice(pos, 0, id)
 
+	// travel time on initial insert TTV
+	/*var next_id = find_next_id(state, pos + len)
+	var additional_slack = slack(state, id, next_id)
+	if (additional_slack < 0)
+		console.log("TT VIOLATION: Insert, first")
+	for (var i = additional_slack; i < 0; i++) {
+		state.splice(pos + len, 0, " ")
+	}*/
+
 	// remove whitespace to make blocks align better
 	var num_inserted = 0
 	for (var i = pos + len; i < state.length; i++) {
-		if (state[i] == " ") {
+
+		var additional_slack = 1 // TODO replace with travel time TTV
+		/*if (state[i] != next_id && state[i] != " ") {
+			additional_slack = slack(state, next_id, state[i])
+			next_id = state[i]
+		}
+
+		if (state[i] == " " && additional_slack == 0) {
+			console.log("TT VIOLATION: Insert, second")
+		}*/
+
+		if (state[i] == " " && additional_slack > 0) {
 			state.splice(i, 1)
 			num_inserted++
+			additional_slack--
 			i--;
 			if (num_inserted == len) break;
 		}
@@ -274,6 +354,8 @@ function get_configurations(displacements, partial_configurations, locked) {
 	return get_configurations(displacements, new_configurations, locked)
 }
 
+// given a list of configurations, remove the ones that violate start at/do between/etc constraints
+//
 function filter_configurations(configurations) {
 	var final_configurations = new Array()
 	for (var i = 0; i < configurations.length; i++) {
@@ -281,6 +363,22 @@ function filter_configurations(configurations) {
 		var unique_elements = array_unique_elements(current_config)
 		unique_elements = remove_element(unique_elements, " ")
 
+		// TODO filter travel time violations TTV
+		/*for (var j = 0; j < unique_elements.length - 1; j++) {
+			var from = unique_elements[j]
+			var from_end = current_config.lastIndexOf(from)
+			var to = unique_elements[j+1]
+			var to_start = current_config.indexOf(to)
+			var dist = distance(from, to)
+			if (from_end > -1 && to_start > -1 && (from_end + dist >= to_start)) {
+				console.log("Travel time violation between " + O.activities.get(from).name + " and " + O.activities.get(to).name)
+				current_config = array_replace(current_config, from, " ")
+			} else {
+				console.log("NO Travel time violation between " + O.activities.get(from).name + " and " + O.activities.get(to).name)
+			}
+		}*/
+
+		// TODO we need the backend to handle the "locked" flag properly in order to enable this
 		// filter start_at violations
 		/*for (var j = 0; j < start_at.length; j++) {
 			var fid = start_at[i][0]
@@ -314,7 +412,7 @@ function filter_configurations(configurations) {
 // Cost Functions
 // -----------------------------------------------------------------------------
 
-function diff_state(initial_state, state) {
+function diff_state(initial_state, additional_elements, state) {
 	var eliminations = new Array()
 	var initial_state_set = array_unique_elements(initial_state)
 	for (var i = 0; i < initial_state_set.length; i++) {
@@ -322,14 +420,36 @@ function diff_state(initial_state, state) {
 			eliminations.push([initial_state_set[i], count_array_occurances(initial_state, initial_state_set[i])])
 		}
 	}
+	for (var i = 0; i < additional_elements.length; i++) {
+		if (state.indexOf(additional_elements[i][0]) == -1) {
+			eliminations.push([additional_elements[i][0], additional_elements[i].length])
+		}		
+	}
 	return eliminations
 }
 
-function cost_function(initial_state, configuration, excludes) {
+function cost_function(initial_state, configuration, excludes, includes, use_distance_cost) {
 	var old_model = model_from_string(initial_state)
 	var new_model = model_from_string(configuration)
 
 	var eliminations = new Array()
+
+	// total distance cost
+	var total_distance_cost = 0
+	if (use_distance_cost) {
+		var distances = new Array()
+		var unique_elements = array_unique_elements(configuration)
+		//console.log(unique_elements)
+		unique_elements = remove_element(unique_elements, " ")
+		for (var j = 0; j < unique_elements.length - 1; j++) {
+			var from = unique_elements[j]
+			var from_end = configuration.lastIndexOf(from)
+			var to = unique_elements[j+1]
+			var to_start = configuration.indexOf(to)
+			distances.push(distance(from, to))
+		}
+		total_distance_cost = array_average(distances) * DISTANCE_COST
+	}
 
 	// calculate displacement and movement costs
 	var displacement_cost = 0
@@ -351,7 +471,7 @@ function cost_function(initial_state, configuration, excludes) {
 		}
 	}
 
-	// elimination cost; TODO combine with diff_state
+	// elimination cost
 	var elimination_cost = 0
 	var initial_state_set = array_unique_elements(initial_state)
 	for (var i = 0; i < initial_state_set.length; i++) {
@@ -360,19 +480,25 @@ function cost_function(initial_state, configuration, excludes) {
 			elimination_cost += ELIMINATION_COST
 		}
 	}
+	var configuration_set = array_unique_elements(configuration)
+	for (var i = 0; i < includes.length; i++) {
+		if (configuration_set.indexOf(includes[i]) == -1) {
+			elimination_cost += ELIMINATION_COST
+		}
+	}
 	
-	var total_cost = displacement_cost + movement_cost + elimination_cost
-	if (DEBUG_COST_FUNC) console.log("Cost: from [" + initial_state + "] -> [" + configuration + "] = " + total_cost + "\t(" + displacement_cost + ", " + movement_cost + ", " + elimination_cost + ")")
+	var total_cost = displacement_cost + movement_cost + elimination_cost + total_distance_cost
+	if (DEBUG_COST_FUNC) console.log("Cost: from [" + initial_state + "] -> [" + configuration + "] = " + total_cost + "\t(" + displacement_cost + ", " + movement_cost + ", " + elimination_cost + ", " + total_distance_cost + ")")
 	return [total_cost, eliminations]
 }
 
-function pick_configuration(initial_state, configurations, excludes) {
+function pick_configuration(initial_state, configurations, excludes, includes, use_distance_cost) {
 	var min_cost = Number.MAX_VALUE
 	var min_configuration = null
 	var min_eliminations = null
 	for (var i = 0; i < configurations.length; i++) {
 		if (DEBUG) console.log("Testing config: [" + configurations[i] + "]")
-		var cost_bundle = cost_function(initial_state, configurations[i], excludes)
+		var cost_bundle = cost_function(initial_state, configurations[i], excludes, includes, use_distance_cost)
 		var cost = cost_bundle[0]
 		var eliminations = cost_bundle[1]
 		if (cost < min_cost) {
@@ -414,7 +540,7 @@ function edit_distance(string, id, pos_final, len) {
 	configurations = filter_configurations(configurations)
 	
 	// pick the best configuration
-	var state_bundle = pick_configuration(initial_state, configurations, [id])
+	var state_bundle = pick_configuration(initial_state, configurations, [id], [], false)
 	var state = state_bundle[0]
 	var eliminations = state_bundle[1]
 
@@ -428,7 +554,7 @@ function edit_distance(string, id, pos_final, len) {
 		var e_id = eliminations[i][0]
 		if (!(e_id == id && eliminatedTarget)) {
 			var e_len = eliminations[i][1]
-			console.log("Eliminated: " + e_id)
+			//console.log("Eliminated: " + e_id)
 			setupActivity(e_id, e_len, ".activitiesList", 0)
 		}
 	}
@@ -493,7 +619,7 @@ function constrain_bounds(string, start, stop) {
 	state = states[0]
 
 	// redraw eliminated activities
-	var eliminations = diff_state(orig_state, state)
+	var eliminations = diff_state(orig_state, [], state)
 	for (var i = 0; i < eliminations.length; i++) {
 		var e_id = eliminations[i][0]
 		var e_len = eliminations[i][1]
@@ -517,25 +643,43 @@ function constrain_bounds(string, start, stop) {
 	return ret
 }
 
-// The auto schedule function
+// The auto schedule button
 //
 function partially_schedule(string, los) {
 	var state = string.split("")
 	var initial_state = string.split("")
 
+	// some preprocessing
+	var excludes = Array()
+	for (var i = 0; i < los.length; i++) { excludes.push(los[i].charAt(0)) }
+
 	for (var j = 0; j < los.length; j++) {
+		var current_element = los[j]
+
+		//console.log("Round of auto-complete starting ~ adding: " + current_element)
+
 		var state_this_iteration = state.slice()
 
-		// some preprocessing
-		var excludes = Array()
-		for (var i = 0; i < los.length; i++) { excludes.push(los[i].charAt(0)) }
-
 		// find a set of decent configurations, given the blocks we displaced
-		configurations = get_configurations([los[j]], [state.slice()], -1)
+		configurations = get_configurations([current_element], [state.slice()], -1)
+		configurations = filter_configurations(configurations)
 
 		// pick the best configuration
-		state = pick_configuration(state_this_iteration, configurations, [])[0]
+		state = pick_configuration(state_this_iteration, configurations, excludes, [current_element[0]], true)[0]
+
+		//console.log("Round of auto-complete finished ~ [" + state + "]")
 	}
+
+	var eliminations = diff_state(initial_state, los, state)
+	for (var i = 0; i < eliminations.length; i++) {
+		var e_id = eliminations[i][0]
+		var e_len = eliminations[i][1]
+		setupActivity(e_id, e_len, ".activitiesList", 0)
+	}
+
+	//
+	// Post-schedule wrap-up
+	//
 
 	var ret = state.join("").replace(/,/g, "")
 	console.log("partially_schedule() returning: \"" + ret + "\"")
