@@ -10,6 +10,25 @@ window.initForm = function initForm () {
       addSuggestion(O.activties.get(i));
     }
   }
+  $("#make_event").click(function (e){
+    debugger;
+    var name = $("#activity_name").value
+    if ($("#radio-start-end")[0].checked){
+      var start = undefined;
+      var duration = 60;
+      var range = [$("#radio-start-field")[0].value,$("#radio-end-field")[0].value];
+    } else if ($("#radio-start-at")[0].checked){
+      var start = $("#radio-start-at-field")[0].value;
+      var duration = 60;
+      var range = [undefined,undefined];
+    } else if ($('#radio-autotime')){
+      var start = undefined;
+      var duration = 60;
+      var range = [$("#radio-start-field").value,$("#radio-end-field").value];
+    }
+    var activity = new O.Activity(name,[undefined,undefined],start,undefined,range,true,"todo");
+    O.activities.set(activity.id,activity);
+  });
 
 
   /*
