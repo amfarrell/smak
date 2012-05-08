@@ -96,6 +96,13 @@ window.initMap = function initMap () {
         return;
         //TODO: have it display a different colour marker.
       }
+      if (typeof list[0] ==="number" || typeof list[0] ==="string"){
+        var scraplist = [];
+        while (list.length > 0){
+          scraplist.push(O.activities.get(list.shift()));
+        }
+        list = scraplist;
+      }
       return Map.directions(list);
       var newlist = [];
       var origin;

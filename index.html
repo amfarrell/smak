@@ -56,33 +56,34 @@ $(document).ready(function() {
   <div id="activity_suggest">
     <!-- Dynamically load this with activities. -->
   </div>
-  <div id="activity_time">
-  <!--
-    <div id="time_form">
-      <div id="time_definite">
-        From <input id="definite_start"></input> 
-        To <input id="definite_end"></input>
-        <div id="definite_add_event">  
-          <button type="button" id="add_schedule" onclick="addEvent('schedule');">Add to Schedule</button>
-        </div>
-      </div>
-      <div id="or">or</div>
-      <div id="time_range">
-        <input id="range_duration"></input>hours
-        between <input id="range_start"></input>
-        and <input id="range_end"></input>
-      <div id="range_add_event">
-        <button type="button"  id="add_todo" onclick="addEvent('todo');">Add to Todo</button>
-      </div>
-      </div>
-    </div>
-    <div id="time_display">
-      <canvas> </canvas>
-    </div>
-    <div id="description">
-    </div>
-    -->
-  </div>
+  <table>
+    <form>
+      <tr valign="bottom">
+        <td rowspan="2" valign="middle"><input type="radio" id="radio-start-end"/> </td> 
+        <td width="20px"> </td>
+        <td> Earliest Start Time </td>
+        <td> <input type="text" size="6" id="radio-start-field"></input> </td>
+        <td> e.g. Museum Opening Time</td>
+      </tr><tr valign="top">
+        <td width="20px"> </td>
+        <td> Latest End Time </td>
+        <td> <input type="text" size="6" id="radio-end-field"></input> </td>
+        <td> e.g. Museum Closing Time</td>
+      </tr><tr>
+        <td> <input type="radio" id="radio-start-at"/> </td>
+        <td width="20px"> </td>
+        <td> Start At </td>
+        <td> <input type="text" size="6" id="radio-start-at-field"></input> </td>
+        <td> e.g. Appointment</td>
+      </tr><tr>
+        <td> <input type="radio" id="radio-autotime"/> </td>
+        <td width="20px"> </td>
+        <td> Decide for me </td>
+        <td></td>
+        <td align="right"> <input type="button" value="+" id="make_event"></input></td>
+      </tr>
+    </form>
+  </table>
 
   <div id="activity_location">
     <div id="location_form">
@@ -102,7 +103,7 @@ $(document).ready(function() {
     <td>Activities</td>
     <td>Schedule</td>
   </tr>
-    <td><div class="autoSchedule"><button type="button" onclick="autoSchedule();">Schedule these activities</button></div></td>
+    <td><div class="autoSchedule"><button type="button" onclick="autoSchedule();">Schedule these activities for me</button></div></td>
     <td id="startTimeCell"></td>
   <tr>
     <td valign="top" style="padding:0 10px">
