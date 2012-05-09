@@ -82,11 +82,43 @@ window.initModel = function initModel () {
       },
       '_firehandler':function _firehandler(view, handler, i, otherdata) {
         if (['',false,'map','schedule','form'].indexOf(view) === -1){throw new Error("unknown interface "+view)};
+        var prev = O.activities._undo_ll;
+        O.activities._undo_ll = {
+          'prev':prev,
+          'handler':handler,
+          'i':i,
+          'old_state':otherdata
+        };
+        console.log("undo state");
+        console.log(O.activities._undo_ll);
         for (subscriber in O.activities._subscribers) {
           if (subscriber !== view) {
             O.activities._subscribers[subscriber][handler](i, otherdata);
           }
         }
+      },
+      '_undo_ll':{
+        'prev':{},
+        'handler':function(i,data){},
+        'i':0,
+        'old_state':{}
+      },
+      'undo': function undo(){
+        debugger;
+        var prev = O.activities._undo_ll.prev;
+        var activity = O.activities.get(O.activities._undo_ll.i);
+        var reversed_state;
+        if (O.activities._undo_ll.handler == 'commitment') {
+          reversed_state = activity.commitment;
+          activity.commitment = O.activities._undo_ll.old_state; 
+        } else if (O.activities._undo_ll.handler == 'update'){
+          reversed_state = {};
+          for (change in O.activities._undo_ll.old_state){
+            reversed_state[change] = activity[change];
+            activity[change] = O.activities._undo_ll.old_state[change]; 
+          }
+        }
+        O.activities._firehandler("",O.activities._undo_ll.handler,O.activities._undo_ll.i,reversed_state);
       },
       'all':function allActivities (type) {
         var queriedevents = [];
@@ -150,6 +182,7 @@ window.initModel = function initModel () {
         checkstring(view);
         console.log("selected: "+i);
         O.activities.selected_activity = $.jStorage.get(i);
+        console.log(O.activities.selected_activity);
         O.activities._firehandler(view, 'select', i,{});
       },
       'deselect':function deselect(view) {
@@ -244,8 +277,7 @@ window.initModel = function initModel () {
       },
       'add':function add(i){
         var activity;
-        if (i === undefined && O.currentActivity ){
-          activity = O.currentActivity;
+        if (i === undefined && O.activities.selected_activity ){
         } else {
           activity = $.jStorage.get(i)
         }
@@ -261,6 +293,7 @@ window.initModel = function initModel () {
     'Activity': Activity,
     'google_suggestions':{},
   };
+  window.O.undo = window.O.activities.undo;
 
   prebuilt = [
   new Activity("Breakfast", [43.778422,11.257163], "13:00", "14:00", 60, ["8:00","10:30"], true, "suggested"), 

@@ -303,6 +303,8 @@ window.initMap = function initMap () {
           if (newstate === "suggested"){
             // remove marker. recalc order.
           } else if (newstate === "todo"){
+            var order = O.activities.all("ordered_schedule");
+            console.log("removing from schedule"+i)
             //change colour of marker, recalc order.
           } else if (newstate === "locked"){
             // Do nothing
@@ -386,8 +388,8 @@ window.initMapInput = function initMapInput () {
           e.pageY > map.offset().top && 
           e.pageY < map.offset().top + map.height()) {
         $("#location_text").val((""+ll.lat()).substr(0,8) + ", " + (""+ll.lng()).substr(0,8));
-        if (O.currentActivity) {
-          O.activities.update("map",O.currentActivity.id,{"coords":[ll.lat(), ll.lng()]});
+        if (O.activities.selected_activity) {
+          O.activities.update("map",O.activities.selected_activity.id,{"coords":[ll.lat(), ll.lng()]});
         } else {
           Map.currentCoords = [ll.lat(), ll.lng()];
         }
@@ -403,8 +405,8 @@ window.initMapInput = function initMapInput () {
 
   /*
   $("#location_text").keyup(function (e){
-    O.currentActivity.coords = e.srcElement.value.replace(" ","").split(",");
-    console.log(O.currentActivity)
+    O.activities.selected_activity.coords = e.srcElement.value.replace(" ","").split(",");
+    console.log(O.activities.selected_activity)
     //TODO: check if valid time. Highlight in red if not.
     //TODO: visualize the time in some way.
   });
