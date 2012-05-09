@@ -64,30 +64,32 @@ $(document).ready(function() {
     <!-- Dynamically load this with activities. -->
   </div>
   <table>
-    <form>
+    <form id="crud">
       <tr valign="bottom">
-        <td rowspan="2" valign="middle"><input type="radio" id="radio-start-end"/> </td> 
         <td width="20px"> </td>
         <td> Earliest Start Time </td>
-        <td> <input type="text" size="6" id="radio-start-field"></input> </td>
+        <td><input type="text" size="8" id="radio-start-field" readonly></input> 
+						<script type="text/javascript"> 
+							document.forms['crud'].elements["radio-start-field"].value = startTime.toString("h:mmtt");
+							$('#radio-start-field').calendricalTime(); 
+						</script>
+				</td>
         <td> e.g. Museum Opening Time</td>
       </tr><tr valign="top">
         <td width="20px"> </td>
         <td> Latest End Time </td>
-        <td> <input type="text" size="6" id="radio-end-field"></input> </td>
+        <td><input type="text" size="8" id="radio-end-field" readonly></input>
+						<script type="text/javascript">
+							document.forms['crud'].elements["radio-end-field"].value = (new Date( startTime.valueOf()).addHours(schedule.length/4)).toString("h:mmtt");
+							$('#radio-end-field').calendricalTime(); 
+						</script>
+				</td>
         <td> e.g. Museum Closing Time</td>
       </tr><tr>
-        <td> <input type="radio" id="radio-start-at"/> </td>
-        <td width="20px"> </td>
-        <td> Start At </td>
-        <td> <input type="text" size="6" id="radio-start-at-field"></input> </td>
-        <td> e.g. Appointment</td>
-      </tr><tr>
-        <td> <input type="radio" id="radio-autotime"/> </td>
-        <td width="20px"> </td>
-        <td> Decide for me </td>
-        <td></td>
-        <td align="right"> <input type="button" value="+" id="make_event"></input></td>
+				<td width="20px"> </td>
+				<td></td>
+				<td></td>
+        <td align="right"><input type="button" value="Add Activity" id="make_event"></input></td>
       </tr>
     </form>
   </table>

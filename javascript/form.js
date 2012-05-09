@@ -44,9 +44,9 @@ window.initForm = function initForm () {
     var activity = O.activities.get(id);
     $("#activity_name")[0].value = activity.name 
     if (activity.range && activity.range[0]){
-      $("#radio-start-end")[0].checked = true;
-      $("#radio-start-field")[0].value = activity.range[0];
-      $("#radio-end-field")[0].value = activity.range[1];
+      //$("#radio-start-end")[0].checked = true;
+      $("#radio-start-field")[0].value = new Date(Date.parse(activity.range[0])).toString("h:mmtt");
+      $("#radio-end-field")[0].value = new Date(Date.parse(activity.range[1])).toString("h:mmtt");
     } else if (activity.start){
       $("#radio-start-at")[0].checked = true;
       var start = $("#radio-start-at-field")[0].value = activity.start;
@@ -60,8 +60,8 @@ window.initForm = function initForm () {
     var activity = O.activities.get(id);
     if (activity.id === O.activities.selected_activity.id){
       $("#activity_name")[0].value = activity.name;
-      $("#radio-start-field").value = activity.range[0];
-      $("#radio-end-field").value = activity.range[1];
+      $("#radio-start-field").value = new Date(Date.parse(activity.range[0])).toString("h:mmtt");
+      $("#radio-end-field").value = new Date(Date.parse(activity.range[1])).toString("h:mmtt");
       $("#radio-start-at-field").value = activity.start;
     }
 
