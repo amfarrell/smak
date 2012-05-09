@@ -12,29 +12,14 @@ window.initForm = function initForm () {
   }
   $("#make_event").click(function (e){
     var name = $("#activity_name")[0].value
-    if ($("#radio-start-end")[0].checked){
-      var start = undefined;
-      var duration = 60;
-      var range = [$("#radio-start-field")[0].value,$("#radio-end-field")[0].value];
-    } else if ($("#radio-start-at")[0].checked){
-      var start = $("#radio-start-at-field")[0].value;
-      var duration = 60;
-      var range = [undefined,undefined];
-    } else if ($('#radio-autotime')[0].checked){
-      var start = undefined;
-      var duration = 60;
-      var range = [undefined,undefined];
-    }
+    var range = [$("#radio-start-field")[0].value,$("#radio-end-field")[0].value];
 
     //function Activity(name, coords, start, end, duration, range, user_createdP, commitment) {
     var activity = new O.Activity(name,Map.currentCoords,start,undefined,undefined,range,true);
     O.activities.set(activity.id,activity);
     $("#activity_name")[0].value = '';
-    $("#radio-start-end")[0].checked = false;
     $("#radio-start-field").value = '';
     $("#radio-end-field").value = '';
-    $('#radio-autotime')[0].checked = false;
-    $("#radio-start-at")[0].checked = false;
     $("#radio-start-at-field").value = '';
     
     O.activities.todo('',activity.id);
