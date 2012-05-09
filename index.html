@@ -46,6 +46,12 @@ $(document).ready(function() {
   initScheduleListeners()
   initMapInput();
 
+  $('html').bind('click tap',function() {
+    deselectItem();
+  });
+  $("#activity").bind('click tap',function(event) {
+    event.stopPropagation();
+  });
 
 });
 </script>
