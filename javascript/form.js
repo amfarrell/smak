@@ -56,6 +56,16 @@ window.initForm = function initForm () {
     $('#location_text')[0].value = activity.coords;
     console.log(activity.coords);
   });
+
+  O.activities.deselected("form",function(id,otherdata){
+    console.log("the form sees that "+id+" was de-selected.");
+    var activity = O.activities.get(id);
+    $("#activity_name")[0].value = ""
+    $("#radio-start-field")[0].value = ""
+    $("#radio-end-field")[0].value = ""
+    $('#location_text')[0].value = "";
+  });
+
   O.activities.updated("form",function form_updated(id,olddata){
     var activity = O.activities.get(id);
     if (activity.id === O.activities.selected_activity.id){
