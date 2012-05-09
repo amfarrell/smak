@@ -76,6 +76,12 @@ function array_unique_elements(array) {
 											})
 }
 
+function get_id_list(state) {
+	var unique = array_unique_elements(state)
+	unique = remove_element(unique, " ")
+	return unique
+}
+
 // remove an element from an array by value
 //
 function remove_element(arr) {
@@ -116,7 +122,7 @@ function translate_start_at_time(id) {
 // increments) between the two locations (that is, the number of space that 
 // should be left between from and to)
 //
-var ATOMIC_DISTANCE = 0.0030 // TODO a hack while we work out walking distance
+var ATOMIC_DISTANCE = 0.0030
 function distance(from, to) {
 	
 	// Euclidean distance
@@ -573,6 +579,7 @@ function edit_distance(string, id, pos_final, len) {
 			setupActivity(e_id, e_len, ".activitiesList", 0)
 		}
 	}
+	Map.renderPath(get_id_list(state))
 
 	var ret = state.join("").replace(/,/g, "")
 	console.log("edit_distance() returning: \"" + ret + "\"")
@@ -641,6 +648,7 @@ function constrain_bounds(string, start, stop) {
 		O.activities.recommit("", e_id, "todo")
 		setupActivity(e_id, e_len, ".activitiesList", 0)
 	}
+	Map.renderPath(get_id_list(state))
 
 	ret = state.join("").replace(/,/g, "")
 
@@ -692,6 +700,7 @@ function partially_schedule(string, los) {
 		O.activities.recommit("", e_id, "todo")
 		setupActivity(e_id, e_len, ".activitiesList", 0)
 	}
+	Map.renderPath(get_id_list(state))
 
 	//
 	// Post-schedule wrap-up
