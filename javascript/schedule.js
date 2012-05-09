@@ -313,7 +313,7 @@ window.autoSchedule = function autoSchedule(){
       snap: '.schedule, .activitiesList',
       snapMode: "inner",
       cursor: "move",
-      stack: "div.item", 
+      stack: "div.item",
       opacity: 0.75, 
       start:function(event,ui) {
         selectItem(id);
@@ -359,6 +359,10 @@ window.autoSchedule = function autoSchedule(){
           addActivity($(this).attr("id"), height);
           $(this).remove();
           schedule = schedule.replace(new RegExp($(this).attr("id"), 'g'), " "); // remove item from schedule
+					
+					var new_activities = get_id_list(schedule.split(""))
+					Map.renderPath(new_activities)
+					
         } else {  // move within Activities
           $(this).css({"left":0, "top":0}); //return to original position
         }
