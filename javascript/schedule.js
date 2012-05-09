@@ -5,10 +5,6 @@
   var scheduleItemWidth = 260;  //pixels width of schdeduleItem
   var borderMarginHeight = 5;  //pixels width of border and margin of schdeduleItem
   
-  $('html').bind('click tap',function() {
-    deselectItem();
-  });
-  
   var initScheduleListeners = function initScheduleListeners(){
     O.activities.updated('schedule',function scheduleUpdate(i,oldvalues){
       //Do stuff after an item's value is updated
