@@ -28,8 +28,6 @@ window.initModel = function initModel () {
       this.description = "";
       this.id = JSON.stringify(globalIDCounter);
       this.displayid = "";
-      this.nextevent = undefined;
-      this.prevevent = undefined;
       globalIDCounter += 1;
       return this;
     }

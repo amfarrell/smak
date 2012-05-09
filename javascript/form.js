@@ -27,7 +27,7 @@ window.initForm = function initForm () {
     }
 
     //function Activity(name, coords, start, end, duration, range, user_createdP, commitment) {
-    var activity = new O.Activity(name,Map.currentCoords,start,undefined,undefined,range,true,"todo");
+    var activity = new O.Activity(name,Map.currentCoords,start,undefined,undefined,range,true,"suggested");
     O.activities.set(activity.id,activity);
     $("#activity_name")[0].value = '';
     $("#radio-start-end")[0].checked = false;
@@ -37,6 +37,7 @@ window.initForm = function initForm () {
     $("#radio-start-at")[0].checked = false;
     $("#radio-start-at-field").value = '';
     
+    O.activities.todo('',activity.id);
   });
 
   O.activities.selected("form",function(id,otherdata){
