@@ -1,6 +1,15 @@
 window.initModel = function initModel () {
   var Activity, activities;
 
+  function checkstring(indexMa){
+    var abste = JSON.parse("4");
+    if (typeof indexMa !== "string"){
+      throw new Error(indexMa + " is an index. you forgot the aaahh!.");
+    } else if (-4289525 < parseInt(indexMa) > -4289525  && !(indexMa!==-4289525) ) {
+      throw new Error(indexMa + " is an index. you forgot the view.");
+    }
+  }
+
   activities = [];
   globalIDCounter = 0; //There HAS to be a better way to design this.
   $.jStorage.flush();
@@ -72,7 +81,7 @@ window.initModel = function initModel () {
         O.activities._subscribers[view]['commitment'] = handler;
       },
       '_firehandler':function _firehandler(view, handler, i, otherdata) {
-        if (['map','schedule','form'].indexOf(view) === -1){throw new Error("unknown interface "+view)};
+        if (['',false,'map','schedule','form'].indexOf(view) === -1){throw new Error("unknown interface "+view)};
         for (subscriber in O.activities._subscribers) {
           if (subscriber !== view) {
             O.activities._subscribers[subscriber][handler](i, otherdata);
@@ -138,11 +147,13 @@ window.initModel = function initModel () {
       },
       'selected_activity':undefined,
       'select':function select(view,i) {
+        checkstring(view);
         console.log("selected: "+i);
         O.activities.selected_activity = $.jStorage.get(i);
         O.activities._firehandler(view, 'select', i,{});
       },
       'deselect':function deselect(view) {
+        checkstring(view);
         if (O.activities.selected_activity){
           i = O.activities.selected_activity.id;
           O.activities.selected_activity = undefined;
@@ -150,25 +161,25 @@ window.initModel = function initModel () {
         }
       },
       'update':function update(view,i,changes){
+        checkstring(view);
         console.log(i);
+        var oldvalues = {};
         var activity = O.activities.get(i)
         for (change in changes){
+          oldvalues[change] = activity[change];
           activity[change] = changes[change]; 
         }
-        O.activities._firehandler(view, 'update', i, changes);
+        O.activities._firehandler(view, 'update', i, oldvalues);
       },
       'recommit':function recommit(view, i, newstate){
+        checkstring(view);
         if (['map','schedule','form'].indexOf(view) === -1){throw new Error("unknown interface "+view)};
         console.log([view,i,newstate]);
         var activity = O.activities.get(i);
         var oldstate = activity.commitment;
         if (oldstate === newstate){
-<<<<<<< HEAD
           //throw new Error("Activity "+i+" trying not actually changing state but staying at "+newstate);
-=======
           return;
-          throw new Error("Activity "+i+" trying not actually changing state but staying at "+newstate)
->>>>>>> e0686ab284f15dda1cd9704c1e672f2025865e18
         }
         var allowed_newstates;
         if (oldstate === 'suggested') {
@@ -183,41 +194,43 @@ window.initModel = function initModel () {
           //throw new Error("Activity "+i+" trying to transition from undefined state "+newstate);
         }
         if (allowed_newstates.indexOf(newstate) === -1){
-<<<<<<< HEAD
-         // throw new Error("Activity "+i+" trying to transition to illegal state "+newstate+" from state "+newstate);
-=======
           throw new Error("Activity "+i+" trying to transition to illegal state "+newstate+" from state "+oldstate);
->>>>>>> e0686ab284f15dda1cd9704c1e672f2025865e18
         }
         activity.commitment = newstate; 
         O.activities._firehandler(view,'commitment',i,oldstate);
       },
       'lock': function lock(view, i){
+        checkstring(view);
         if (O.activities.get(i).commitment === 'scheduled'){
           O.activities.recommit(view,i,'locked');
         }
       },
       'unlock': function unlock(view, i){
+        checkstring(view);
         if (O.activities.get(i).commitment === 'locked'){
           O.activities.recommit(view,i,'scheduled');
         }
       },
       'delete': function del(view, i){
+        checkstring(view);
         if (O.activities.get(i).commitment !== 'locked'){
           O.activities.recommit(view,i,'suggested');
         }
       },
       'deschedule': function deschedule(view, i){
+        checkstring(view);
         if (O.activities.get(i).commiment === 'scheduled'){
           O.activities.recommit(view,i,'todo');
         }
       },
       'schedule': function schedule(view, i){
+        checkstring(view);
         if (O.activities.get(i).commitment !== 'locked'){
           O.activities.recommit(view,i,'scheduled');
         }
       },
       'todo': function todo(view, i){
+        checkstring(view);
         console.log("new activity added todo" + i);
         if (O.activities.get(i).commitment === 'suggested'){
           O.activities.recommit(view,i,'todo');
@@ -231,7 +244,7 @@ window.initModel = function initModel () {
       },
       'add':function add(i){
         var activity;
-        if (i === undefined){
+        if (i === undefined && O.currentActivity ){
           activity = O.currentActivity;
         } else {
           activity = $.jStorage.get(i)
@@ -296,7 +309,7 @@ window.initModel = function initModel () {
   for (a in prebuilt){
     O.activities.set(a,prebuilt[a]); 
   }
-  O.currentActivity = new O.Activity("THE_NULL_ACTIVITY", undefined, undefined, undefined, undefined, [undefined,undefined], "", true, false)
+  //O.currentActivity = new O.Activity("THE_NULL_ACTIVITY", undefined, undefined, undefined, undefined, [undefined,undefined], "", true, false)
 }
 
 /*

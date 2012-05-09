@@ -9,7 +9,30 @@
     deselectItem();
   });
   
-  //updated('schedule',function scheduleUpdate(i,changes){});
+  var initScheduleListeners = function initScheduleListeners(){
+    O.activities.updated('schedule',function scheduleUpdate(i,oldvalues){
+      //Do stuff after an item's value is updated
+      var activity = O.activities.get(i);
+      for (key in oldvalues){
+        console.log("the schedule sees that "+key+" changed in activity "+i+" from "+oldvalues[key]+" to "+activity[key]+".");
+      }
+
+    });
+    O.activities.selected("schedule",function scheduleSelected(id,empty_map){
+      console.log("the schedule sees that "+id+" has been selected.");
+      //Do stuff after the item is deselected.
+      $(".selected:not(#"+id+")").removeClass('selected');
+      $("#"+id).addClass('selected');
+      updateDoBetweenBox();
+    });
+    O.activities.deselected("schedule",function scheduleSelected(id,empty_map){
+      $(".selected").removeClass('selected');
+      updateDoBetweenBox();
+      O.activities.deselect('schedule');
+      console.log("the schedule sees that "+id+" has been deselected.");
+      //Do stuff after the item is deselected.
+    });
+  }
 
   function initHeights() {
     $('.schedule').height(blockHeight*schedule.length);    
@@ -438,15 +461,21 @@ window.autoSchedule = function autoSchedule(){
     event.stopPropagation();
   }
   function deselectItem(){
+    //Do stuff before the item is deselected.
+    /*
     $(".selected").removeClass('selected');
     updateDoBetweenBox();
-    O.activities.deselect('schedule');
+    */
+    O.activities.deselect('');
   }
   function selectItem(id){
+    //Do stuff before the item is selected.
+    /*
     $(".selected:not(#"+id+")").removeClass('selected');
     $("#"+id).addClass('selected');
     updateDoBetweenBox();
-    O.activities.select('schedule',id);
+    */
+    O.activities.select('',id);
   }
 
   function updateDoBetweenBox(){
