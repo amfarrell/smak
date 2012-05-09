@@ -10,11 +10,32 @@
       //Do stuff after an item's value is updated
       var activity = O.activities.get(i);
       for (key in oldvalues){
-        console.log("the schedule sees that "+key+" changed in activity "+i+" from "+oldvalues[key]+" to "+activity[key]+".");
-      }
+      console.log("the schedule sees that "+key+" changed in activity "+i+" from "+oldvalues[key]+" to "+activity[key]+".");
 
+        if (key == "name"){
+          $("#"+i+" .activityName").html(activity.name);
+        }
+        if (key == "range"){
+          drawDoBetween(i);
+          updateDoBetweenBox();
+        }
+        if (key == "duration"){
+          // TODO: change duration
+        }
+      }
     });
-    O.activities.selected("schedule",function scheduleSelected(id,empty_map){
+    O.activities.commitment_changed('schedule',function commitmentUpdate(i,oldState){
+      //Do stuff after an item changes commitment state
+      var activity = O.activities.get(i);
+      if (oldState == 'scheduled' && activity.commitment == 'todo'){
+        
+      }else if (oldState == 'todo' && activity.commitment == 'scheduled'){
+        $("#"+i).remove();
+        drawSchedule(edit_distance(schedule,id, positionY,height));
+      }
+      console.log("the schedule sees that "+key+" changed in activity "+i+" from "+oldvalues[key]+" to "+activity[key]+".");
+    });
+    O.activities.selected("schedule",function scheduleDeselected(id,empty_map){
       console.log("the schedule sees that "+id+" has been selected.");
       //Do stuff after the item is deselected.
       $(".selected:not(#"+id+")").removeClass('selected');
@@ -278,11 +299,20 @@ window.autoSchedule = function autoSchedule(){
       },
       drag:function(){
         updateTimes(id);
-        if ($(this).overlaps($(".doBetween" +  $(this).attr("id")+" .doBetweenTop")) ||
-            $(this).overlaps($(".doBetween" +  $(this).attr("id")+" .doBetweenBottom"))) {
-          $(this).addClass("outsideDoBetween");
-        } else {
+        if ($(this).overlaps($(".doBetween" +  $(this).attr("id")+" .doBetweenTop"))){
+          if ($(".error").length == 0) $(this).children(".activityCenter").append("<div class='error'>Can not be placed before "+O.activities.get(id).range[0]+".</div>");
+        }else if($(this).overlaps($(".doBetween" +  $(this).attr("id")+" .doBetweenBottom"))){
+          if ($(".error").length == 0) $(this).children(".activityCenter").append("<div class='error'>Can not be placed after "+O.activities.get(id).range[1]+".</div>");
+        }else if($(this).overlaps($(".ui-draggable-disabled"))) {
+          if ($(".error").length == 0) $(this).children(".activityCenter").append("<div class='error'>Can not be placed on a locked activity.</div>");
+        }else{
+          $(".error").remove();
+        }
+        
+        if ($(".error").length == 0){
           $(this).removeClass("outsideDoBetween");
+        }else{
+          $(this).addClass("outsideDoBetween");
         }
       },
       stop: function(event, ui) { 
@@ -290,15 +320,16 @@ window.autoSchedule = function autoSchedule(){
         var height = getDuration(id);
         if ((list == ".schedule" && ($(this).position().left>-160)) ||  // move in schedule
             (list == ".activitiesList" && ($(this).position().left>scheduleItemWidth/2)) ){  // move from Activities to Schedule
-          if (!$(this).overlaps($(".doBetween" +  $(this).attr("id")+" .doBetweenTop")) && // if moved to a location in the doBetween times
-              !$(this).overlaps($(".doBetween" +  $(this).attr("id")+" .doBetweenBottom"))) {
+          if (!$(this).overlaps($(".doBetween" +  $(this).attr("id")+" .doBetweenTop")) && // if moved to a location not in the doBetween times
+              !$(this).overlaps($(".doBetween" +  $(this).attr("id")+" .doBetweenBottom")) &&
+              !$(this).overlaps($(".ui-draggable-disabled"))) { //or on a locked item
                   var positionY = getPositionY(id);
                   if (list == ".activitiesList") {  // move from Activities to Schedule
                     $(this).remove();
                   }       
                   drawSchedule(edit_distance(schedule,id, positionY,height));
           }else{
-            $(this).css({"left":0, "top":0}); //return to original position
+            $(this).css({"left":ui.originalPosition.left, "top":ui.originalPosition.top}); //return to original position
           }
         } else if (list == ".schedule") {   // move from Schedule to Activities
           addActivity($(this).attr("id"), height);
@@ -307,6 +338,7 @@ window.autoSchedule = function autoSchedule(){
         } else {  // move within Activities
           $(this).css({"left":0, "top":0}); //return to original position
         }
+        $(".error").remove();
         $(this).removeClass("outsideDoBetween");
         updateTimes(id);
         selectItem(id);
@@ -332,13 +364,24 @@ window.autoSchedule = function autoSchedule(){
       resize:function(event, ui) {  
         updateDuration(id);
         updateTimes(id);
+        if ($(this).overlaps($(".ui-draggable-disabled")) && $(".error").length == 0) {
+          $(this).children(".activityCenter").append("<div class='error'>Can not be placed on a locked activity.</div>");
+          $(this).addClass("outsideDoBetween");
+        } else if($(".error").length == 0){
+          $(".error").remove();
+          $(this).removeClass("outsideDoBetween");
+        }
       },
       stop: function(event, ui) {
         var id = $(this).attr("id");
         if (list == ".schedule" ) {
           var positionY = getPositionY(id);
           var height = getDuration(id);
-          drawSchedule(edit_distance(schedule,id, positionY,height));
+          if (!$(this).overlaps($(".ui-draggable-disabled"))) { // not on a locked item   
+            drawSchedule(edit_distance(schedule,id, positionY,height));
+          }else{
+            $(this).css({"left":ui.originalPosition.left, "top":ui.originalPosition.top}); //return to original position
+          }
         } else {
           $(".activitiesList div.scheduleItem").css({
             "position": "relative",
@@ -384,7 +427,7 @@ window.autoSchedule = function autoSchedule(){
         $(list + " div.item:last").append("<div class='lock'><img src='unlock.png' alt='unlocked' /></div>");
       $(list + " div.item:last .lock").click(toggleLock);
       var letter = String.fromCharCode(64+itemNumber);
-      $(list + " div.item:last").append("<div class='activityName'><img src='Google Maps Markers/darkgreen_Marker"+letter+".png' alt='"+letter+"'/>"+O.activities.get(id).name+"</div>");
+      $(list + " div.item:last").append("<div class='activityCenter'><img src='Google Maps Markers/darkgreen_Marker"+letter+".png' alt='"+letter+"'/>"+O.activities.get(id).name+"</div>");
      
       $(list + " div.item:last").css({// Set item to it's current absolute position
         "position": "absolute",
@@ -395,14 +438,13 @@ window.autoSchedule = function autoSchedule(){
       $(list + " div.item:last").draggable("option", "containment", ".doBetween"+id);
       $(list + " div.item:last").resizable("option", "containment", ".doBetween"+id);
     }else{    // activitiesList 
-      $(list + " div.item:last").append("<div class='activityName'>"+O.activities.get(id).name+"</div>");
+      $(list + " div.item:last").append("<div class='activityCenter'><div class='activityName'>"+O.activities.get(id).name+"</div></div>");
       $(list + " div.item:last").draggable("option", "containment", ".activitiesContainer");
       $(list + " div.item:last").resizable("option", "containment", ".activitiesResizeContainer");
     }
     $(list + " div.item:last").append("<div class='times'></div>");
     $(list + " div.item:last").append("<div class='duration'></div>");
-    $(list + " div.item:last .activityName").append("<div class='error'>Can not be placed outside do between times</div>");
-    $(".error").hide();
+
     
     $(list + " div.item:last").corner();
     
