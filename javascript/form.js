@@ -70,8 +70,8 @@ window.initForm = function initForm () {
   $("#activity_name").keyup(function (e){
     console.log(e)
     var name = $("#activity_name")[0].value
-    if (O.currentActivity){
-        O.activities.update("",O.currentActivity.id,{"name":name});
+    if (O.activities.selected_activity){
+        O.activities.update("",O.activities.selected_activity.id,{"name":name});
     }
     //TODO: check if valid time. Highlight in red if not.
   });
@@ -108,8 +108,8 @@ window.initForm = function initForm () {
       start = incremened_time(start);
       //increment
     }
-    if (O.currentActivity){
-        O.activities.update("",O.currentActivity.id,{"range":[start, O.currentActivity.range[1]]});
+    if (O.activities.selected_activity){
+        O.activities.update("",O.activities.selected_activity.id,{"range":[start, O.activities.selected_activity.range[1]]});
     }
     //TODO: check if valid time. Highlight in red if not.
   });
@@ -122,8 +122,8 @@ window.initForm = function initForm () {
     } else if (e.which === 38) { 
       end = incremened_time(end);
     } 
-    if (O.currentActivity){
-        O.activities.update("",O.currentActivity.id,{"range":[O.currentActivity.range[0], end]});
+    if (O.activities.selected_activity){
+        O.activities.update("",O.activities.selected_activity.id,{"range":[O.activities.selected_activity.range[0], end]});
     }
     //TODO: check if valid time. Highlight in red if not.
   });
@@ -136,8 +136,8 @@ window.initForm = function initForm () {
     } else if (e.which === 38) { 
       start_at = incremened_time(start_at);
     }
-    if (O.currentActivity){
-        O.activities.update("",O.currentActivity.id,{"start":start_at});
+    if (O.activities.selected_activity){
+        O.activities.update("",O.activities.selected_activity.id,{"start":start_at});
     }
     //TODO: check if valid time. Highlight in red if not.
   });
@@ -150,7 +150,7 @@ window.initForm = function initForm () {
     } else if (e.which === 38) { 
       //increment
     } 
-    O.currentActivity.duration = e.srcElement.value;
+    O.activities.selected_activity.duration = e.srcElement.value;
     //TODO: check if valid time. Highlight in red if not.
   });
   $("#range_end").keyup(function (e){
@@ -160,7 +160,7 @@ window.initForm = function initForm () {
     } else if (e.which === 38) { 
       //increment
     }
-    O.currentActivity.range[0] = e.srcElement.value;
+    O.activities.selected_activity.range[0] = e.srcElement.value;
     //TODO: check if valid time. Highlight in red if not.
     //TODO: visualize the time in some way.
   });
@@ -168,7 +168,7 @@ window.initForm = function initForm () {
 
   });
   $("#add_todo").mouseup(function (e){
-    alert("TODO: add this to todo list\n"+JSON.stringify(O.currentActivity));
+    alert("TODO: add this to todo list\n"+JSON.stringify(O.activities.selected_activity));
   });
 
 

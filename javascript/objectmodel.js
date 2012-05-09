@@ -85,10 +85,12 @@ window.initModel = function initModel () {
         var prev = O.activities._undo_ll;
         O.activities._undo_ll = {
           'prev':prev,
-          'type':handler,
+          'handler':handler,
           'i':i,
           'old_state':otherdata
         };
+        console.log("undo state");
+        console.log(O.activities._undo_ll);
         for (subscriber in O.activities._subscribers) {
           if (subscriber !== view) {
             O.activities._subscribers[subscriber][handler](i, otherdata);
@@ -97,18 +99,19 @@ window.initModel = function initModel () {
       },
       '_undo_ll':{
         'prev':{},
-        'type':function(i,data){},
+        'handler':function(i,data){},
         'i':0,
         'old_state':{}
       },
       'undo': function undo(){
+        debugger;
         var prev = O.activities._undo_ll.prev;
         var activity = O.activities.get(O.activities._undo_ll.i);
         var reversed_state;
         if (O.activities._undo_ll.handler == 'commitment') {
           reversed_state = activity.commitment;
           activity.commitment = O.activities._undo_ll.old_state; 
-        } else if (O.activities._undo_ll.handler == 'updated'){
+        } else if (O.activities._undo_ll.handler == 'update'){
           reversed_state = {};
           for (change in O.activities._undo_ll.old_state){
             reversed_state[change] = activity[change];
@@ -274,8 +277,7 @@ window.initModel = function initModel () {
       },
       'add':function add(i){
         var activity;
-        if (i === undefined && O.currentActivity ){
-          activity = O.currentActivity;
+        if (i === undefined && O.activities.selected_activity ){
         } else {
           activity = $.jStorage.get(i)
         }
@@ -291,6 +293,7 @@ window.initModel = function initModel () {
     'Activity': Activity,
     'google_suggestions':{},
   };
+  window.O.undo = window.O.activities.undo;
 
   prebuilt = [
   new Activity("Breakfast", [43.778422,11.257163], "13:00", "14:00", 60, ["8:00","10:30"], true, "suggested"), 
