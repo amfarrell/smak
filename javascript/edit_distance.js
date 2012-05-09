@@ -89,12 +89,27 @@ function remove_element(arr) {
 	return arr;
 }
 
+// Given an activity id, returns space-counts for the earliest allowed and latest allowed position
+//
 function translate_do_between_times(id) {
 	var global_start_time = dateToNumber(startTime)
 	var earliest_offset = (dateToNumber(new Date(Date.parse(O.activities.get(id).range[0]))) - global_start_time) * 4
 	var latest_offset = (dateToNumber(new Date(Date.parse(O.activities.get(id).range[1]))) - global_start_time) * 4
 	
 	return [earliest_offset, latest_offset]
+}
+
+// Given an activity ID, returns the number of spaces into the schedule string where that activity should start, or -1 if there is no specified start at time
+//
+function translate_start_at_time(id) {
+	var global_start_time = dateToNumber(startTime)
+	var activity_handle = O.activities.get(id)
+	var is_locked = activity_handle.commitment == "locked"
+	if (is_locked) {
+		return (dateToNumber(new Date(Date.parse(O.activities.get(id).start))) - global_start_time) * 4
+	} else {
+		return -1
+	}
 }
 
 // given the id for two locations, return the travel time (in 15 minute 
@@ -378,16 +393,15 @@ function filter_configurations(configurations) {
 			}
 		}*/
 
-		// TODO we need the backend to handle the "locked" flag properly in order to enable this
 		// filter start_at violations
-		/*for (var j = 0; j < start_at.length; j++) {
-			var fid = start_at[i][0]
-			var sap = start_at[i][1]
-			var start_index = current_config.indexOf(fid)
-			if (start_index > -1 && sap != start_index) {
+		for (var j = 0; j < unique_elements.length; j++) {
+			var fid = unique_elements[j]
+			var start_at_time = translate_start_at_time(fid)
+			var start_at_index = current_config.indexOf(fid)
+			if (start_at_time != -1 && start_at_index != start_at_time) {
 				current_config = array_replace(current_config, fid, " ")
 			}
-		}*/
+		}
 
 		// filter do_between violations
 		for (var j = 0; j < unique_elements.length; j++) {
@@ -548,13 +562,14 @@ function edit_distance(string, id, pos_final, len) {
 	var eliminatedTarget = false
 	if (state.indexOf(id) == -1) { // corner case (hack)
 		eliminatedTarget = true
+		O.activities.recommit("", id, "todo")
 		setupActivity(id, len, ".activitiesList", 0)
 	}
 	for (var i = 0; i < eliminations.length; i++) {
 		var e_id = eliminations[i][0]
 		if (!(e_id == id && eliminatedTarget)) {
 			var e_len = eliminations[i][1]
-			//console.log("Eliminated: " + e_id)
+			O.activities.recommit("", e_id, "todo")
 			setupActivity(e_id, e_len, ".activitiesList", 0)
 		}
 	}
@@ -623,7 +638,7 @@ function constrain_bounds(string, start, stop) {
 	for (var i = 0; i < eliminations.length; i++) {
 		var e_id = eliminations[i][0]
 		var e_len = eliminations[i][1]
-		//console.log("Eliminated: " + e_id)
+		O.activities.recommit("", e_id, "todo")
 		setupActivity(e_id, e_len, ".activitiesList", 0)
 	}
 
@@ -674,6 +689,7 @@ function partially_schedule(string, los) {
 	for (var i = 0; i < eliminations.length; i++) {
 		var e_id = eliminations[i][0]
 		var e_len = eliminations[i][1]
+		O.activities.recommit("", e_id, "todo")
 		setupActivity(e_id, e_len, ".activitiesList", 0)
 	}
 

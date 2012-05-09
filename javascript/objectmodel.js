@@ -173,7 +173,7 @@ window.initModel = function initModel () {
       },
       'recommit':function recommit(view, i, newstate){
         checkstring(view);
-        if (['map','schedule','form'].indexOf(view) === -1){throw new Error("unknown interface "+view)};
+        if (['','map','schedule','form'].indexOf(view) === -1){throw new Error("unknown interface "+view)};
         console.log([view,i,newstate]);
         var activity = O.activities.get(i);
         var oldstate = activity.commitment;
@@ -186,10 +186,10 @@ window.initModel = function initModel () {
           allowed_newstates = ["todo","scheduled"];
         } else if ( oldstate === 'todo'){
           allowed_newstates = ["suggested","scheduled"];
-        } else if (oldstate === 'scheduled'){
+        } else if (oldstate === 'scheduled') {
           allowed_newstates = ["suggested","todo","locked"];
-        } else if (oldstate === 'locked'){
-          allowed_newstates = ["scheduled"];
+        } else if (oldstate === 'locked') {
+          allowed_newstates = ["scheduled", "todo"];
         } else {
           //throw new Error("Activity "+i+" trying to transition from undefined state "+newstate);
         }
