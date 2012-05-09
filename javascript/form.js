@@ -27,7 +27,6 @@ window.initForm = function initForm () {
     }
 
     //function Activity(name, coords, start, end, duration, range, user_createdP, commitment) {
-    debugger;
     var activity = new O.Activity(name,Map.currentCoords,start,undefined,undefined,range,true,"todo");
     O.activities.set(activity.id,activity);
     $("#activity_name")[0].value = '';

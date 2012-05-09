@@ -260,7 +260,6 @@ window.initMap = function initMap () {
       //Takes a list of N events and returns a list of N-1 travel times in minutes.
       /*
       var traveltime = 0;
-      debugger;
         {
           origins: [google.maps.LatLng(event1.coords[0],event1.coords[1])],
           destinations: [google.maps.LatLng(event2.coords[0],event1.coords[1])],
@@ -268,7 +267,6 @@ window.initMap = function initMap () {
           avoidHighways: true,
           avoidTolls: false
         }, function callback(response, status) {
-          debugger;
         // See Parsing the Results for
         // the basics of a callback function.
       });
@@ -376,7 +374,6 @@ window.initMapInput = function initMapInput () {
     },
     'stop': function(e,ui) {
       //Record the x,y position of the map_pin and put it there absolutely.
-      debugger;
       var point=new google.maps.Point(e.pageX - startX + offsetX, 
                                       e.pageY - startY + offsetY);
       var ll=Map.overlay.getProjection().fromContainerPixelToLatLng(point);
