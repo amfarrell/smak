@@ -11,7 +11,6 @@ window.initForm = function initForm () {
     }
   }
   $("#make_event").click(function (e){
-    debugger;
     var name = $("#activity_name")[0].value
     if ($("#radio-start-end")[0].checked){
       var start = undefined;
@@ -21,17 +20,28 @@ window.initForm = function initForm () {
       var start = $("#radio-start-at-field")[0].value;
       var duration = 60;
       var range = [undefined,undefined];
-    } else if ($('#radio-autotime')){
+    } else if ($('#radio-autotime')[0].checked){
       var start = undefined;
       var duration = 60;
-      var range = [$("#radio-start-field").value,$("#radio-end-field").value];
+      var range = [undefined,undefined];
     }
-    var activity = new O.Activity(name,[undefined,undefined],start,undefined,range,true,"todo");
+
+    //function Activity(name, coords, start, end, duration, range, user_createdP, commitment) {
+    debugger;
+    var activity = new O.Activity(name,Map.currentCoords,start,undefined,undefined,range,true,"todo");
     O.activities.set(activity.id,activity);
+    $("#activity_name")[0].value = '';
+    $("#radio-start-end")[0].checked = false;
+    $("#radio-start-field").value = '';
+    $("#radio-end-field").value = '';
+    $('#radio-autotime')[0].checked = false;
+    $("#radio-start-at")[0].checked = false;
+    $("#radio-start-at-field").value = '';
+    
   });
 
   O.activities.selected("form",function(id,otherdata){
-    debugger;
+    console.log("the form sees that "+id+" was selected.");
     var activity = O.activities.get(id);
     $("#activity_name")[0].value = activity.name 
     if (activity.range && activity.range[0]){
@@ -42,8 +52,10 @@ window.initForm = function initForm () {
       $("#radio-start-at")[0].checked = true;
       var start = $("#radio-start-at-field")[0].value = activity.start;
     } else {
-      $('#radio-autotime').checked = true;
+      $('#radio-autotime')[0].checked = true;
     }
+    $('#location_text')[0].value = activity.coords;
+    console.log(activity.coords);
   });
 
   /*

@@ -41,6 +41,7 @@ window.initMap = function initMap () {
   }
   window.Map = {
     
+    'currentCoords':undefined,
     '_map': _map,
     'placeMarker':function placeMarker(activity) {
       console.log("marker placed for");
@@ -251,7 +252,7 @@ window.initMap = function initMap () {
         O.activities.set(activity.id,activity);
         O.google_suggestions[place.id] = activity;
       }
-      var html = "<div class='suggestion' id='suggestion_"+activity.id+"'>"+activity.name+" <button onclick='O.activities.todo(\"form\","+activity.id+")'>todo</button></div>";
+      var html = "<a><div class='suggestion' id='suggestion_"+activity.id+"'>"+activity.name+" <button onclick='O.activities.todo(\"form\","+activity.id+")'>todo</button></div></a>";
       //note that the correct thing to do here is actually to have the item be draggable.
       return {'html':html, 'id':activity.id, 'label':activity.name, 'value':activity.name};
     },
@@ -372,13 +373,10 @@ window.initMapInput = function initMapInput () {
           $(this).draggable({'revert':true});
         }
       }
-      if (O.currentActivity.user_createdP===false) {
-        $(this).draggable({'revert':true});
-        console.log("revert true")
-      }
     },
     'stop': function(e,ui) {
       //Record the x,y position of the map_pin and put it there absolutely.
+      debugger;
       var point=new google.maps.Point(e.pageX - startX + offsetX, 
                                       e.pageY - startY + offsetY);
       var ll=Map.overlay.getProjection().fromContainerPixelToLatLng(point);
@@ -390,17 +388,21 @@ window.initMapInput = function initMapInput () {
           e.pageX < map.offset().left + map.width() &&
           e.pageY > map.offset().top && 
           e.pageY < map.offset().top + map.height()) {
-        O.currentActivity.coords = [ll.Ya,ll.Za];
-        $("#location_text").val((""+ll.Ya).substr(0,8) + ", " + (""+ll.Za).substr(0,8));
-      } else if (O.currentActivity.user_createdP) {
-        O.currentActivity.coords = undefined;
-        $("#location_text").val("");
+        $("#location_text").val((""+ll.lat()).substr(0,8) + ", " + (""+ll.lng()).substr(0,8));
+        if (O.currentActivity) {
+          O.currentActivity.coords = [ll.lat(), ll.lng()];
+        } else {
+          Map.currentCoords = [ll.lat(), ll.lng()];
+        }
+      } else {
+        Map.currentCoords = undefined;
       }
       //TODO: when the event marker gets moved off the map it:
       //returns to its original position if not put in the socket
       //or the location info gets cleared if it is put in the socket.
       }
   });
+
 
   /*
   $("#location_text").keyup(function (e){
@@ -414,12 +416,15 @@ window.initMapInput = function initMapInput () {
     if (O.activities.get(i).commitment === "suggested"){
       //place a temporary marker.
     }
-    //O.activities.get(i).marker.setAnimation(google.maps.Animation.BOUNCE)
+    if (O.activities.get(i).marker){
+      O.activities.get(i).marker.setAnimation(google.maps.Animation.BOUNCE)
+    }
         //This belongs in the handler
-
   });
   O.activities.deselected("map",function map_select_handle(i,changes){
-    O.activities.get(i).marker.setAnimation(null)
+    if (O.activities.get(i).marker){
+      O.activities.get(i).marker.setAnimation(null)
+    }
 
     if (O.activities.get(i).commitment === "suggested"){
     // remove the temporary marker.

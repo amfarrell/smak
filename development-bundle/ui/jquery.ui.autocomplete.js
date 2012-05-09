@@ -167,7 +167,6 @@ $.widget( "ui.autocomplete", {
 					var item = ui.item.data( "item.autocomplete" );
 					if ( false !== self._trigger( "focus", event, { item: item } ) ) {
 						// use value to match what will end up in the input, if it was a key event
-            debugger;
 						if ( /^key/.test(event.originalEvent.type) ) {
 							self.element.val( item.value );
 						}
@@ -194,7 +193,7 @@ $.widget( "ui.autocomplete", {
 						self.element.val( item.value );
 					}
           if (O){
-            O.activities.select(item.id);
+            O.activities.select("",item.id);
           }
 					// reset the term after the select event
 					// this allows custom select handling to work properly
