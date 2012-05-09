@@ -12,29 +12,16 @@ window.initForm = function initForm () {
   }
   $("#make_event").click(function (e){
     var name = $("#activity_name")[0].value
-    if ($("#radio-start-end")[0].checked){
-      var start = undefined;
-      var duration = 60;
-      var range = [$("#radio-start-field")[0].value,$("#radio-end-field")[0].value];
-    } else if ($("#radio-start-at")[0].checked){
-      var start = $("#radio-start-at-field")[0].value;
-      var duration = 60;
-      var range = [undefined,undefined];
-    } else if ($('#radio-autotime')[0].checked){
-      var start = undefined;
-      var duration = 60;
-      var range = [undefined,undefined];
-    }
+    var start = undefined;
+    var duration = 60;
+    var range = [$("#radio-start-field")[0].value,$("#radio-end-field")[0].value];
 
     //function Activity(name, coords, start, end, duration, range, user_createdP, commitment) {
     var activity = new O.Activity(name,Map.currentCoords,start,undefined,undefined,range,true,"todo");
     O.activities.set(activity.id,activity);
     $("#activity_name")[0].value = '';
-    $("#radio-start-end")[0].checked = false;
     $("#radio-start-field").value = '';
     $("#radio-end-field").value = '';
-    $('#radio-autotime')[0].checked = false;
-    $("#radio-start-at")[0].checked = false;
     $("#radio-start-at-field").value = '';
     
   });
@@ -68,7 +55,7 @@ window.initForm = function initForm () {
 
   O.activities.updated("form",function form_updated(id,olddata){
     var activity = O.activities.get(id);
-    if (activity.id === O.activities.selected_activity.id){
+    if ( O.activities.selected_activity && activity.id === O.activities.selected_activity.id){
       $("#activity_name")[0].value = activity.name;
       $("#radio-start-field").value = new Date(Date.parse(activity.range[0])).toString("h:mmtt");
       $("#radio-end-field").value = new Date(Date.parse(activity.range[1])).toString("h:mmtt");
