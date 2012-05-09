@@ -322,10 +322,13 @@ window.autoSchedule = function autoSchedule(){
         updateTimes(id);
         if ($(this).overlaps($(".doBetween" +  $(this).attr("id")+" .doBetweenTop"))){
           if ($(".error").length == 0) $(this).children(".activityCenter").append("<div class='error'>Can not be placed before "+O.activities.get(id).range[0]+".</div>");
+          else $(".error").html("Can not be placed before "+O.activities.get(id).range[0]);
         }else if($(this).overlaps($(".doBetween" +  $(this).attr("id")+" .doBetweenBottom"))){
           if ($(".error").length == 0) $(this).children(".activityCenter").append("<div class='error'>Can not be placed after "+O.activities.get(id).range[1]+".</div>");
+          else $(".error").html("Can not be placed after "+O.activities.get(id).range[1]);
         }else if($(this).overlaps($(".ui-draggable-disabled"))) {
           if ($(".error").length == 0) $(this).children(".activityCenter").append("<div class='error'>Can not be placed on a locked activity.</div>");
+          else $(".error").html("Can not be placed on a locked activity.");
         }else{
           $(".error").remove();
         }
@@ -395,13 +398,14 @@ window.autoSchedule = function autoSchedule(){
       },
       stop: function(event, ui) {
         var id = $(this).attr("id");
+        console.log(ui);
         if (list == ".schedule" ) {
           var positionY = getPositionY(id);
           var height = getDuration(id);
           if (!$(this).overlaps($(".ui-draggable-disabled"))) { // not on a locked item   
             drawSchedule(edit_distance(schedule,id, positionY,height));
           }else{
-            $(this).css({"left":ui.originalPosition.left, "top":ui.originalPosition.top}); //return to original position
+            $(this).css({"left":ui.originalPosition.left, "top":ui.originalPosition.top, "height":ui.originalSize.height}); //return to original position
           }
         } else {
           $(".activitiesList div.scheduleItem").css({
@@ -411,6 +415,8 @@ window.autoSchedule = function autoSchedule(){
           });
           $(".spaceHolder").remove();
         }
+        $(".error").remove();
+        $(this).removeClass("outsideDoBetween");
         updateDuration(id);
         updateTimes(id);
         selectItem(id);
