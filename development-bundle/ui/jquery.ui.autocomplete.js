@@ -40,7 +40,7 @@ $.widget( "ui.autocomplete", {
 
 		this.element
 			.addClass( "ui-autocomplete-input" )
-			//.attr( "autocomplete", "off" )
+			.attr( "autocomplete", "off" )
 			// TODO verify these actually work as intended
 			.attr({
 				role: "textbox",
@@ -192,6 +192,9 @@ $.widget( "ui.autocomplete", {
 					if ( false !== self._trigger( "select", event, { item: item } ) ) {
 						self.element.val( item.value );
 					}
+          if (O){
+            O.activities.select("",item.id);
+          }
 					// reset the term after the select event
 					// this allows custom select handling to work properly
 					self.term = self.element.val();
@@ -398,6 +401,11 @@ $.widget( "ui.autocomplete", {
 
 	_renderMenu: function( ul, items ) {
 		var self = this;
+    /*items.unshift({
+      'label':"<div class='suggestion' id='create_new'> Create New Activity </div>",
+      'value':"<div class='suggestion' id='create_new'> Create New Activity </div>"});
+      */
+
 		$.each( items, function( index, item ) {
 			self._renderItem( ul, item );
 		});
@@ -406,7 +414,8 @@ $.widget( "ui.autocomplete", {
 	_renderItem: function( ul, item) {
     var html = $( "<li></li>" )
 			.data( "item.autocomplete", item )
-			.append(  item.label )
+			.append(  item.html || item.label)
+			.addClass("ui-menu-item")
 			.appendTo( ul );
     return html;
 	},
