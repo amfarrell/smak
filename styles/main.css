@@ -85,7 +85,6 @@ body {
 #map_canvas {
  width:450px; 
  height:500px;
-  z-index:-9;
 }
 
 /* New Activity Form */
