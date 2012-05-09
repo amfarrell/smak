@@ -299,12 +299,20 @@ window.autoSchedule = function autoSchedule(){
       },
       drag:function(){
         updateTimes(id);
-        if ($(this).overlaps($(".doBetween" +  $(this).attr("id")+" .doBetweenTop")) ||
-            $(this).overlaps($(".doBetween" +  $(this).attr("id")+" .doBetweenBottom")) ||
-            $(this).overlaps($(".ui-draggable-disabled"))) {
-          $(this).addClass("outsideDoBetween");
-        } else {
+        if ($(this).overlaps($(".doBetween" +  $(this).attr("id")+" .doBetweenTop"))){
+          if ($(".error").length == 0) $(this).children(".activityCenter").append("<div class='error'>Can not be placed before "+O.activities.get(id).range[0]+".</div>");
+        }else if($(this).overlaps($(".doBetween" +  $(this).attr("id")+" .doBetweenBottom"))){
+          if ($(".error").length == 0) $(this).children(".activityCenter").append("<div class='error'>Can not be placed after "+O.activities.get(id).range[1]+".</div>");
+        }else if($(this).overlaps($(".ui-draggable-disabled"))) {
+          if ($(".error").length == 0) $(this).children(".activityCenter").append("<div class='error'>Can not be placed on a locked activity.</div>");
+        }else{
+          $(".error").remove();
+        }
+        
+        if ($(".error").length == 0){
           $(this).removeClass("outsideDoBetween");
+        }else{
+          $(this).addClass("outsideDoBetween");
         }
       },
       stop: function(event, ui) { 
@@ -330,6 +338,7 @@ window.autoSchedule = function autoSchedule(){
         } else {  // move within Activities
           $(this).css({"left":0, "top":0}); //return to original position
         }
+        $(".error").remove();
         $(this).removeClass("outsideDoBetween");
         updateTimes(id);
         selectItem(id);
@@ -355,9 +364,11 @@ window.autoSchedule = function autoSchedule(){
       resize:function(event, ui) {  
         updateDuration(id);
         updateTimes(id);
-        if ($(this).overlaps($(".ui-draggable-disabled"))) {
+        if ($(this).overlaps($(".ui-draggable-disabled")) && $(".error").length == 0) {
+          $(this).children(".activityCenter").append("<div class='error'>Can not be placed on a locked activity.</div>");
           $(this).addClass("outsideDoBetween");
-        } else {
+        } else if($(".error").length == 0){
+          $(".error").remove();
           $(this).removeClass("outsideDoBetween");
         }
       },
@@ -433,8 +444,7 @@ window.autoSchedule = function autoSchedule(){
     }
     $(list + " div.item:last").append("<div class='times'></div>");
     $(list + " div.item:last").append("<div class='duration'></div>");
-    $(list + " div.item:last .activityCenter").append("<div class='error'>Can not be placed outside do between times</div>");
-    $(".error").hide();
+
     
     $(list + " div.item:last").corner();
     

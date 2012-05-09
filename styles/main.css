@@ -199,11 +199,14 @@ body {
   background-position:top; 
   bottom:-30px;
 }
-.selected:not(.ui-draggable-dragging) .ui-resizable-handle{
+.selected:not(.ui-draggable-dragging):not(.ui-state-disabled) .ui-resizable-handle{
   display:block !important;
   z-index:100;
 }
 .selected .ui-icon{
+  display:none;
+}
+.ui-state-disabled .ui-icon{
   display:none;
 }
 .outsideDoBetween{
