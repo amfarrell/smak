@@ -321,7 +321,7 @@ window.autoSchedule = function autoSchedule(){
                   }       
                   drawSchedule(edit_distance(schedule,id, positionY,height));
           }else{
-            $(this).css({"left":0, "top":0}); //return to original position
+            $(this).css({"left":ui.originalPosition.left, "top":ui.originalPosition.top}); //return to original position
           }
         } else if (list == ".schedule") {   // move from Schedule to Activities
           addActivity($(this).attr("id"), height);
@@ -355,13 +355,22 @@ window.autoSchedule = function autoSchedule(){
       resize:function(event, ui) {  
         updateDuration(id);
         updateTimes(id);
+        if ($(this).overlaps($(".ui-draggable-disabled"))) {
+          $(this).addClass("outsideDoBetween");
+        } else {
+          $(this).removeClass("outsideDoBetween");
+        }
       },
       stop: function(event, ui) {
         var id = $(this).attr("id");
         if (list == ".schedule" ) {
           var positionY = getPositionY(id);
           var height = getDuration(id);
-          drawSchedule(edit_distance(schedule,id, positionY,height));
+          if (!$(this).overlaps($(".ui-draggable-disabled"))) { // not on a locked item   
+            drawSchedule(edit_distance(schedule,id, positionY,height));
+          }else{
+            $(this).css({"left":ui.originalPosition.left, "top":ui.originalPosition.top}); //return to original position
+          }
         } else {
           $(".activitiesList div.scheduleItem").css({
             "position": "relative",
