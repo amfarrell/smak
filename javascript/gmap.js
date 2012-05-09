@@ -387,7 +387,7 @@ window.initMapInput = function initMapInput () {
           e.pageY < map.offset().top + map.height()) {
         $("#location_text").val((""+ll.lat()).substr(0,8) + ", " + (""+ll.lng()).substr(0,8));
         if (O.currentActivity) {
-          O.currentActivity.coords = [ll.lat(), ll.lng()];
+          O.activities.update("map",O.currentActivity.id,{"coords":[ll.lat(), ll.lng()]});
         } else {
           Map.currentCoords = [ll.lat(), ll.lng()];
         }

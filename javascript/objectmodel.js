@@ -163,11 +163,13 @@ window.initModel = function initModel () {
       'update':function update(view,i,changes){
         checkstring(view);
         console.log(i);
+        var oldvalues = {};
         var activity = O.activities.get(i)
         for (change in changes){
+          oldvalues[change] = activity[change];
           activity[change] = changes[change]; 
         }
-        O.activities._firehandler(view, 'update', i, changes);
+        O.activities._firehandler(view, 'update', i, oldvalues);
       },
       'recommit':function recommit(view, i, newstate){
         checkstring(view);
@@ -177,6 +179,7 @@ window.initModel = function initModel () {
         var oldstate = activity.commitment;
         if (oldstate === newstate){
           //throw new Error("Activity "+i+" trying not actually changing state but staying at "+newstate);
+          return;
         }
         var allowed_newstates;
         if (oldstate === 'suggested') {
