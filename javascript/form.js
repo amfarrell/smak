@@ -12,7 +12,7 @@ window.initForm = function initForm () {
   }
   $("#make_event").click(function (e){
     debugger;
-    var name = $("#activity_name").value
+    var name = $("#activity_name")[0].value
     if ($("#radio-start-end")[0].checked){
       var start = undefined;
       var duration = 60;
@@ -30,6 +30,21 @@ window.initForm = function initForm () {
     O.activities.set(activity.id,activity);
   });
 
+  O.activities.selected("form",function(id,otherdata){
+    debugger;
+    var activity = O.activities.get(id);
+    $("#activity_name")[0].value = activity.name 
+    if (activity.range && activity.range[0]){
+      $("#radio-start-end")[0].checked = true;
+      $("#radio-start-field")[0].value = activity.range[0];
+      $("#radio-end-field")[0].value = activity.range[1];
+    } else if (activity.start){
+      $("#radio-start-at")[0].checked = true;
+      var start = $("#radio-start-at-field")[0].value = activity.start;
+    } else {
+      $('#radio-autotime').checked = true;
+    }
+  });
 
   /*
   $("#activity_name").keyup(function (e){

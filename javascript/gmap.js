@@ -253,7 +253,7 @@ window.initMap = function initMap () {
       }
       var html = "<div class='suggestion' id='suggestion_"+activity.id+"'>"+activity.name+" <button onclick='O.activities.todo(\"form\","+activity.id+")'>todo</button></div>";
       //note that the correct thing to do here is actually to have the item be draggable.
-      return html
+      return {'html':html, 'id':activity.id, 'label':activity.name, 'value':activity.name};
     },
     'traveltime':function travelTime(event1,event2){
       //Takes a list of N events and returns a list of N-1 travel times in minutes.
