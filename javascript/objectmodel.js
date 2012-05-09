@@ -82,11 +82,40 @@ window.initModel = function initModel () {
       },
       '_firehandler':function _firehandler(view, handler, i, otherdata) {
         if (['',false,'map','schedule','form'].indexOf(view) === -1){throw new Error("unknown interface "+view)};
+        var prev = O.activities._undo_ll;
+        O.activities._undo_ll = {
+          'prev':prev,
+          'type':handler,
+          'i':i,
+          'old_state':otherdata
+        };
         for (subscriber in O.activities._subscribers) {
           if (subscriber !== view) {
             O.activities._subscribers[subscriber][handler](i, otherdata);
           }
         }
+      },
+      '_undo_ll':{
+        'prev':{},
+        'type':function(i,data){},
+        'i':0,
+        'old_state':{}
+      },
+      'undo': function undo(){
+        var prev = O.activities._undo_ll.prev;
+        var activity = O.activities.get(O.activities._undo_ll.i);
+        var reversed_state;
+        if (O.activities._undo_ll.handler == 'commitment') {
+          reversed_state = activity.commitment;
+          activity.commitment = O.activities._undo_ll.old_state; 
+        } else if (O.activities._undo_ll.handler == 'updated'){
+          reversed_state = {};
+          for (change in O.activities._undo_ll.old_state){
+            reversed_state[change] = activity[change];
+            activity[change] = O.activities._undo_ll.old_state[change]; 
+          }
+        }
+        O.activities._firehandler("",O.activities._undo_ll.handler,O.activities._undo_ll.i,reversed_state);
       },
       'all':function allActivities (type) {
         var queriedevents = [];
@@ -150,6 +179,7 @@ window.initModel = function initModel () {
         checkstring(view);
         console.log("selected: "+i);
         O.activities.selected_activity = $.jStorage.get(i);
+        console.log(O.activities.selected_activity);
         O.activities._firehandler(view, 'select', i,{});
       },
       'deselect':function deselect(view) {

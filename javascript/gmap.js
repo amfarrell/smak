@@ -303,6 +303,8 @@ window.initMap = function initMap () {
           if (newstate === "suggested"){
             // remove marker. recalc order.
           } else if (newstate === "todo"){
+            var order = O.activities.all("ordered_schedule");
+            console.log("removing from schedule"+i)
             //change colour of marker, recalc order.
           } else if (newstate === "locked"){
             // Do nothing

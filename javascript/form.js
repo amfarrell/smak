@@ -56,26 +56,56 @@ window.initForm = function initForm () {
     $('#location_text')[0].value = activity.coords;
     console.log(activity.coords);
   });
+  O.activities.updated("form",function form_updated(id,olddata){
+    var activity = O.activities.get(id);
+    if (activity.id === O.activities.selected_activity.id){
+      $("#activity_name")[0].value = activity.name;
+      $("#radio-start-field").value = activity.range[0];
+      $("#radio-end-field").value = activity.range[1];
+      $("#radio-start-at-field").value = activity.start;
+    }
+
+  });
 
   $("#activity_name").keyup(function (e){
     console.log(e)
     var name = $("#activity_name")[0].value
-    if (e.which === 40) {
-      //decrement
-    } else if (e.which === 38) { 
-      //increment
-    }
     if (O.currentActivity){
         O.activities.update("",O.currentActivity.id,{"name":name});
     }
     //TODO: check if valid time. Highlight in red if not.
   });
+  function incremened_time(time){
+      if (time === ""){
+        return time;
+      }
+      time = time.split(':');
+      time[1] = parseInt(time[1]) + 15;
+      if (time[1] > 59){
+        time[0] = parseInt(time[0]) +1
+        time[1] = time[1] - 60;
+      }
+      return ""+time[0]+':'+time[1];
+  }
+  function decremened_time(time){
+      if (time === ""){
+        return time;
+      }
+      time = time.split(':');
+      time[1] = parseInt(time[1]) - 15;
+      if (time[1] < 0){
+        time[0] = parseInt(time[0]) -1
+        time[1] = time[1] + 60;
+      }
+      return ""+time[0]+':'+time[1];
+  }
   $("#radio-start-field").keyup(function (e){
     console.log(e)
-    var start = $("#radio-start-field")[0].value
+    var start = $("#radio-start-field")[0].value;
     if (e.which === 40) {
-      //decrement
+      start = decremened_time(start);
     } else if (e.which === 38) { 
+      start = incremened_time(start);
       //increment
     }
     if (O.currentActivity){
@@ -88,9 +118,9 @@ window.initForm = function initForm () {
     console.log(e.which);
     var end = $("#radio-end-field")[0].value
     if (e.which === 40) {
-      //decrement
+      end = decremened_time(end);
     } else if (e.which === 38) { 
-      //increment
+      end = incremened_time(end);
     } 
     if (O.currentActivity){
         O.activities.update("",O.currentActivity.id,{"range":[O.currentActivity.range[0], end]});
@@ -102,9 +132,9 @@ window.initForm = function initForm () {
     console.log(e.which);
     var start_at = $("#radio-start-at-field")[0].value
     if (e.which === 40) {
-      //decrement
+      start_at = decremened_time(start_at);
     } else if (e.which === 38) { 
-      //increment
+      start_at = incremened_time(start_at);
     }
     if (O.currentActivity){
         O.activities.update("",O.currentActivity.id,{"start":start_at});
