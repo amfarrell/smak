@@ -121,7 +121,7 @@ window.autoSchedule = function autoSchedule(){
     });
     console.log("partially_schedule " + schedule + ", " + unscheduledActivities);
     $(".activitiesList").html('');
-    //var list = drawSchedule(partially_schedule(schedule, unscheduledActivities));
+    var list = drawSchedule(partially_schedule(schedule, unscheduledActivities));
     //Map.renderPath(list);
   }
 
