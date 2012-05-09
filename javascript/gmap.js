@@ -248,7 +248,7 @@ window.initMap = function initMap () {
           return false;
         }
       } else {
-        activity =  new O.Activity(place.name,[place.geometry.location.lat,place.geometry.location.lng],undefined,undefined,60,[undefined,undefined],false,"suggested");
+        activity =  new O.Activity(place.name,[place.geometry.location.lat,place.geometry.location.lng],undefined,undefined,60,[undefined,undefined],false);
         O.activities.set(activity.id,activity);
         O.google_suggestions[place.id] = activity;
       }
