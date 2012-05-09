@@ -10,11 +10,32 @@
       //Do stuff after an item's value is updated
       var activity = O.activities.get(i);
       for (key in oldvalues){
-        console.log("the schedule sees that "+key+" changed in activity "+i+" from "+oldvalues[key]+" to "+activity[key]+".");
-      }
+      console.log("the schedule sees that "+key+" changed in activity "+i+" from "+oldvalues[key]+" to "+activity[key]+".");
 
+        if (key == "name"){
+          $("#"+i+" .activityName").html(activity.name);
+        }
+        if (key == "range"){
+          drawDoBetween(i);
+          updateDoBetweenBox();
+        }
+        if (key == "duration"){
+          // TODO: change duration
+        }
+      }
     });
-    O.activities.selected("schedule",function scheduleSelected(id,empty_map){
+    O.activities.commitment_changed('schedule',function commitmentUpdate(i,oldState){
+      //Do stuff after an item changes commitment state
+      var activity = O.activities.get(i);
+      if (oldState == 'scheduled' && activity.commitment == 'todo'){
+        
+      }else if (oldState == 'todo' && activity.commitment == 'scheduled'){
+        $("#"+i).remove();
+        drawSchedule(edit_distance(schedule,id, positionY,height));
+      }
+      console.log("the schedule sees that "+key+" changed in activity "+i+" from "+oldvalues[key]+" to "+activity[key]+".");
+    });
+    O.activities.selected("schedule",function scheduleDeselected(id,empty_map){
       console.log("the schedule sees that "+id+" has been selected.");
       //Do stuff after the item is deselected.
       $(".selected:not(#"+id+")").removeClass('selected');
@@ -279,7 +300,8 @@ window.autoSchedule = function autoSchedule(){
       drag:function(){
         updateTimes(id);
         if ($(this).overlaps($(".doBetween" +  $(this).attr("id")+" .doBetweenTop")) ||
-            $(this).overlaps($(".doBetween" +  $(this).attr("id")+" .doBetweenBottom"))) {
+            $(this).overlaps($(".doBetween" +  $(this).attr("id")+" .doBetweenBottom")) ||
+            $(this).overlaps($(".ui-draggable-disabled"))) {
           $(this).addClass("outsideDoBetween");
         } else {
           $(this).removeClass("outsideDoBetween");
@@ -290,8 +312,9 @@ window.autoSchedule = function autoSchedule(){
         var height = getDuration(id);
         if ((list == ".schedule" && ($(this).position().left>-160)) ||  // move in schedule
             (list == ".activitiesList" && ($(this).position().left>scheduleItemWidth/2)) ){  // move from Activities to Schedule
-          if (!$(this).overlaps($(".doBetween" +  $(this).attr("id")+" .doBetweenTop")) && // if moved to a location in the doBetween times
-              !$(this).overlaps($(".doBetween" +  $(this).attr("id")+" .doBetweenBottom"))) {
+          if (!$(this).overlaps($(".doBetween" +  $(this).attr("id")+" .doBetweenTop")) && // if moved to a location not in the doBetween times
+              !$(this).overlaps($(".doBetween" +  $(this).attr("id")+" .doBetweenBottom")) &&
+              !$(this).overlaps($(".ui-draggable-disabled"))) { //or on a locked item
                   var positionY = getPositionY(id);
                   if (list == ".activitiesList") {  // move from Activities to Schedule
                     $(this).remove();
@@ -384,7 +407,7 @@ window.autoSchedule = function autoSchedule(){
         $(list + " div.item:last").append("<div class='lock'><img src='unlock.png' alt='unlocked' /></div>");
       $(list + " div.item:last .lock").click(toggleLock);
       var letter = String.fromCharCode(64+itemNumber);
-      $(list + " div.item:last").append("<div class='activityName'><img src='Google Maps Markers/darkgreen_Marker"+letter+".png' alt='"+letter+"'/>"+O.activities.get(id).name+"</div>");
+      $(list + " div.item:last").append("<div class='activityCenter'><img src='Google Maps Markers/darkgreen_Marker"+letter+".png' alt='"+letter+"'/>"+O.activities.get(id).name+"</div>");
      
       $(list + " div.item:last").css({// Set item to it's current absolute position
         "position": "absolute",
@@ -395,13 +418,13 @@ window.autoSchedule = function autoSchedule(){
       $(list + " div.item:last").draggable("option", "containment", ".doBetween"+id);
       $(list + " div.item:last").resizable("option", "containment", ".doBetween"+id);
     }else{    // activitiesList 
-      $(list + " div.item:last").append("<div class='activityName'>"+O.activities.get(id).name+"</div>");
+      $(list + " div.item:last").append("<div class='activityCenter'><div class='activityName'>"+O.activities.get(id).name+"</div></div>");
       $(list + " div.item:last").draggable("option", "containment", ".activitiesContainer");
       $(list + " div.item:last").resizable("option", "containment", ".activitiesResizeContainer");
     }
     $(list + " div.item:last").append("<div class='times'></div>");
     $(list + " div.item:last").append("<div class='duration'></div>");
-    $(list + " div.item:last .activityName").append("<div class='error'>Can not be placed outside do between times</div>");
+    $(list + " div.item:last .activityCenter").append("<div class='error'>Can not be placed outside do between times</div>");
     $(".error").hide();
     
     $(list + " div.item:last").corner();
