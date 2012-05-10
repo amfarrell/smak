@@ -137,6 +137,10 @@
     var newSchedule = state[0];
     startTime = state[1];
     
+    // remove all markers
+    for (var i in O.activities.all()) {
+      O.activities.get(i).marker.setMap(null);
+    }
     $.jStorage.flush();
     for (var j=0; j<state[2].length; j++){
       state[2][j].marker=null;
