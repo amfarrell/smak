@@ -6,7 +6,7 @@ var pythag = function pythag(pointA,pointB){
 }
 window.initMap = function initMap () {
 
-  var latlng = new google.maps.LatLng(43.781, 11.260);
+  var latlng = new google.maps.LatLng(43.769606,11.257153);
   var myOptions = {
     zoom: 14,
     center: latlng,
@@ -41,7 +41,7 @@ window.initMap = function initMap () {
   }
   window.Map = {
     
-    'currentCoords':undefined,
+    //'currentCoords':undefined,
     '_map': _map,
     'placeMarker':function placeMarker(activity) {
       console.log("marker placed for");
@@ -54,21 +54,30 @@ window.initMap = function initMap () {
       //  'draggable':true,
         'clickable':true,
       });
+      
+      /*google.maps.event.addListener(marker,'drag',function() {
+          document.getElementById('lat').value = marker.position.lat();
+          document.getElementById('lng').value = marker.position.lng();
+      });*/
       google.maps.event.addListener(marker, 'click', function select_pin() {
         //XXX This does not yet work...
         if (marker.icon == 'images/red-dot.png'){
           marker.icon = 'images/blue-dot.png';
           marker.setAnimation(null);
+          marker.setDraggable(false);
           O.activities.deselect("map",activity.id);
         }else{
+          // deselect all markers
           for (var i in O.activities.all()){
-            if (O.activities.get(j).marker){
+            if (O.activities.get(i).marker){
               O.activities.get(i).marker.icon = 'images/blue-dot.png';
               O.activities.get(i).marker.setAnimation(null);
+              O.activities.get(i).marker.setDraggable(false);
             }
           }
-          marker.icon = 'images/red-dot.png';
+          marker.icon = 'images/drag_me.gif';
           marker.setAnimation(google.maps.Animation.BOUNCE);
+          marker.setDraggable(true);
           O.activities.select("map",activity.id);
         }
       });
@@ -336,16 +345,25 @@ window.initMap = function initMap () {
             // Do nothing
         }
   });
-
-  google.maps.event.addListener(_map, 'mouseover', function select_pin() {
-    //XXX This does not yet work...
-    console.log("map moused over");
-  });
 }
+window.tempMarker = null;
+function newMarker(){
+  
+  if (!window.tempMarker){
+    window.tempMarker = new google.maps.Marker({
+      'animation':google.maps.Animation.DROP,
+      'position':window.Map._map.getCenter(), 
+      'icon':'images/drag_me.gif',
+    //  'title': activity.title,
+      'draggable':true,
+     // 'clickable':true,
+    });
 
-window.initMapInput = function initMapInput () {
-
-  var map = $("#map_canvas")
+    window.tempMarker.setMap(window.Map._map);
+  }
+}
+window.initMapInput = function initMapInput () {    
+  /*var map = $("#map_canvas")
   var startX;
   var startY;
   var offsetX = 62.593; //hardcoded values for now.
@@ -422,7 +440,7 @@ window.initMapInput = function initMapInput () {
       //returns to its original position if not put in the socket
       //or the location info gets cleared if it is put in the socket.
       }
-  });
+  });*/
 
 
   /*
@@ -438,15 +456,18 @@ window.initMapInput = function initMapInput () {
       //place a temporary marker.
     }
     
+    // deselect all markers
     for (var j in O.activities.all()){
       if (O.activities.get(j).marker){
         O.activities.get(j).marker.icon = 'images/blue-dot.png';
         O.activities.get(j).marker.setAnimation(null);
+        O.activities.get(j).marker.setDraggable(false);
       }
     }
     if (O.activities.get(i).marker){
-      O.activities.get(i).marker.icon = 'images/red-dot.png';
+      O.activities.get(i).marker.icon = 'images/drag_me.gif';
       O.activities.get(i).marker.setAnimation(google.maps.Animation.BOUNCE)
+      O.activities.get(i).marker.setDraggable(true);      
     }
         //This belongs in the handler
   });
@@ -454,6 +475,7 @@ window.initMapInput = function initMapInput () {
     if (O.activities.get(i).marker){
       O.activities.get(i).marker.icon = 'images/blue-dot.png';
       O.activities.get(i).marker.setAnimation(null)
+      O.activities.get(i).marker.setDraggable(false);
     }
 
     if (O.activities.get(i).commitment === "suggested"){

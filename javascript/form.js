@@ -11,19 +11,25 @@ window.initForm = function initForm () {
     }
   }
   $("#make_event").click(function (e){
-    var name = $("#activity_name").value
+    var name = $("#activity_name")[0].value
     var start = undefined;
     var duration = 60;
     var range = [$("#radio-start-field")[0].value,$("#radio-end-field")[0].value];
 
     //function Activity(name, coords, start, end, duration, range, user_createdP, commitment) {
-    var activity = new O.Activity(name,Map.currentCoords,start,undefined,duration,range,true,"suggested");
+    console.log([window.tempMarker.getPosition().lat(),window.tempMarker.getPosition().lng()]);
+    console.log(window.Map._map.getCenter());
+    var activity = new O.Activity(name,[window.tempMarker.getPosition().lat(),window.tempMarker.getPosition().lng()],start,undefined,duration,range,true,"suggested");
     O.activities.set(activity.id,activity);
-    $("#activity_name")[0].val("");
-    $("#radio-start-field").val(startTime.toString("h:mmtt"));
-    $("#radio-end-field").val(new Date( startTime.valueOf()).addHours(schedule.length/4).toString("h:mmtt"));
-    
     O.activities.todo('',activity.id);
+    
+    // clear form
+    $("#activity_name").val("");
+    $("#radio-start-field").val("");
+    $("#radio-end-field").val("");
+    window.tempMarker.setMap(null);
+    window.tempMarker=null;
+    
   });
 
   O.activities.selected("form",function(id,otherdata){
@@ -66,13 +72,23 @@ window.initForm = function initForm () {
   });
 
   $("#activity_name").keyup(function (e){
-    console.log(e)
     var name = $("#activity_name")[0].value
     if (O.activities.selected_activity){
         O.activities.update("",O.activities.selected_activity.id,{"name":name});
+    }else if (!window.tempMarker){
+      newMarker();
+      $("#radio-start-field").val(startTime.toString("h:mmtt"));
+      $("#radio-end-field").val(new Date( startTime.valueOf()).addHours(schedule.length/4).toString("h:mmtt"));
     }
     //TODO: check if valid time. Highlight in red if not.
   });
+  
+  $("#activity_name").blur(function (e){
+    console.log(e)
+    if (!O.activities.selected_activity){
+    }
+  });
+  
   function incremened_time(time){
       if (time === ""){
         return time;
