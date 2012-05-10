@@ -22,20 +22,21 @@ window.initForm = function initForm () {
     var activity = new O.Activity(name,[window.tempMarker.getPosition().lat(),window.tempMarker.getPosition().lng()],start,undefined,duration,range,true,"suggested");
     O.activities.set(activity.id,activity);
     O.activities.todo('',activity.id);
+    O.activities.select('',activity.id);
     
-    // clear form
-    $("#activity_name").val("");
-    $("#radio-start-field").val("");
-    $("#radio-end-field").val("");
     window.tempMarker.setMap(null);
     window.tempMarker=null;
     
   });
 
   O.activities.selected("form",function(id,otherdata){
+    if (window.tempMarker){
+      window.tempMarker.setMap(null);
+      window.tempMarker=null;
+    }
     console.log("the form sees that "+id+" was selected.");
     var activity = O.activities.get(id);
-    $("#activity_name").value = activity.name 
+    $("#activity_name").val(activity.name);
     if (activity.range && activity.range[0]){
       $("#radio-start-field")[0].value = new Date(Date.parse(activity.range[0])).toString("h:mmtt");
       $("#radio-end-field")[0].value = new Date(Date.parse(activity.range[1])).toString("h:mmtt");

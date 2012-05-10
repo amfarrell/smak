@@ -6,6 +6,7 @@
 <head>
 
   <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>SMak</title>
   <link rel="shortcut icon" href="smak-icon.png" /> 
 
@@ -55,10 +56,10 @@ $(document).ready(function() {
   initScheduleListeners()
   initMapInput();
 
-  $('html').bind('click tap',function() {
+  $('html').bind('click touchend',function() {
     deselectItem();
   });
-  $("#activity").bind('click tap',function(event) {
+  $("#activity").bind('click touchend',function(event) {
     event.stopPropagation();
   });
 

@@ -4,7 +4,7 @@
   var activitiesListPos = 0; // position of the end of the activities list. (counted in 15 min blocks)
   var scheduleItemWidth = 260;  //pixels width of schdeduleItem
   var borderMarginHeight = 5;  //pixels width of border and margin of schdeduleItem
-  var history = new Array(); //for undos
+  var stateHistory = new Array(); //for undos
   var currentStateIndex = -1;
 
   var initScheduleListeners = function initScheduleListeners(){
@@ -132,7 +132,7 @@
   }
   function loadState(i){
     currentStateIndex = i;
-    var state = history[i];
+    var state = stateHistory[i];
     console.log(state);
     var newSchedule = state[0];
     startTime = state[1];
@@ -163,7 +163,7 @@
     }
     var state = [schedule, startTime, activities];
     currentStateIndex++;
-    history[currentStateIndex]=state;
+    stateHistory[currentStateIndex]=state;
     undoButtons();
   }
   
@@ -172,8 +172,8 @@
       $("#undo").attr("disabled", "disabled");
     else
       $("#undo").removeAttr("disabled");   
-    
-    if (currentStateIndex == (history.length - 1))
+      
+    if (currentStateIndex == (stateHistory.length - 1))
       $("#redo").attr("disabled", "disabled");
     else
       $("#redo").removeAttr("disabled");   
@@ -510,7 +510,7 @@ window.autoSchedule = function autoSchedule(){
     $("#" + id).height(blockHeight*duration - borderMarginHeight);  // -2 to compensate for the border height
     
     // Make selectable
-    $("#" + id).click(toggleItem);
+    $("#" + id).bind('click touchstart touchend',toggleItem);
     
     // Set z-index so that items are always on top
     $("#" + id).css({
