@@ -67,9 +67,9 @@
       if (i > 6){
         break;
       }
-      if (!O.activities.get(i).scheduledP) {
+      if (O.activities.get(i).commitment=="todo") {
         addActivity(i, O.activities.get(i).duration/15)
-        O.activities.todo('schedule',i);
+        //O.activities.todo('schedule',i);
       }
     }
   }
@@ -125,25 +125,45 @@
     updateDoBetween();
     drawSchedule(schedule);
   }
-  
-  /*function loadState(i){
+  function undo(){
+    loadState(currentStateIndex-1);
+  }
+  function redo(){
+    loadState(currentStateIndex+1);
+  }
+  function loadState(i){
+    currentStateIndex = i;
     var state = history[i];
+    console.log(state);
     var newSchedule = state[0];
     startTime = state[1];
-    O.activities = state[2];
+    
+    $.jStorage.flush();
+    for (var j=0; j<state[2].length; j++){
+      state[2][j].marker=null;
+      var id = JSON.stringify(j)
+      O.activities.set(id,state[2][j]); 
+      var activity = O.activities.get(id);
+      activity.marker = Map.placeMarker(activity);
+    }
     initActivitiesList();
     drawScheduleGrid();
-    drawSchedule(newSchedule);
+    drawSchedule(newSchedule, true);
   }
   function saveState(){
-    var activities = {};
-    jQuery.extend(activities,O.activities);
+    var activities = [];
+    
+    for (var i in O.activities.all()) {
+      var a = $.extend(true, {}, O.activities.get(i));
+      activities.push(a);
+    }
     var state = [schedule, startTime, activities];
     currentStateIndex++;
     history[currentStateIndex]=state;
     console.log(history);
-  }*/
-  function drawSchedule(newSchedule) {
+  }
+  
+  function drawSchedule(newSchedule, undoing) {
   //XXX This also returns the list of Activity IDs.
     schedule = newSchedule;
     console.log("drawSchedule:"+ schedule);
@@ -170,7 +190,7 @@
       }
     }
     Map.renderPath(idList);
-   // saveState();
+    if (typeof(undoing)==='undefined') saveState();
     return idList;
   }
 

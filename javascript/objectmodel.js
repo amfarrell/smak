@@ -271,6 +271,8 @@ window.initModel = function initModel () {
         return $.jStorage.get(i);
       },
       'set':function set(i, v){
+      
+      console.log(v);
         return $.jStorage.set(i, v);
       },
       'add':function add(i){
@@ -336,10 +338,6 @@ window.initModel = function initModel () {
   new Activity('Rivoire', [43.7719,11.2439], undefined, undefined, 75, ['13:15','2000'], false),
   new Activity('Semel', [43.7326,11.263], undefined, undefined, 45, ['16:45','2215'], false)]*/
 
-  var a;
-  for (a in prebuilt){
-    O.activities.set(a,prebuilt[a]); 
-  }
   //O.currentActivity = new O.Activity("THE_NULL_ACTIVITY", undefined, undefined, undefined, undefined, [undefined,undefined], "", true, false)
 }
 

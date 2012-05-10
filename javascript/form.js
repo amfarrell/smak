@@ -11,7 +11,7 @@ window.initForm = function initForm () {
     }
   }
   $("#make_event").click(function (e){
-    var name = $("#activity_name")[0].value
+    var name = $("#activity_name").value
     var start = undefined;
     var duration = 60;
     var range = [$("#radio-start-field")[0].value,$("#radio-end-field")[0].value];
@@ -29,7 +29,7 @@ window.initForm = function initForm () {
   O.activities.selected("form",function(id,otherdata){
     console.log("the form sees that "+id+" was selected.");
     var activity = O.activities.get(id);
-    $("#activity_name")[0].value = activity.name 
+    $("#activity_name").value = activity.name 
     if (activity.range && activity.range[0]){
       //$("#radio-start-end")[0].checked = true;
       $("#radio-start-field")[0].value = new Date(Date.parse(activity.range[0])).toString("h:mmtt");
@@ -47,7 +47,7 @@ window.initForm = function initForm () {
   O.activities.deselected("form",function(id,otherdata){
     console.log("the form sees that "+id+" was de-selected.");
     var activity = O.activities.get(id);
-    $("#activity_name")[0].val("");
+    $("#activity_name").val("");
     $("#radio-start-field").val(startTime.toString("h:mmtt"));
     $("#radio-end-field").val(new Date( startTime.valueOf()).addHours(schedule.length/4).toString("h:mmtt"));
     console.log(startTime.toString("h:mmtt"));
