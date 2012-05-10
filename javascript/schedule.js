@@ -186,18 +186,22 @@
     var prevItem="";
     var idList = [];
     var itemNum = 1;
+    var item;
       
     $('.schedule').html("");    //clear schedule  
     
     for (var i=0; i<schedule.length; i++) {
-      var item = schedule[i];
+      item = schedule[i];
       
-      if (item != prevItem && item != " ") {
-        setupActivity(item, 1, ".schedule", i, itemNum);
-        idList.push(item)
-              
-        prevItem=item;
-        itemNum +=1;
+      if (item != prevItem){
+        if (prevItem!="") updateModel(prevItem);
+        if(item != " ") {
+          setupActivity(item, 1, ".schedule", i, itemNum);
+          idList.push(item);
+                
+          prevItem=item;
+          itemNum +=1;
+        }
       } else if (item != " ") {
         var height = Math.round(($(".schedule div.item:last").height()+borderMarginHeight)/blockHeight) * blockHeight - borderMarginHeight; // remove rounding errors
         $(".schedule div.item:last").height(height+blockHeight);
@@ -205,7 +209,8 @@
         updateTimes(item);
       }
     }
-    O.activities.update
+    if (item!=" ") updateModel(item);
+    O.activities.update;
     Map.renderPath(idList);
     if (typeof(undoing)==='undefined') saveState();
     return idList;
@@ -420,9 +425,10 @@ window.autoSchedule = function autoSchedule(){
           addActivity($(this).attr("id"), height);
           $(this).remove();
           schedule = schedule.replace(new RegExp($(this).attr("id"), 'g'), " "); // remove item from schedule
-					
-					var new_activities = get_id_list(schedule.split(""))
-					Map.renderPath(new_activities)
+          
+					var new_activities = get_id_list(schedule.split(""));
+					Map.renderPath(new_activities);
+					saveState();
 					
         } else {  // move within Activities
           $(this).css({"left":0, "top":0}); //return to original position
