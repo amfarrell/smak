@@ -48,6 +48,7 @@ $.widget( "ui.autocomplete", {
 				"aria-haspopup": "true"
 			})
 			.bind( "keydown.autocomplete", function( event ) {
+
 				if ( self.options.disabled || self.element.propAttr( "readOnly" ) ) {
 					return;
 				}
@@ -191,6 +192,9 @@ $.widget( "ui.autocomplete", {
 					if ( false !== self._trigger( "select", event, { item: item } ) ) {
 						self.element.val( item.value );
 					}
+          if (O){
+            O.activities.select("",item.id);
+          }
 					// reset the term after the select event
 					// this allows custom select handling to work properly
 					self.term = self.element.val();
@@ -400,10 +404,12 @@ $.widget( "ui.autocomplete", {
 	},
 
 	_renderItem: function( ul, item) {
-		return $( "<li></li>" )
+    var html = $( "<li></li>" )
 			.data( "item.autocomplete", item )
-			.append( $( "<a></a>" ).text( item.label ) )
+			.append(  item.html || item.label)
+			.addClass("ui-menu-item")
 			.appendTo( ul );
+    return html;
 	},
 
 	_move: function( direction, event ) {

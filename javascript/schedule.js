@@ -149,6 +149,7 @@
         updateTimes(item);
       }
     }
+    O.activities.update
     Map.renderPath(idList);
     return idList;
   }
@@ -162,13 +163,13 @@ window.autoSchedule = function autoSchedule(){
     console.log("partially_schedule " + schedule + ", " + unscheduledActivities);
     $(".activitiesList").html('');
     var list = drawSchedule(partially_schedule(schedule, unscheduledActivities));
-    //Map.renderPath(list);
+    Map.renderPath(list);
   }
 
   function updateModel(id, list){
     var height = getDuration(id);
     var positionY = getPositionY(id);
-    O.activities.get(id).duration = height*15;
+    var duration = height*15;
     if ($("#"+id).parents(".schedule").length>0) {
       var minute = Math.floor(15*(positionY%4) +  startTime.getMinutes("mm"));
       var hour = Math.floor(positionY/4) + parseFloat(startTime.toString("H"));
@@ -188,11 +189,18 @@ window.autoSchedule = function autoSchedule(){
       if (hour > 24){
         //XXX What should we do?
       }
-      O.activities.update("schedule",id,{"start":"" + hour + ":" + minute}); 
+      var endmin = minute + duration;
+      var endhr = hour;
+      while (endmin > 59){
+        endmin = endmin - 60;
+        endhr = endhr +1;
+      }
+      O.activities.update("schedule",id,{"start":"" + hour + ":" + minute, "end":""+endhr+":"+endmin,"duration":duration}); 
       //XXX brittle. depends on the increments being 15min.
       O.activities.schedule("schedule",id);
     } else {
       O.activities.deschedule("schedule",id);
+      O.activities.update("schedule",id,{"start":undefined, "end":undefined}); 
     }
   }
   
@@ -258,6 +266,8 @@ window.autoSchedule = function autoSchedule(){
     var duration = getDuration(id);
     if (($("#"+id).parents(".schedule").length>0 && $("#"+id).position().left>-160) ||  // move within schedule
        ($("#"+id).parents(".schedule").length==0 && ($("#"+id).position().left>scheduleItemWidth/2)) ){  // move from Activities to Schedule
+          var start = getStartTime(id);
+          var end = getEndTime(id);
           if(duration<4){   // if the activity is too short, hide the times
             $("#"+id+" .times").text("");
           }else{
@@ -394,7 +404,7 @@ window.autoSchedule = function autoSchedule(){
         updateTimes(id);
         selectItem(id);
         updateModel(id);
-        //O.map.drawpath(schedule);
+        //Map.renderPath(list);
       }
     });
     $(list + " div.item:last .ui-resizable-n").after("<div class='ui-icon ui-icon-grip-solid-horizontal-n'></div>");
