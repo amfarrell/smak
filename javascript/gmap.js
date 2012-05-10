@@ -41,7 +41,6 @@ window.initMap = function initMap () {
   }
   window.Map = {
     
-    //'currentCoords':undefined,
     '_map': _map,
     'placeMarker':function placeMarker(activity) {
       console.log("marker placed for");
@@ -55,12 +54,7 @@ window.initMap = function initMap () {
         'clickable':true,
       });
       
-      /*google.maps.event.addListener(marker,'drag',function() {
-          document.getElementById('lat').value = marker.position.lat();
-          document.getElementById('lng').value = marker.position.lng();
-      });*/
       google.maps.event.addListener(marker, 'click', function select_pin() {
-        //XXX This does not yet work...
         if (marker.icon == 'images/red-dot.png'){
           marker.icon = 'images/blue-dot.png';
           marker.setAnimation(null);
@@ -363,86 +357,6 @@ function newMarker(){
   }
 }
 window.initMapInput = function initMapInput () {    
-  /*var map = $("#map_canvas")
-  var startX;
-  var startY;
-  var offsetX = 62.593; //hardcoded values for now.
-  var offsetY = -29.26; //TODO, calculate the displacement from the 
-                        //upper-left corner of the map and the middle 
-                        //of the bottom edge of the 11px wide pin image.
-  var snapTolerance = 35;
-  $("#draggable").draggable({
-    'helper': "original",
-    'zIndex': 9999,
-    'snapMode': "inner",
-    'snapTolerance' : snapTolerance,
-    'containment' : "document",
-    //draggable adds a listener such that when the mouse moves, 
-    //the map_pin follows it.
-    'start': function(e,ui) {
-      startX = e.pageX;
-      startY = e.pageY;
-    },
-    'cursorAt': {
-      top:0,
-      left:50, //assuming image is 60px wide.
-    },
-    'drag': function(e,ui) {
-      var slot = $("#pin_slot")
-      var XtoleranceFudge = $("#draggable").width();
-      var YtoleranceFudge = $("#draggable").height();
-      if (e.pageX > map.offset().left && 
-          e.pageX < map.offset().left + map.width() &&
-          e.pageY > map.offset().top && 
-          e.pageY < map.offset().top + map.height()) {
-        $(this).draggable({'revert':false,'snapTolerance':snapTolerance/4});
-        console.log([e.pageX,e.pageY]);
-        console.log(map.offset().left + "-"+ (map.offset().left + map.width()))
-        console.log(map.offset().top + "-"+ (map.offset().top + map.height()))
-      } else {
-        console.log([e.pageX,e.pageY]);
-        console.log(map.offset().left + "-"+ (map.offset().left + map.width()))
-        console.log(map.offset().top + "-"+ (map.offset().top + map.height()))
-        $(this).draggable({'snapTolerance':snapTolerance});
-        if (e.pageX > slot.offset().left - snapTolerance + XtoleranceFudge && 
-            e.pageX < slot.offset().left + slot.width() + snapTolerance - XtoleranceFudge  &&
-            e.pageY > slot.offset().top - snapTolerance + YtoleranceFudge && 
-            e.pageY < slot.offset().top + slot.height() + snapTolerance - YtoleranceFudge ) {
-          $(this).draggable({'revert':false});
-        } else {
-          $(this).draggable({'revert':true});
-        }
-      }
-    },
-    'stop': function(e,ui) {
-      //Record the x,y position of the map_pin and put it there absolutely.
-      var point=new google.maps.Point(e.pageX - startX + offsetX, 
-                                      e.pageY - startY + offsetY);
-      var ll=Map.overlay.getProjection().fromContainerPixelToLatLng(point);
-      //placeMarker(ll); 
-      //TODO: When we add an item to the schedule or todo, put it on the map.
-      //TODO: When we put it in the schedule, draw arrows indicating event order.
-      //TODO: enforce that there is enough travel time between events.
-      if (e.pageX > map.offset().left && 
-          e.pageX < map.offset().left + map.width() &&
-          e.pageY > map.offset().top && 
-          e.pageY < map.offset().top + map.height()) {
-        $("#location_text").val((""+ll.lat()).substr(0,8) + ", " + (""+ll.lng()).substr(0,8));
-        if (O.activities.selected_activity) {
-          O.activities.update("map",O.activities.selected_activity.id,{"coords":[ll.lat(), ll.lng()]});
-        } else {
-          Map.currentCoords = [ll.lat(), ll.lng()];
-        }
-      } else {
-        Map.currentCoords = undefined;
-      }
-      //TODO: when the event marker gets moved off the map it:
-      //returns to its original position if not put in the socket
-      //or the location info gets cleared if it is put in the socket.
-      }
-  });*/
-
-
   /*
   $("#location_text").keyup(function (e){
     O.activities.selected_activity.coords = e.srcElement.value.replace(" ","").split(",");

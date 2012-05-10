@@ -37,27 +37,19 @@ window.initForm = function initForm () {
     var activity = O.activities.get(id);
     $("#activity_name").value = activity.name 
     if (activity.range && activity.range[0]){
-      //$("#radio-start-end")[0].checked = true;
       $("#radio-start-field")[0].value = new Date(Date.parse(activity.range[0])).toString("h:mmtt");
       $("#radio-end-field")[0].value = new Date(Date.parse(activity.range[1])).toString("h:mmtt");
-    } else if (activity.start){
-      $("#radio-start-at")[0].checked = true;
-      var start = $("#radio-start-at-field")[0].value = activity.start;
-    } else {
-      $('#radio-autotime')[0].checked = true;
     }
-    //$('#location_text')[0].value = activity.coords;
-    console.log(activity.coords);
+    $("#add_activity_form").addClass("activitySelected");
   });
 
   O.activities.deselected("form",function(id,otherdata){
     console.log("the form sees that "+id+" was de-selected.");
     var activity = O.activities.get(id);
     $("#activity_name").val("");
-    $("#radio-start-field").val(startTime.toString("h:mmtt"));
-    $("#radio-end-field").val(new Date( startTime.valueOf()).addHours(schedule.length/4).toString("h:mmtt"));
-    console.log(startTime.toString("h:mmtt"));
-    //$('#location_text')[0].value = "";
+    $("#radio-start-field").val("");
+    $("#radio-end-field").val("");
+    $("#add_activity_form").removeClass("activitySelected");    
   });
 
   O.activities.updated("form",function form_updated(id,olddata){
