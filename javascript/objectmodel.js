@@ -80,7 +80,7 @@ window.initModel = function initModel () {
       },
       '_firehandler':function _firehandler(view, handler, i, otherdata) {
         if (['',false,'map','schedule','form'].indexOf(view) === -1){throw new Error("unknown interface "+view)};
-        var prev = O.activities._undo_ll;
+        /*var prev = O.activities._undo_ll;
         O.activities._undo_ll = {
           'prev':prev,
           'handler':handler,
@@ -88,14 +88,14 @@ window.initModel = function initModel () {
           'old_state':otherdata
         };
         console.log("undo state");
-        console.log(O.activities._undo_ll);
+        console.log(O.activities._undo_ll);*/
         for (subscriber in O.activities._subscribers) {
           if (subscriber !== view) {
             O.activities._subscribers[subscriber][handler](i, otherdata);
           }
         }
       },
-      '_undo_ll':{
+      /*'_undo_ll':{
         'prev':{},
         'handler':function(i,data){},
         'i':0,
@@ -117,7 +117,7 @@ window.initModel = function initModel () {
           }
         }
         O.activities._firehandler("",O.activities._undo_ll.handler,O.activities._undo_ll.i,reversed_state);
-      },
+      },*/
       'all':function allActivities (type) {
         var queriedevents = [];
         var a;
@@ -253,7 +253,7 @@ window.initModel = function initModel () {
       },
       'deschedule': function deschedule(view, i){
         checkstring(view);
-        if (O.activities.get(i).commiment === 'scheduled'){
+        if (O.activities.get(i).commitment === 'scheduled'){
           O.activities.recommit(view,i,'todo');
         }
       },

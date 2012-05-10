@@ -352,10 +352,25 @@ window.autoSchedule = function autoSchedule(){
     }
   }
   function setupActivity(id, duration, list, verticalPos, itemNumber){  //list = ".schedule" or ".activitiesList"
-    $(list).append('<div class="scheduleItem item" id='+id+'></div>');
+    $("#" + id).remove();
+    if (list == ".activitiesList"){ 
+      if($(".activitiesList .scheduleItem").length == 0) $(list).append('<div class="scheduleItem item" id='+id+'></div>'); //add first item
+      else{ // insert into list
+        $(".activitiesList .scheduleItem").each(function(){
+              if ($(this).attr('id') > id) {
+                  $(this).before('<div class="scheduleItem item" id='+id+'></div>');
+                  return false;
+              }
+        });
+        if ($("#" + id).length == 0){ // if still not added, add to end of list
+          $(".activitiesList").append('<div class="scheduleItem item" id='+id+'></div>');
+        }
+      }
+    }else
+      $(".schedule").append('<div class="scheduleItem item" id='+id+'></div>');
         
     // Make item draggable
-    $(list + " div.item:last").draggable({
+    $("#" + id).draggable({
       snap: '.schedule, .activitiesList',
       snapMode: "inner",
       cursor: "move",
@@ -418,13 +433,13 @@ window.autoSchedule = function autoSchedule(){
         selectItem(id);
         updateModel(id); //We get errors if we don't change state (
       }
-    })
+    });
     
-    $(list + " div.item:last").append("<div class='grip-n ui-resizable-handle ui-resizable-n' id='grip-n"+id+"'></div>");
-    $(list + " div.item:last").append("<div class='grip-s ui-resizable-handle ui-resizable-s' id='grip-s"+id+"'></div>");
+    $("#" + id).append("<div class='grip-n ui-resizable-handle ui-resizable-n' id='grip-n"+id+"'></div>");
+    $("#" + id).append("<div class='grip-s ui-resizable-handle ui-resizable-s' id='grip-s"+id+"'></div>");
     
     // Make item resizable
-    $(list + " div.item:last").resizable({ 
+    $("#" + id).resizable({ 
       //handles: "n,s",
       handles: {n: "#grip-n"+id,
                 s: "#grip-s"+id},
@@ -474,19 +489,19 @@ window.autoSchedule = function autoSchedule(){
         //Map.renderPath(list);
       }
     });
-    $(list + " div.item:last .ui-resizable-n").after("<div class='ui-icon ui-icon-grip-solid-horizontal-n'></div>");
-    $(list + " div.item:last .ui-resizable-s").after("<div class='ui-icon ui-icon-grip-solid-horizontal-s'></div>");
+    $("#" + id+ " .ui-resizable-n").after("<div class='ui-icon ui-icon-grip-solid-horizontal-n'></div>");
+    $("#" + id+ " .ui-resizable-s").after("<div class='ui-icon ui-icon-grip-solid-horizontal-s'></div>");
     //$(list + " div.item:last .ui-resizable-n").html("<div class='grip-n'></div>");
     //$(list + " div.item:last .ui-resizable-s").html("<div class='grip-s'></div>");
     
     // Set item height
-    $(list + " div.item:last").height(blockHeight*duration - borderMarginHeight);  // -2 to compensate for the border height
+    $("#" + id).height(blockHeight*duration - borderMarginHeight);  // -2 to compensate for the border height
     
     // Make selectable
-    $(list + " div.item:last").click(toggleItem);
+    $("#" + id).click(toggleItem);
     
     // Set z-index so that items are always on top
-    $(list + " div.item:last").css({
+    $("#" + id).css({
         "z-index":10,
     });
     
@@ -497,33 +512,33 @@ window.autoSchedule = function autoSchedule(){
     
     if (list == ".schedule"){
       if(O.activities.get(id).commitment == "locked"){
-        $(list + " div.item:last").append("<div class='lock'><img src='lock.png' alt='locked' /></div>");
+        $("#" + id).append("<div class='lock'><img src='lock.png' alt='locked' /></div>");
         $("#" + id).draggable( "disable" );
         $("#" + id).resizable( "disable" );
       }else
-        $(list + " div.item:last").append("<div class='lock'><img src='unlock.png' alt='unlocked' /></div>");
-      $(list + " div.item:last .lock").click(toggleLock);
+        $("#" + id).append("<div class='lock'><img src='unlock.png' alt='unlocked' /></div>");
+      $("#" + id + " .lock").click(toggleLock);
       var letter = String.fromCharCode(64+itemNumber);
-      $(list + " div.item:last").append("<div class='activityCenter'><img height='5px' src='Google Maps Markers/darkgreen_Marker"+letter+".png' alt='"+letter+"'/>"+O.activities.get(id).name+"</div>");
+      $("#" + id).append("<div class='activityCenter'><img height='5px' src='Google Maps Markers/darkgreen_Marker"+letter+".png' alt='"+letter+"'/>"+O.activities.get(id).name+"</div>");
      
-      $(list + " div.item:last").css({// Set item to it's current absolute position
+      $("#" + id).css({// Set item to it's current absolute position
         "position": "absolute",
         "left":0,
         "top":verticalPos*blockHeight,
       });
       
-      $(list + " div.item:last").draggable("option", "containment", ".doBetween"+id);
-      $(list + " div.item:last").resizable("option", "containment", ".doBetween"+id);
+      $("#" + id).draggable("option", "containment", ".doBetween"+id);
+      $("#" + id).resizable("option", "containment", ".doBetween"+id);
     }else{    // activitiesList 
-      $(list + " div.item:last").append("<div class='activityCenter'><div class='activityName'>"+O.activities.get(id).name+"</div></div>");
-      $(list + " div.item:last").draggable("option", "containment", ".activitiesContainer");
-      $(list + " div.item:last").resizable("option", "containment", ".activitiesResizeContainer");
+      $("#" + id).append("<div class='activityCenter'><div class='activityName'>"+O.activities.get(id).name+"</div></div>");
+      $("#" + id).draggable("option", "containment", ".activitiesContainer");
+      $("#" + id).resizable("option", "containment", ".activitiesResizeContainer");
     }
-    $(list + " div.item:last").append("<div class='times'></div>");
-    $(list + " div.item:last").append("<div class='duration'></div>");
+    $("#" + id).append("<div class='times'></div>");
+    $("#" + id).append("<div class='duration'></div>");
 
     
-    $(list + " div.item:last").corner();
+    $("#" + id).corner();
     
     updateDuration(id);
     updateModel(id);
