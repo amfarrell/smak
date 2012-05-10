@@ -303,8 +303,8 @@ window.initModel = function initModel () {
   new Activity("Accademia Gallery", [43.776907, 11.258475], "09:45", "11:00", 75, ["10:00","18:00"], true), 
   new Activity("Piazzale Michelangelo", [43.762917, 11.265156], "11:15", "12:00", 75, ["1:00","23:30"], true),
   new Activity("Giotto's Tower", [43.772895, 11.255235], "09:45", "11:00", 60, ["10:00","18:00"], true),
-  new Activity("Dinner", [43.767266,11.253322], "09:45", "11:00", 60, ["18:00","20:00"], true),
-  new Activity('Dancing', [43.7315,11.2407], undefined, undefined, 45, ['13:30','1530'], false),
+  new Activity("Dinner", [43.767266,11.253322], "09:45", "11:00", 60, ["18:00","20:00"], true)]
+  /*new Activity('Dancing', [43.7315,11.2407], undefined, undefined, 45, ['13:30','1530'], false),
   new Activity('Piazzale Michelangelo', [43.7312,11.2463], undefined, undefined, 75, ['09:00','1100'], false),
   new Activity('Palazzo Pitti', [43.7453,11.2557], undefined, undefined, 30, ['09:45','1215'], false),
   new Activity('Piazza della Signoria', [43.7624,11.2775], undefined, undefined, 45, ['13:30','1745'], false),
@@ -337,7 +337,7 @@ window.initModel = function initModel () {
   new Activity('Pugi', [43.769,11.2533], undefined, undefined, 15, ['10:30','1215'], false),
   new Activity('Botique Nadine', [43.7669,11.2595], undefined, undefined, 45, ['12:00','1500'], false),
   new Activity('Rivoire', [43.7719,11.2439], undefined, undefined, 75, ['13:15','2000'], false),
-  new Activity('Semel', [43.7326,11.263], undefined, undefined, 45, ['16:45','2215'], false)]
+  new Activity('Semel', [43.7326,11.263], undefined, undefined, 45, ['16:45','2215'], false)]*/
 
   var a;
   for (a in prebuilt){

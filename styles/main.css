@@ -85,7 +85,6 @@ body {
 #map_canvas {
  width:450px; 
  height:500px;
-  z-index:-9;
 }
 
 /* New Activity Form */
@@ -205,6 +204,14 @@ body {
 }
 .selected .ui-icon{
   display:none;
+}
+.ui-state-disabled{
+  background:#A7B6BB!important;
+  opacity: 0.7;
+}
+.ui-state-disabled .selected{
+  background:#98a4a8!important;
+  opacity:1!important;
 }
 .ui-state-disabled .ui-icon{
   display:none;

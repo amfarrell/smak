@@ -12,10 +12,12 @@ window.initForm = function initForm () {
   }
   $("#make_event").click(function (e){
     var name = $("#activity_name")[0].value
+    var start = undefined;
+    var duration = 60;
     var range = [$("#radio-start-field")[0].value,$("#radio-end-field")[0].value];
 
     //function Activity(name, coords, start, end, duration, range, user_createdP, commitment) {
-    var activity = new O.Activity(name,Map.currentCoords,start,undefined,undefined,range,true);
+    var activity = new O.Activity(name,Map.currentCoords,start,undefined,duration,range,true,"suggested");
     O.activities.set(activity.id,activity);
     $("#activity_name")[0].value = '';
     $("#radio-start-field").value = '';

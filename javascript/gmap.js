@@ -54,11 +54,24 @@ window.initMap = function initMap () {
       //  'draggable':true,
         'clickable':true,
       });
-      google.maps.event.addListener(marker, 'mouseover', function select_pin() {
+      google.maps.event.addListener(marker, 'click', function select_pin() {
         //XXX This does not yet work...
-        marker.icon = 'images/red-dot.png';
-        marker.setAnimation(google.maps.Animation.BOUNCE)
-        O.activities.select("map",activity.id);
+        if (marker.icon == 'images/red-dot.png'){
+          marker.icon = 'images/blue-dot.png';
+          marker.setAnimation(null);
+          O.activities.deselect("map",activity.id);
+        }else{
+          for (var i in O.activities.all()){
+            console.log(O.activities.all());
+            console.log(O.activities.get(i).marker);
+            O.activities.get(i).marker.icon = 'images/blue-dot.png';
+            O.activities.get(i).marker.setAnimation(null);
+            console.log(O.activities.get(i).marker);
+          }
+          marker.icon = 'images/red-dot.png';
+          marker.setAnimation(google.maps.Animation.BOUNCE);
+          O.activities.select("map",activity.id);
+        }
       });
       marker.setMap(window.Map._map);
       return marker;
@@ -261,7 +274,7 @@ window.initMap = function initMap () {
         O.activities.set(activity.id,activity);
         O.google_suggestions[place.id] = activity;
       }
-      var html = "<a><div class='suggestion' id='suggestion_"+activity.id+"'>"+activity.name+" <button onclick='O.activities.todo(\"form\","+activity.id+")'>todo</button></div></a>";
+      var html = "<a class='ui-corner-all' tabindex='-1'>"+activity.name+"</a>";
       //note that the correct thing to do here is actually to have the item be draggable.
       return {'html':html, 'id':activity.id, 'label':activity.name, 'value':activity.name};
     },
@@ -424,13 +437,20 @@ window.initMapInput = function initMapInput () {
     if (O.activities.get(i).commitment === "suggested"){
       //place a temporary marker.
     }
+    
+    for (var j in O.activities.all()){
+      O.activities.get(j).marker.icon = 'images/blue-dot.png';
+      O.activities.get(j).marker.setAnimation(null);
+    }
     if (O.activities.get(i).marker){
+      O.activities.get(i).marker.icon = 'images/red-dot.png';
       O.activities.get(i).marker.setAnimation(google.maps.Animation.BOUNCE)
     }
         //This belongs in the handler
   });
   O.activities.deselected("map",function map_select_handle(i,changes){
     if (O.activities.get(i).marker){
+      O.activities.get(i).marker.icon = 'images/blue-dot.png';
       O.activities.get(i).marker.setAnimation(null)
     }
 

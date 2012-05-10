@@ -1,10 +1,12 @@
-  var blockHeight = 15;   // vertical pixels per 15 minute chunk
+  var blockHeight = 12;   // vertical pixels per 15 minute chunk
   var startTime = new Date(Date.parse("9:30AM"));      //hour of the day (in military time)
   var schedule = "                                          ";      // currently displayed schedule
   var activitiesListPos = 0; // position of the end of the activities list. (counted in 15 min blocks)
   var scheduleItemWidth = 260;  //pixels width of schdeduleItem
   var borderMarginHeight = 5;  //pixels width of border and margin of schdeduleItem
-  
+  var history = new Array(); //for undos
+  var currentStateIndex = -1;
+
   var initScheduleListeners = function initScheduleListeners(){
     O.activities.updated('schedule',function scheduleUpdate(i,oldvalues){
       //Do stuff after an item's value is updated
@@ -27,13 +29,13 @@
     O.activities.commitment_changed('schedule',function commitmentUpdate(i,oldState){
       //Do stuff after an item changes commitment state
       var activity = O.activities.get(i);
-      if (oldState == 'scheduled' && activity.commitment == 'todo'){
-        
+      if (oldState!='todo' && activity.commitment == 'todo'){
+        $("#"+i).remove();
+        addActivity(i, O.activities.get(i).duration/15);
       }else if (oldState == 'todo' && activity.commitment == 'scheduled'){
         $("#"+i).remove();
         drawSchedule(edit_distance(schedule,id, positionY,height));
       }
-      console.log("the schedule sees that "+key+" changed in activity "+i+" from "+oldvalues[key]+" to "+activity[key]+".");
     });
     O.activities.selected("schedule",function scheduleDeselected(id,empty_map){
       console.log("the schedule sees that "+id+" has been selected.");
@@ -60,7 +62,7 @@
   }
 
   function initActivitiesList() {
-    console.log(O.activities.all());
+    $(".activitiesList").html("");
     for (var i in O.activities.all()) {
       if (i > 6){
         break;
@@ -123,6 +125,24 @@
     updateDoBetween();
     drawSchedule(schedule);
   }
+  
+  /*function loadState(i){
+    var state = history[i];
+    var newSchedule = state[0];
+    startTime = state[1];
+    O.activities = state[2];
+    initActivitiesList();
+    drawScheduleGrid();
+    drawSchedule(newSchedule);
+  }
+  function saveState(){
+    var activities = {};
+    jQuery.extend(activities,O.activities);
+    var state = [schedule, startTime, activities];
+    currentStateIndex++;
+    history[currentStateIndex]=state;
+    console.log(history);
+  }*/
   function drawSchedule(newSchedule) {
   //XXX This also returns the list of Activity IDs.
     schedule = newSchedule;
@@ -151,6 +171,7 @@
     }
     O.activities.update
     Map.renderPath(idList);
+   // saveState();
     return idList;
   }
 
@@ -302,7 +323,7 @@ window.autoSchedule = function autoSchedule(){
       snap: '.schedule, .activitiesList',
       snapMode: "inner",
       cursor: "move",
-      stack: "div.item", 
+      stack: "div.item",
       opacity: 0.75, 
       start:function(event,ui) {
         selectItem(id);
@@ -311,10 +332,13 @@ window.autoSchedule = function autoSchedule(){
         updateTimes(id);
         if ($(this).overlaps($(".doBetween" +  $(this).attr("id")+" .doBetweenTop"))){
           if ($(".error").length == 0) $(this).children(".activityCenter").append("<div class='error'>Can not be placed before "+O.activities.get(id).range[0]+".</div>");
+          else $(".error").html("Can not be placed before "+O.activities.get(id).range[0]);
         }else if($(this).overlaps($(".doBetween" +  $(this).attr("id")+" .doBetweenBottom"))){
           if ($(".error").length == 0) $(this).children(".activityCenter").append("<div class='error'>Can not be placed after "+O.activities.get(id).range[1]+".</div>");
+          else $(".error").html("Can not be placed after "+O.activities.get(id).range[1]);
         }else if($(this).overlaps($(".ui-draggable-disabled"))) {
           if ($(".error").length == 0) $(this).children(".activityCenter").append("<div class='error'>Can not be placed on a locked activity.</div>");
+          else $(".error").html("Can not be placed on a locked activity.");
         }else{
           $(".error").remove();
         }
@@ -345,6 +369,10 @@ window.autoSchedule = function autoSchedule(){
           addActivity($(this).attr("id"), height);
           $(this).remove();
           schedule = schedule.replace(new RegExp($(this).attr("id"), 'g'), " "); // remove item from schedule
+					
+					var new_activities = get_id_list(schedule.split(""))
+					Map.renderPath(new_activities)
+					
         } else {  // move within Activities
           $(this).css({"left":0, "top":0}); //return to original position
         }
@@ -384,13 +412,14 @@ window.autoSchedule = function autoSchedule(){
       },
       stop: function(event, ui) {
         var id = $(this).attr("id");
+        console.log(ui);
         if (list == ".schedule" ) {
           var positionY = getPositionY(id);
           var height = getDuration(id);
           if (!$(this).overlaps($(".ui-draggable-disabled"))) { // not on a locked item   
             drawSchedule(edit_distance(schedule,id, positionY,height));
           }else{
-            $(this).css({"left":ui.originalPosition.left, "top":ui.originalPosition.top}); //return to original position
+            $(this).css({"left":ui.originalPosition.left, "top":ui.originalPosition.top, "height":ui.originalSize.height}); //return to original position
           }
         } else {
           $(".activitiesList div.scheduleItem").css({
@@ -400,6 +429,8 @@ window.autoSchedule = function autoSchedule(){
           });
           $(".spaceHolder").remove();
         }
+        $(".error").remove();
+        $(this).removeClass("outsideDoBetween");
         updateDuration(id);
         updateTimes(id);
         selectItem(id);
@@ -437,7 +468,7 @@ window.autoSchedule = function autoSchedule(){
         $(list + " div.item:last").append("<div class='lock'><img src='unlock.png' alt='unlocked' /></div>");
       $(list + " div.item:last .lock").click(toggleLock);
       var letter = String.fromCharCode(64+itemNumber);
-      $(list + " div.item:last").append("<div class='activityCenter'><img src='Google Maps Markers/darkgreen_Marker"+letter+".png' alt='"+letter+"'/>"+O.activities.get(id).name+"</div>");
+      $(list + " div.item:last").append("<div class='activityCenter'><img height='5px' src='Google Maps Markers/darkgreen_Marker"+letter+".png' alt='"+letter+"'/>"+O.activities.get(id).name+"</div>");
      
       $(list + " div.item:last").css({// Set item to it's current absolute position
         "position": "absolute",
