@@ -102,7 +102,7 @@ window.initModel = function initModel () {
         'old_state':{}
       },
       'undo': function undo(){
-        debugger;
+        //debugger;
         var prev = O.activities._undo_ll.prev;
         var activity = O.activities.get(O.activities._undo_ll.i);
         var reversed_state;
@@ -140,6 +140,9 @@ window.initModel = function initModel () {
             if (a.commitment === "scheduled" || a.commitment === "locked"){
               queriedevents.push(a);
             }
+          }
+          if (queriedevents.length < 2){
+            return queriedevents;
           }
           queriedevents.sort(function find_later_events(event1,event2){
             //Put the later events later in the list.

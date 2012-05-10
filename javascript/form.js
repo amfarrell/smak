@@ -56,7 +56,7 @@ window.initForm = function initForm () {
 
   O.activities.updated("form",function form_updated(id,olddata){
     var activity = O.activities.get(id);
-    if ( O.activities.selected_activity && activity.id === O.activities.selected_activity.id){
+    if (O.activities.selected_activity && activity.id === O.activities.selected_activity.id){
       $("#activity_name")[0].value = activity.name;
       $("#radio-start-field").value = new Date(Date.parse(activity.range[0])).toString("h:mmtt");
       $("#radio-end-field").value = new Date(Date.parse(activity.range[1])).toString("h:mmtt");

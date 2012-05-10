@@ -85,6 +85,9 @@ window.initMap = function initMap () {
         coords.push({'stopover':true,'location':list.shift().coords.join(",")})
       }
       console.log(coords);
+      if (coords.length <2){
+        return;
+      }
       var request = {
         'origin': coords.shift().location,
         'destination': coords.pop().location,
@@ -105,11 +108,17 @@ window.initMap = function initMap () {
       });
     },
     'renderPath':function renderPath(list){
-      if (list.length < 2){
-        return;
+      console.log("renderpath");
+      console.log(list);
+      if (list.length === 1){
+        list.push(list[0]);
         //TODO: have it display a different colour marker.
+      } else if (list.length === 0) {
+        //debugger;
+        _display.setMap(null);
+        _display.setMap(Map._map);
       }
-      if (typeof list[0] ==="number" || typeof list[0] ==="string"){
+      if (typeof list[0] === "number" || typeof list[0] === "string"){
         var scraplist = [];
         while (list.length > 0){
           scraplist.push(O.activities.get(list.shift()));
@@ -260,7 +269,7 @@ window.initMap = function initMap () {
           return false;
         }
       } else {
-        activity =  new O.Activity(place.name,[place.geometry.location.lat,place.geometry.location.lng],undefined,undefined,60,[undefined,undefined],false,"suggested");
+        activity =  new O.Activity(place.name,[place.geometry.location.lat(),place.geometry.location.lng()],undefined,undefined,60,[undefined,undefined],false);
         O.activities.set(activity.id,activity);
         O.google_suggestions[place.id] = activity;
       }
@@ -452,8 +461,10 @@ window.initMapInput = function initMapInput () {
     }
   });
   O.activities.updated("map",function map_update_handle(i,changes){
-    
-
+    if( O.activities.get(i).commitment === "scheduled"){
+      var order = O.activities.all("ordered_schedule");
+      Map.renderPath(order);
+    }
   });
 
 }
