@@ -277,6 +277,12 @@ window.autoSchedule = function autoSchedule(){
         plural = "";
       $("#"+id+" .duration").text((duration/4)+' Hour'+plural);
     }
+    
+    if (duration <6 && duration>=4){
+      $("#"+id+" .activityCenter").css("margin-top", "-2px");
+    }else{
+      $("#"+id+" .activityCenter").css("margin-top", "");
+    }
       //O.activities.update("schedule",id,{"duration":duration}); 
     //XXX I think this is the wrong format.
   }
