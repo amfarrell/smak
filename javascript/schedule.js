@@ -107,7 +107,7 @@
       }
     }
     //$('.scheduleGrid td').height(blockHeight*4-2);
-    $('.scheduleGrid').append("End Day at <input readonly='readonly' onchange='changeDayStartEndTimes()' type='time' size='8' id='endTime' name='endTime' value='"+ endTime.toString("h:mmtt")+"'/>");
+    $('.scheduleGrid').append("<br />End Day at <input readonly='readonly' onchange='changeDayStartEndTimes()' type='time' size='8' id='endTime' name='endTime' value='"+ endTime.toString("h:mmtt")+"'/>");
     $('#endTime').calendricalTime();
     //TODO: modify length of the map so that they line up roughly.
   }
@@ -321,14 +321,14 @@ window.autoSchedule = function autoSchedule(){
       drag:function(){
         updateTimes(id);
         if ($(this).overlaps($(".doBetween" +  $(this).attr("id")+" .doBetweenTop"))){
-          if ($(".error").length == 0) $(this).children(".activityCenter").append("<div class='error'>Can not be placed before "+O.activities.get(id).range[0]+".</div>");
-          else $(".error").html("Can not be placed before "+O.activities.get(id).range[0]);
+          if ($(".error").length == 0) $(this).append("<div class='error'>Cannot be placed before "+O.activities.get(id).range[0]+".</div>");
+          else $(".error").html("Cannot be placed before "+O.activities.get(id).range[0]);
         }else if($(this).overlaps($(".doBetween" +  $(this).attr("id")+" .doBetweenBottom"))){
-          if ($(".error").length == 0) $(this).children(".activityCenter").append("<div class='error'>Can not be placed after "+O.activities.get(id).range[1]+".</div>");
-          else $(".error").html("Can not be placed after "+O.activities.get(id).range[1]);
+          if ($(".error").length == 0) $(this).append("<div class='error'>Cannot be placed after "+O.activities.get(id).range[1]+".</div>");
+          else $(".error").html("Cannot be placed after "+O.activities.get(id).range[1]);
         }else if($(this).overlaps($(".ui-draggable-disabled"))) {
-          if ($(".error").length == 0) $(this).children(".activityCenter").append("<div class='error'>Can not be placed on a locked activity.</div>");
-          else $(".error").html("Can not be placed on a locked activity.");
+          if ($(".error").length == 0) $(this).append("<div class='error'>Cannot be placed on a locked activity.</div>");
+          else $(".error").html("Cannot be placed on a locked activity.");
         }else{
           $(".error").remove();
         }
@@ -393,7 +393,7 @@ window.autoSchedule = function autoSchedule(){
         updateDuration(id);
         updateTimes(id);
         if ($(this).overlaps($(".ui-draggable-disabled")) && $(".error").length == 0) {
-          $(this).children(".activityCenter").append("<div class='error'>Can not be placed on a locked activity.</div>");
+          $(this).append("<div class='error'>Cannot be placed on a locked activity.</div>");
           $(this).addClass("outsideDoBetween");
         } else if($(".error").length == 0){
           $(".error").remove();

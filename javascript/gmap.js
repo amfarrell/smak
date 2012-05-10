@@ -62,11 +62,10 @@ window.initMap = function initMap () {
           O.activities.deselect("map",activity.id);
         }else{
           for (var i in O.activities.all()){
-            console.log(O.activities.all());
-            console.log(O.activities.get(i).marker);
-            O.activities.get(i).marker.icon = 'images/blue-dot.png';
-            O.activities.get(i).marker.setAnimation(null);
-            console.log(O.activities.get(i).marker);
+            if (O.activities.get(j).marker){
+              O.activities.get(i).marker.icon = 'images/blue-dot.png';
+              O.activities.get(i).marker.setAnimation(null);
+            }
           }
           marker.icon = 'images/red-dot.png';
           marker.setAnimation(google.maps.Animation.BOUNCE);
@@ -346,7 +345,6 @@ window.initMapInput = function initMapInput () {
   $("#draggable").draggable({
     'helper': "original",
     'zIndex': 9999,
-    'snap': "#pin_slot",
     'snapMode': "inner",
     'snapTolerance' : snapTolerance,
     'containment' : "document",
@@ -357,8 +355,8 @@ window.initMapInput = function initMapInput () {
       startY = e.pageY;
     },
     'cursorAt': {
-      bottom:0,
-      left:11, //assuming image is 22px wide.
+      top:0,
+      left:50, //assuming image is 60px wide.
     },
     'drag': function(e,ui) {
       var slot = $("#pin_slot")
@@ -430,8 +428,10 @@ window.initMapInput = function initMapInput () {
     }
     
     for (var j in O.activities.all()){
-      O.activities.get(j).marker.icon = 'images/blue-dot.png';
-      O.activities.get(j).marker.setAnimation(null);
+      if (O.activities.get(j).marker){
+        O.activities.get(j).marker.icon = 'images/blue-dot.png';
+        O.activities.get(j).marker.setAnimation(null);
+      }
     }
     if (O.activities.get(i).marker){
       O.activities.get(i).marker.icon = 'images/red-dot.png';

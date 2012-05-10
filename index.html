@@ -4,6 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
 <head>
+
   <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
   <title>SMak</title>
   <link rel="shortcut icon" href="smak-icon.png" /> 
@@ -35,6 +36,7 @@
 <script type="text/javascript">
 
 $(document).ready(function() {
+
   initModel();
   initMap();
   initForm();
@@ -55,73 +57,75 @@ $(document).ready(function() {
 
 });
 </script>
-<img class="title" src="images/smak_title.gif" alt="SMAK" />
-
-<div id="activity">
-  <h2>New Activity</h2>
-  <input id="activity_name" type="text" name="activityName" placeholder="Enter your activity's name"></input>
-	
-  <div id="activity_suggest">
-    <!-- Dynamically load this with activities. -->
-  </div>
-  <table>
-    <form id="crud">
-      <tr valign="bottom">
-        <td width="20px"> </td>
-        <td> Earliest Start Time </td>
-        <td><input type="text" size="8" id="radio-start-field" readonly></input> 
-						<script type="text/javascript"> 
-							document.forms['crud'].elements["radio-start-field"].value = startTime.toString("h:mmtt");
-							$('#radio-start-field').calendricalTime(); 
-						</script>
-				</td>
-        <td> e.g. Museum Opening Time</td>
-      </tr><tr valign="top">
-        <td width="20px"> </td>
-        <td> Latest End Time </td>
-        <td><input type="text" size="8" id="radio-end-field" readonly></input>
-						<script type="text/javascript">
-							document.forms['crud'].elements["radio-end-field"].value = (new Date( startTime.valueOf()).addHours(schedule.length/4)).toString("h:mmtt");
-							$('#radio-end-field').calendricalTime(); 
-						</script>
-				</td>
-        <td> e.g. Museum Closing Time</td>
-      </tr><tr>
-				<td width="20px"> </td>
-				<td></td>
-				<td></td>
-        <td align="right"><input type="button" value="Add Activity" id="make_event"></input></td>
-      </tr>
-    </form>
-  </table>
-
-  <div id="activity_location">
-    <div id="location_form">
-      Where:<span id="pin_spot">
-                <img id="draggable" src='images/blue-dot.png'/>
-                <img id="pin_slot" src="images/map_pin_empty.png"/>
-            </span>
-      <input id="location_text"></input>
-    </div>
-    <div id="map_canvas">    </div>
-  </div>
-</div>
 
 <div id="schedule">
 <table class="layout">
   <tr>
-    <td>Activities</td>
-    <td>Schedule</td>
+    <td><center><img class="title" src="images/smak_title.gif" alt="SMAK" /></center></td>
+    <td style="padding:10px 10px"><b>Activities</b></td>
+    <td style="padding:10px 10px"><b>Schedule</b></td>
   </tr>
+    <td></td>
     <td><div class="autoSchedule"><button type="button" onclick="autoSchedule();">Schedule these activities for me</button></div></td>
     <td id="startTimeCell"></td>
   <tr>
-    <td valign="top" style="padding:0 10px">
+    <td valign="top">
+    
+      <div id="activity">
+   
+      <div id="add_activity_form">
+        <input id="activity_name" type="text" name="activityName" placeholder="Enter your activity's name"></input>
+        <input type="button" value="Add Activity" id="make_event"></input>
+          
+        <div id="activity_suggest">
+          <!-- Dynamically load this with activities. -->
+        </div>
+        <table id="time_form">
+          <form id="crud">
+            <tr valign="bottom">
+              <td> Earliest Start Time </td>
+              <td><input type="text" size="8" id="radio-start-field" readonly></input> 
+                              <script type="text/javascript"> 
+                                  document.forms['crud'].elements["radio-start-field"].value = startTime.toString("h:mmtt");
+                                  $('#radio-start-field').calendricalTime(); 
+                              </script>
+                      </td>
+              <td> e.g. Museum Opening Time</td>
+            </tr><tr valign="top">
+              <td> Latest End Time </td>
+              <td><input type="text" size="8" id="radio-end-field" readonly></input>
+                              <script type="text/javascript">
+                                  document.forms['crud'].elements["radio-end-field"].value = (new Date( startTime.valueOf()).addHours(schedule.length/4)).toString("h:mmtt");
+                                  $('#radio-end-field').calendricalTime(); 
+                              </script>
+                      </td>
+              <td> e.g. Museum Closing Time</td>
+            </tr>
+          </form>
+        </table>
+      </div>
+
+      <div id="activity_location">
+        <img id="draggable" src='images/drag_me.gif' />
+        <!--<div id="location_form">
+          Where:<span id="pin_spot">
+                    
+                    <img id="pin_slot" src="images/map_pin_empty.png"/>
+                </span>
+          <input id="location_text"></input>
+        </div>-->
+        <div id="map_canvas">    </div>
+      </div>
+    </div>
+    
+    
+    </td>
+    <td valign="top" style="padding:10px 10px">
       <div class="activitiesResizeContainer"></div>
       <div class="activitiesContainer"></div>
       <div class="doBetweenContainerContainer"></div>
       <div class="activitiesList"></div>
-    </td><td style="position:relative;padding:0 10px">
+    </td><td valign="top" style="position:relative;padding:10px 10px">
       <div class="scheduleGrid"> 
         <div class="schedule">  </div>
       </div>

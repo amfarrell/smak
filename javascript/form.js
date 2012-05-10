@@ -19,10 +19,9 @@ window.initForm = function initForm () {
     //function Activity(name, coords, start, end, duration, range, user_createdP, commitment) {
     var activity = new O.Activity(name,Map.currentCoords,start,undefined,duration,range,true,"suggested");
     O.activities.set(activity.id,activity);
-    $("#activity_name")[0].value = '';
-    $("#radio-start-field").value = '';
-    $("#radio-end-field").value = '';
-    $("#radio-start-at-field").value = '';
+    $("#activity_name")[0].val("");
+    $("#radio-start-field").val(startTime.toString("h:mmtt"));
+    $("#radio-end-field").val(new Date( startTime.valueOf()).addHours(schedule.length/4).toString("h:mmtt"));
     
     O.activities.todo('',activity.id);
   });
@@ -41,17 +40,18 @@ window.initForm = function initForm () {
     } else {
       $('#radio-autotime')[0].checked = true;
     }
-    $('#location_text')[0].value = activity.coords;
+    //$('#location_text')[0].value = activity.coords;
     console.log(activity.coords);
   });
 
   O.activities.deselected("form",function(id,otherdata){
     console.log("the form sees that "+id+" was de-selected.");
     var activity = O.activities.get(id);
-    $("#activity_name")[0].value = ""
-    $("#radio-start-field")[0].value = ""
-    $("#radio-end-field")[0].value = ""
-    $('#location_text')[0].value = "";
+    $("#activity_name")[0].val("");
+    $("#radio-start-field").val(startTime.toString("h:mmtt"));
+    $("#radio-end-field").val(new Date( startTime.valueOf()).addHours(schedule.length/4).toString("h:mmtt"));
+    console.log(startTime.toString("h:mmtt"));
+    //$('#location_text')[0].value = "";
   });
 
   O.activities.updated("form",function form_updated(id,olddata){
