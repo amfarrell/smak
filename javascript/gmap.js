@@ -288,7 +288,7 @@ window.initMap = function initMap () {
   };
   window.Map.overlay.draw = function() {};
   window.Map.overlay.setMap(window.Map._map);
-  O.activities.commitment_changed("map",function map_select_handle(i,oldstate){
+  O.activities.commitment_changed("map",function map_commitment_handle(i,oldstate){
         //var marker = window.Map.placeMarker(activity.coords,activity.name)
         //$.jStorage.get(i).marker = marker;
 
@@ -439,7 +439,7 @@ window.initMapInput = function initMapInput () {
     }
         //This belongs in the handler
   });
-  O.activities.deselected("map",function map_select_handle(i,changes){
+  O.activities.deselected("map",function map_deselect_handle(i,changes){
     if (O.activities.get(i).marker){
       O.activities.get(i).marker.icon = 'images/blue-dot.png';
       O.activities.get(i).marker.setAnimation(null)
@@ -449,7 +449,7 @@ window.initMapInput = function initMapInput () {
     // remove the temporary marker.
     }
   });
-  O.activities.updated("map",function map_select_handle(i,changes){
+  O.activities.updated("map",function map_update_handle(i,changes){
     
 
   });

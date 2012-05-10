@@ -68,8 +68,7 @@
         break;
       }
       if (O.activities.get(i).commitment=="todo") {
-        addActivity(i, O.activities.get(i).duration/15)
-        //O.activities.todo('schedule',i);
+        addActivity(i, O.activities.get(i).duration/15);
       }
     }
   }
@@ -149,6 +148,7 @@
     initActivitiesList();
     drawScheduleGrid();
     drawSchedule(newSchedule, true);
+    undoButtons();
   }
   function saveState(){
     var activities = [];
@@ -160,7 +160,19 @@
     var state = [schedule, startTime, activities];
     currentStateIndex++;
     history[currentStateIndex]=state;
-    console.log(history);
+    undoButtons();
+  }
+  
+  function undoButtons(){
+    if (currentStateIndex == 0)
+      $("#undo").attr("disabled", "disabled");
+    else
+      $("#undo").removeAttr("disabled");   
+    
+    if (currentStateIndex == (history.length - 1))
+      $("#redo").attr("disabled", "disabled");
+    else
+      $("#redo").removeAttr("disabled");   
   }
   
   function drawSchedule(newSchedule, undoing) {

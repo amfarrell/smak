@@ -38,11 +38,12 @@
 $(document).ready(function() {
 
   initModel();
+  initMap();
+  
   for (var a in prebuilt){
     O.activities.set(a,prebuilt[a]); 
     O.activities.todo("",a);
   }
-  initMap();
   initForm();
   
   initHeights();
@@ -69,7 +70,7 @@ $(document).ready(function() {
     <td style="padding:10px 10px"><b>Activities</b></td>
     <td style="padding:10px 10px"><b>Schedule</b></td>
   </tr>
-    <td><button type="button" onclick="undo();">Undo</button><button type="button" onclick="redo();">Redo</button></td>
+    <td><button type="button" id='undo' onclick="undo();">Undo</button><button type="button" id='redo' onclick="redo();">Redo</button></td>
     <td><div class="autoSchedule"><button type="button" onclick="autoSchedule();">Schedule these activities for me</button></div></td>
     <td id="startTimeCell"></td>
   <tr>
