@@ -39,11 +39,11 @@
         $("#"+i).remove();
         var letter = hashMapContains(i);
         if (letter == false){
-          lastLetter++
+          lastLetter = String.fromCharCode(lastLetter.charCodeAt() + 1);
           scheduleHashMap[lastLetter] = i;
           letter = lastLetter;
         }
-        drawSchedule(edit_distance(schedule,i, positionY,height));
+        drawSchedule(edit_distance(schedule,i, positionY,height, scheduleHashMap));
       }
     });
     O.activities.selected("schedule",function scheduleDeselected(id,empty_map){
@@ -127,7 +127,7 @@
     var startDiff = parseFloat(newStartTime.toString("H")) + newStartTime.toString("mm")/60 - (parseFloat(startTime.toString("H")) + startTime.toString("mm")/60);
     var endDiff = parseFloat(newEndTime.toString("H")) + newEndTime.toString("mm")/60 - (parseFloat(endTime.toString("H")) + endTime.toString("mm")/60);
     startTime = newStartTime;
-    schedule = constrain_bounds(schedule, startDiff*4, parseFloat(endDiff)*4 + schedule.length);
+    schedule = constrain_bounds(schedule, startDiff*4, parseFloat(endDiff)*4 + schedule.length, scheduleHashMap);
     initHeights();
     drawScheduleGrid();
     updateDoBetween();
@@ -434,10 +434,11 @@ window.autoSchedule = function autoSchedule(){
                   }      
                   var letter = hashMapContains(id);
                   if (letter == false){
-                    lastLetter++
+                    lastLetter = String.fromCharCode(lastLetter.charCodeAt() + 1);
                     scheduleHashMap[lastLetter] = id;
                     letter = lastLetter;
                   }
+                  console.log(scheduleHashMap);
                   drawSchedule(edit_distance(schedule,letter, positionY, height, scheduleHashMap));
           }else{
             $(this).css({"left":ui.originalPosition.left, "top":ui.originalPosition.top}); //return to original position
