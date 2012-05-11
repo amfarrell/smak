@@ -25,7 +25,10 @@ window.initForm = function initForm () {
     var activity = new O.Activity(name,[window.tempMarker.getPosition().lat(),window.tempMarker.getPosition().lng()],start,undefined,duration,range,true,"suggested");
     O.activities.set(activity.id,activity);
     O.activities.todo('',activity.id);
-    O.activities.select('',activity.id);
+    
+    $("#activity_name").val("");
+    $("#radio-start-field").val("");
+    $("#radio-end-field").val("");
     
     if (window.tempMarker){
       window.tempMarker.setMap(null);
