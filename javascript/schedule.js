@@ -27,7 +27,7 @@
         if (key == "duration"){
           // TODO: change duration
         }
-      }
+      } 
     });
     O.activities.commitment_changed('schedule',function commitmentUpdate(i,oldState){
       //Do stuff after an item changes commitment state
