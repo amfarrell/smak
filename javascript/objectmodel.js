@@ -147,6 +147,9 @@ window.initModel = function initModel () {
           queriedevents.sort(function find_later_events(event1,event2){
             //Put the later events later in the list.
             //
+            if (!(event1.start && event2.start && event1.end && event2.end)){
+              return 0;
+            }
             if (event1.start.length === 4){ // So that you can compare the times by comparing strings
               event1.start = "0" + event1.start
             }
