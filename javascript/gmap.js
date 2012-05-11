@@ -307,6 +307,7 @@ window.initMap = function initMap () {
           //remove any temporary marker and place a new one.
           if (newstate === "todo"){
             activity.marker = Map.placeMarker(activity)
+            activity.marker.icon = 'images/blue-dot.png';
           } else if (newstate === "scheduled"){
 
             console.log("add to itinerary");
@@ -380,14 +381,19 @@ window.initMapInput = function initMapInput () {
       O.activities.get(i).marker.setAnimation(google.maps.Animation.BOUNCE)
       O.activities.get(i).marker.setDraggable(true);      
     }
-        //This belongs in the handler
+    
+    $("#make_event").attr('disabled','disabled');
+
   });
+  
   O.activities.deselected("map",function map_deselect_handle(i,changes){
     if (O.activities.get(i).marker){
       O.activities.get(i).marker.icon = 'images/blue-dot.png';
       O.activities.get(i).marker.setAnimation(null)
       O.activities.get(i).marker.setDraggable(false);
     }
+    
+    $("#make_event").removeAttr('disabled');
 
     if (O.activities.get(i).commitment === "suggested"){
     // remove the temporary marker.
