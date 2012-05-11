@@ -43,14 +43,12 @@ window.initMap = function initMap () {
     
     '_map': _map,
     'placeMarker':function placeMarker(activity) {
-      console.log("marker placed for");
-      console.log(activity);
       var marker = new google.maps.Marker({
         'animation':google.maps.Animation.DROP,
         'position': new google.maps.LatLng(activity.coords[0],activity.coords[1]), 
-        'icon':'images/blue-dot.png',
-        'title': activity.title,
-      //  'draggable':true,
+        'icon':'images/drag_me.gif',
+        'title': activity.name,
+        'draggable':true,
         'clickable':true,
       });
       
@@ -342,18 +340,18 @@ window.initMap = function initMap () {
 window.tempMarker = null;
 function newMarker(){
   
-  if (!window.tempMarker){
-    window.tempMarker = new google.maps.Marker({
-      'animation':google.maps.Animation.DROP,
-      'position':window.Map._map.getCenter(), 
-      'icon':'images/drag_me.gif',
-    //  'title': activity.title,
-      'draggable':true,
-     // 'clickable':true,
-    });
-
-    window.tempMarker.setMap(window.Map._map);
+  if (window.tempMarker != null){
+    window.tempMarker.setMap(null);
   }
+  window.tempMarker = new google.maps.Marker({
+    'animation':google.maps.Animation.DROP,
+    'position':window.Map._map.getCenter(), 
+    'icon':'images/drag_me.gif',
+    'draggable':true,
+   // 'clickable':true,
+  });
+
+  window.tempMarker.setMap(window.Map._map);
 }
 window.initMapInput = function initMapInput () {    
   /*

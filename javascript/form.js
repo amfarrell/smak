@@ -1,31 +1,36 @@
 window.initForm = function initForm () {
   
+  
+  var autocompleteNames = new Array();
+  
   $("#activity_name").autocomplete({
-    'minLength':3,
-    'source':O.getplaces
+    'minLength':1
   });
+  initSuggestedList();
   
   function initSuggestedList() {
+    autocompleteNames = new Array();
     for (var i in O.activities.all("suggested")) {
-      addSuggestion(O.activties.get(i));
+      autocompleteNames.push(O.activities.get(i).name);
     }
+    $("#activity_name").autocomplete( "option", "source", autocompleteNames);
   }
-  $("#make_event").click(function (e){
+  $("#make_event").click(function submitMakeEvent(e){
     var name = $("#activity_name")[0].value
     var start = undefined;
     var duration = 60;
     var range = [$("#radio-start-field")[0].value,$("#radio-end-field")[0].value];
 
     //function Activity(name, coords, start, end, duration, range, user_createdP, commitment) {
-    console.log([window.tempMarker.getPosition().lat(),window.tempMarker.getPosition().lng()]);
-    console.log(window.Map._map.getCenter());
     var activity = new O.Activity(name,[window.tempMarker.getPosition().lat(),window.tempMarker.getPosition().lng()],start,undefined,duration,range,true,"suggested");
     O.activities.set(activity.id,activity);
     O.activities.todo('',activity.id);
     O.activities.select('',activity.id);
     
-    window.tempMarker.setMap(null);
-    window.tempMarker=null;
+    if (window.tempMarker){
+      window.tempMarker.setMap(null);
+      window.tempMarker=null;
+    }
     
   });
 
@@ -38,8 +43,8 @@ window.initForm = function initForm () {
     var activity = O.activities.get(id);
     $("#activity_name").val(activity.name);
     if (activity.range && activity.range[0]){
-      $("#radio-start-field")[0].value = new Date(Date.parse(activity.range[0])).toString("h:mmtt");
-      $("#radio-end-field")[0].value = new Date(Date.parse(activity.range[1])).toString("h:mmtt");
+      $("#radio-start-field").val(new Date(Date.parse(activity.range[0])).toString("h:mmtt"));
+      $("#radio-end-field").val(new Date(Date.parse(activity.range[1])).toString("h:mmtt"));
     }
     $("#add_activity_form").addClass("activitySelected");
   });
@@ -57,31 +62,47 @@ window.initForm = function initForm () {
     var activity = O.activities.get(id);
     if (O.activities.selected_activity && activity.id === O.activities.selected_activity.id){
       $("#activity_name")[0].value = activity.name;
-      $("#radio-start-field").value = new Date(Date.parse(activity.range[0])).toString("h:mmtt");
-      $("#radio-end-field").value = new Date(Date.parse(activity.range[1])).toString("h:mmtt");
-      $("#radio-start-at-field").value = activity.start;
+      $("#radio-start-field").val(new Date(Date.parse(activity.range[0])).toString("h:mmtt"));
+      $("#radio-end-field").val(new Date(Date.parse(activity.range[1])).toString("h:mmtt"));
     }
 
   });
 
   $("#activity_name").keyup(function (e){
+    if (e.keycode == 13)submitMakeEvent(e);
+    
     var name = $("#activity_name")[0].value
     if (O.activities.selected_activity){
         O.activities.update("",O.activities.selected_activity.id,{"name":name});
-    }else if (!window.tempMarker){
-      newMarker();
-      $("#radio-start-field").val(startTime.toString("h:mmtt"));
-      $("#radio-end-field").val(new Date( startTime.valueOf()).addHours(schedule.length/4).toString("h:mmtt"));
+    }else {
+      for (var i in O.activities.all("suggested")) {
+        if (name == O.activities.get(i).name){
+          var activity = O.activities.get(i);
+          if (window.tempMarker && window.tempMarker.getTitle() == activity.name){
+          }else{
+            if (window.tempMarker){
+              window.tempMarker.setMap(null);
+              window.tempMarker=null;
+            }
+            window.tempMarker = Map.placeMarker(activity);
+            
+            $("#radio-start-field").val(new Date(Date.parse(activity.range[0])).toString("h:mmtt"));
+            $("#radio-end-field").val(new Date(Date.parse(activity.range[1])).toString("h:mmtt"));
+          }
+          return;
+        }
+      }
+      
+      if (window.tempMarker==null || window.tempMarker.getTitle()!=undefined){
+      if (window.tempMarker!=null)console.log(window.tempMarker.getTitle())
+        newMarker();
+        $("#radio-start-field").val(startTime.toString("h:mmtt"));
+        $("#radio-end-field").val(new Date( startTime.valueOf()).addHours(schedule.length/4).toString("h:mmtt"));
+      }
     }
     //TODO: check if valid time. Highlight in red if not.
   });
-  
-  $("#activity_name").blur(function (e){
-    console.log(e)
-    if (!O.activities.selected_activity){
-    }
-  });
-  
+    
   function incremened_time(time){
       if (time === ""){
         return time;

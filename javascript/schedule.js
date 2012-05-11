@@ -1,6 +1,9 @@
   var blockHeight = 12;   // vertical pixels per 15 minute chunk
   var startTime = new Date(Date.parse("9:30AM"));      //hour of the day (in military time)
   var schedule = "                                          ";      // currently displayed schedule
+  var scheduleHashMap = new Array();
+  scheduleHashMap[' '] = ' ';
+  var lastLetter = 'A';
   var activitiesListPos = 0; // position of the end of the activities list. (counted in 15 min blocks)
   var scheduleItemWidth = 260;  //pixels width of schdeduleItem
   var borderMarginHeight = 5;  //pixels width of border and margin of schdeduleItem
@@ -34,7 +37,13 @@
         addActivity(i, O.activities.get(i).duration/15);
       }else if (oldState == 'todo' && activity.commitment == 'scheduled'){
         $("#"+i).remove();
-        drawSchedule(edit_distance(schedule,id, positionY,height));
+        var letter = hashMapContains(i);
+        if (letter == false){
+          lastLetter++
+          scheduleHashMap[lastLetter] = i;
+          letter = lastLetter;
+        }
+        drawSchedule(edit_distance(schedule,i, positionY,height));
       }
     });
     O.activities.selected("schedule",function scheduleDeselected(id,empty_map){
@@ -191,7 +200,7 @@
     $('.schedule').html("");    //clear schedule  
     
     for (var i=0; i<schedule.length; i++) {
-      item = schedule[i];
+      item = scheduleHashMap[schedule[i]];
       
       if (item != prevItem){
         if (prevItem!="") updateModel(prevItem);
@@ -422,8 +431,14 @@ window.autoSchedule = function autoSchedule(){
                   var positionY = getPositionY(id);
                   if (list == ".activitiesList") {  // move from Activities to Schedule
                     $(this).remove();
-                  }       
-                  drawSchedule(edit_distance(schedule,id, positionY,height));
+                  }      
+                  var letter = hashMapContains(id);
+                  if (letter == false){
+                    lastLetter++
+                    scheduleHashMap[lastLetter] = id;
+                    letter = lastLetter;
+                  }
+                  drawSchedule(edit_distance(schedule,letter, positionY, height, scheduleHashMap));
           }else{
             $(this).css({"left":ui.originalPosition.left, "top":ui.originalPosition.top}); //return to original position
           }
@@ -480,7 +495,8 @@ window.autoSchedule = function autoSchedule(){
           var positionY = getPositionY(id);
           var height = getDuration(id);
           if (!$(this).overlaps($(".ui-draggable-disabled"))) { // not on a locked item   
-            drawSchedule(edit_distance(schedule,id, positionY,height));
+            var letter = hashMapContains(id);
+            drawSchedule(edit_distance(schedule,letter, positionY,height, scheduleHashMap));
           }else{
             $(this).css({"left":ui.originalPosition.left, "top":ui.originalPosition.top, "height":ui.originalSize.height}); //return to original position
           }
@@ -646,5 +662,13 @@ window.autoSchedule = function autoSchedule(){
   }
   function dateToNumber(date){ //takes date object and outputs a decimal hour time
     return parseFloat(date.toString("H")) + date.toString("mm")/60;
+  }
+  
+  function hashMapContains(id){
+    for(var key in scheduleHashMap){
+      if (scheduleHashMap[key] == id) 
+        return key;
+    }
+    return false;
   }
 

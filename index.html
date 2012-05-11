@@ -16,8 +16,8 @@
   <script type="text/javascript" src='./development-bundle/ui/jquery-ui-1.8.18.custom.js'></script>
   <!--<script type="text/javascript" src="./development-bundle/ui/jquery.ui.autocomplete.js"></script>-->
 
-  <!--<script type="text/javascript" src='./javascript/jquery-ui-1.8.18.js'></script>-->
-  <script type="text/javascript" src="./javascript/my_autocomplete.js"></script>
+  <!--<script type="text/javascript" src='./javascript/jquery-ui-1.8.18.js'></script>
+  <script type="text/javascript" src="./javascript/my_autocomplete.js"></script>-->
   <script type="text/javascript" src="./javascript/jquery.ui.touch-punch.js"></script>
   <script type="text/javascript" src="./javascript/jquery.calendrical.js"></script>
   <script type="text/javascript" src='./javascript/jquery.overlaps.js'></script>
@@ -45,7 +45,7 @@ $(document).ready(function() {
   
   for (var a in prebuilt){
     O.activities.set(a,prebuilt[a]); 
-    O.activities.todo("",a);
+    //O.activities.todo("",a);
   }
   initForm();
   
@@ -83,7 +83,7 @@ $(document).ready(function() {
    
       <div id="add_activity_form">
         <input id="activity_name" type="text" name="activityName" placeholder="Enter your activity's name"></input>
-        <input type="button" value="Add Activity" id="make_event"></input>
+        <input type="submit" value="Add Activity" id="make_event"></input>
           
         <div id="activity_suggest">
           <!-- Dynamically load this with activities. -->
@@ -94,7 +94,6 @@ $(document).ready(function() {
               <td> Earliest Start Time </td>
               <td><input type="text" size="8" id="radio-start-field" readonly></input> 
                               <script type="text/javascript"> 
-                                  document.forms['crud'].elements["radio-start-field"].value = startTime.toString("h:mmtt");
                                   $('#radio-start-field').calendricalTime(); 
                               </script>
                       </td>
@@ -103,8 +102,7 @@ $(document).ready(function() {
               <td> Latest End Time </td>
               <td><input type="text" size="8" id="radio-end-field" readonly></input>
                               <script type="text/javascript">
-                                  document.forms['crud'].elements["radio-end-field"].value = (new Date( startTime.valueOf()).addHours(schedule.length/4)).toString("h:mmtt");
-                                  $('#radio-end-field').calendricalTime(); 
+                                 $('#radio-end-field').calendricalTime(); 
                               </script>
                       </td>
               <td> e.g. Museum Closing Time</td>
