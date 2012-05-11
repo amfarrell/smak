@@ -34,11 +34,15 @@ window.initMap = function initMap () {
   var _map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
   var _places = new google.maps.places.PlacesService(_map);
   _display.setMap(_map);
+  _display.preserveViewport = true;
   _display.polylineOptions = {
     'strokeColor':"#00aa11",
     'strokeOpacity':0.5,
     'clickable':true
-  }
+  };
+  _display.markerOptions = {
+
+  };
   window.Map = {
     
     '_map': _map,
@@ -111,7 +115,30 @@ window.initMap = function initMap () {
     'renderPath':function renderPath(list){
       console.log("renderpath");
       console.log(list);
-      if (list.length === 1){
+      if (list.length === 0) {
+        _display.setOptions({
+          'map':Map._map,
+          'suppressPolylines':true,
+          'suppressMarkers':true,
+          'polylineOptions' : {
+            'strokeColor':"#00aa11",
+            'strokeOpacity':0.5,
+            'clickable':true
+            }
+        });
+      } else {
+        _display.setOptions({
+          'map':Map._map,
+          'suppressPolylines':false,
+          'suppressMarkers':false,
+          'polylineOptions' : {
+            'strokeColor':"#00aa11",
+            'strokeOpacity':0.5,
+            'clickable':true
+            }
+        });
+      }
+      if (list.length === 1) {
         list.push(list[0]);
         //TODO: have it display a different colour marker.
       } else if (list.length === 0) {
@@ -135,6 +162,7 @@ window.initMap = function initMap () {
         destination = list[list.length-1].coords.join(',');
         Map.directions(origin,destination);
       }
+
       newlist.push(list.shift())
       return newlist;
     },
@@ -308,6 +336,7 @@ window.initMap = function initMap () {
           if (newstate === "todo"){
             activity.marker = Map.placeMarker(activity)
             activity.marker.icon = 'images/blue-dot.png';
+            activity.marker.setDraggable(false);
           } else if (newstate === "scheduled"){
 
             console.log("add to itinerary");
@@ -387,6 +416,7 @@ window.initMapInput = function initMapInput () {
   });
   
   O.activities.deselected("map",function map_deselect_handle(i,changes){
+
     if (O.activities.get(i).marker){
       O.activities.get(i).marker.icon = 'images/blue-dot.png';
       O.activities.get(i).marker.setAnimation(null)
@@ -400,7 +430,7 @@ window.initMapInput = function initMapInput () {
     }
   });
   O.activities.updated("map",function map_update_handle(i,changes){
-    if( O.activities.get(i).commitment === "scheduled"){
+    if( O.activities.get(i).commitment !== "suggested"){
       var order = O.activities.all("ordered_schedule");
       Map.renderPath(order);
     }
