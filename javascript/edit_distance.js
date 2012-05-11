@@ -21,6 +21,12 @@ var MOVEMENT_POLY = 		4
 var ELIMINATION_COST = 	10000000
 
 // -----------------------------------------------------------------------------
+// Globals
+// -----------------------------------------------------------------------------
+
+var current_hash_map = null
+
+// -----------------------------------------------------------------------------
 // Low-level Helpers
 // -----------------------------------------------------------------------------
 
@@ -79,7 +85,11 @@ function array_unique_elements(array) {
 function get_id_list(state) {
 	var unique = array_unique_elements(state)
 	unique = remove_element(unique, " ")
-	return unique
+	var ret = new Array()
+	for (var i = 0; i < unique.length; i++) {
+		ret.push(current_hash_map[unique[i]])
+	}
+	return ret
 }
 
 // remove an element from an array by value
@@ -99,8 +109,8 @@ function remove_element(arr) {
 //
 function translate_do_between_times(id) {
 	var global_start_time = dateToNumber(startTime)
-	var earliest_offset = (dateToNumber(new Date(Date.parse(O.activities.get(id).range[0]))) - global_start_time) * 4
-	var latest_offset = (dateToNumber(new Date(Date.parse(O.activities.get(id).range[1]))) - global_start_time) * 4
+	var earliest_offset = (dateToNumber(new Date(Date.parse(O.activities.get(current_hash_map[id]).range[0]))) - global_start_time) * 4
+	var latest_offset = (dateToNumber(new Date(Date.parse(O.activities.get(current_hash_map[id]).range[1]))) - global_start_time) * 4
 	
 	return [earliest_offset, latest_offset]
 }
@@ -109,10 +119,10 @@ function translate_do_between_times(id) {
 //
 function translate_start_at_time(id) {
 	var global_start_time = dateToNumber(startTime)
-	var activity_handle = O.activities.get(id)
+	var activity_handle = O.activities.get(current_hash_map[id])
 	var is_locked = activity_handle.commitment == "locked"
 	if (is_locked) {
-		return (dateToNumber(new Date(Date.parse(O.activities.get(id).start))) - global_start_time) * 4
+		return (dateToNumber(new Date(Date.parse(O.activities.get(current_hash_map[id]).start))) - global_start_time) * 4
 	} else {
 		return -1
 	}
@@ -126,8 +136,8 @@ var ATOMIC_DISTANCE = 0.0030
 function distance(from, to) {
 	
 	// Euclidean distance
-	var from_coords = O.activities.get(from).coords
-	var to_coords = O.activities.get(to).coords
+	var from_coords = O.activities.get(current_hash_map[from]).coords
+	var to_coords = O.activities.get(current_hash_map[to]).coords
 	
 	var from_x = from_coords[0]
 	var from_y = from_coords[1]
@@ -538,7 +548,9 @@ function pick_configuration(initial_state, configurations, excludes, includes, u
 
 // Moving items around in the schedule
 //
-function edit_distance(string, id, pos_final, len) {
+function edit_distance(string, id, pos_final, len, schedule_hash_map) {
+	current_hash_map = schedule_hash_map
+
 	translate_do_between_times(id)
 
 	console.log("edit_distance(\"" + string + "\", \"" + id + "\", " + pos_final + ", " + len + ")")
@@ -568,14 +580,14 @@ function edit_distance(string, id, pos_final, len) {
 	var eliminatedTarget = false
 	if (state.indexOf(id) == -1) { // corner case (hack)
 		eliminatedTarget = true
-		O.activities.recommit("", id, "todo")
+		O.activities.recommit("", current_hash_map[id], "todo")
 		setupActivity(id, len, ".activitiesList", 0)
 	}
 	for (var i = 0; i < eliminations.length; i++) {
 		var e_id = eliminations[i][0]
 		if (!(e_id == id && eliminatedTarget)) {
 			var e_len = eliminations[i][1]
-			O.activities.recommit("", e_id, "todo")
+			O.activities.recommit("", current_hash_map[e_id], "todo")
 			setupActivity(e_id, e_len, ".activitiesList", 0)
 		}
 	}
@@ -589,8 +601,9 @@ function edit_distance(string, id, pos_final, len) {
 
 // Growing and squishing the schedule
 //
-function constrain_bounds(string, start, stop) {
-	
+function constrain_bounds(string, start, stop, schedule_hash_map) {
+	current_hash_map = schedule_hash_map
+
 	var state = string.split("")
 	var orig_len = state.length
 	var orig_state = state.slice()
@@ -645,7 +658,7 @@ function constrain_bounds(string, start, stop) {
 	for (var i = 0; i < eliminations.length; i++) {
 		var e_id = eliminations[i][0]
 		var e_len = eliminations[i][1]
-		O.activities.recommit("", e_id, "todo")
+		O.activities.recommit("", current_hash_map[e_id], "todo")
 		setupActivity(e_id, e_len, ".activitiesList", 0)
 	}
 	Map.renderPath(get_id_list(state))
@@ -668,7 +681,9 @@ function constrain_bounds(string, start, stop) {
 
 // The auto schedule button
 //
-function partially_schedule(string, los) {
+function partially_schedule(string, los, schedule_hash_map) {
+	current_hash_map = schedule_hash_map
+
 	var state = string.split("")
 	var initial_state = string.split("")
 
@@ -697,7 +712,7 @@ function partially_schedule(string, los) {
 	for (var i = 0; i < eliminations.length; i++) {
 		var e_id = eliminations[i][0]
 		var e_len = eliminations[i][1]
-		O.activities.recommit("", e_id, "todo")
+		O.activities.recommit("", current_hash_map[e_id], "todo")
 		setupActivity(e_id, e_len, ".activitiesList", 0)
 	}
 	Map.renderPath(get_id_list(state))
