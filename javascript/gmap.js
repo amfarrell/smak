@@ -117,9 +117,12 @@ window.initMap = function initMap () {
         list.push(list[0]);
         //TODO: have it display a different colour marker.
       } else if (list.length === 0) {
-        //debugger;
-        _display.setMap(null);
-        _display.setMap(Map._map);
+
+        debugger;
+        //_display.setMap(null);
+        //_display.setMap(Map._map);
+        _display.setDirections({routes: []});
+
       }
       if (typeof list[0] === "number" || typeof list[0] === "string"){
         var scraplist = [];
