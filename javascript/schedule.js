@@ -229,11 +229,19 @@ window.autoSchedule = function autoSchedule(){
     var unscheduledActivities = new Array();
     $(".activitiesList .item").each(function() {
       var height = Math.round(($(this).height() + borderMarginHeight) / blockHeight);
-      unscheduledActivities.push(new Array(height + 1).join(($(this).attr("id"))));
+      var id = $(this).attr("id")
+      var letter = hashMapContains(id);
+      if (letter == false){
+        lastLetter = String.fromCharCode(lastLetter.charCodeAt() + 1);
+        scheduleHashMap[lastLetter] = id;
+        letter = lastLetter;
+      }
+      unscheduledActivities.push(new Array(height + 1).join(letter));
+      
     });
     console.log("partially_schedule " + schedule + ", " + unscheduledActivities);
     $(".activitiesList").html('');
-    var list = drawSchedule(partially_schedule(schedule, unscheduledActivities));
+    var list = drawSchedule(partially_schedule(schedule, unscheduledActivities, scheduleHashMap));
     Map.renderPath(list);
   }
 
