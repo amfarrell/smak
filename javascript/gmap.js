@@ -117,10 +117,6 @@ window.initMap = function initMap () {
         list.push(list[0]);
         //TODO: have it display a different colour marker.
       } else if (list.length === 0) {
-
-        debugger;
-        //_display.setMap(null);
-        //_display.setMap(Map._map);
         _display.setDirections({routes: []});
 
       }
