@@ -581,14 +581,14 @@ function edit_distance(string, id, pos_final, len, schedule_hash_map) {
 	if (state.indexOf(id) == -1) { // corner case (hack)
 		eliminatedTarget = true
 		O.activities.recommit("", current_hash_map[id], "todo")
-		setupActivity(id, len, ".activitiesList", 0)
+		setupActivity(current_hash_map[id], len, ".activitiesList", 0)
 	}
 	for (var i = 0; i < eliminations.length; i++) {
 		var e_id = eliminations[i][0]
 		if (!(e_id == id && eliminatedTarget)) {
 			var e_len = eliminations[i][1]
 			O.activities.recommit("", current_hash_map[e_id], "todo")
-			setupActivity(e_id, e_len, ".activitiesList", 0)
+			setupActivity(current_hash_map[e_id], e_len, ".activitiesList", 0)
 		}
 	}
 	Map.renderPath(get_id_list(state))
@@ -659,7 +659,7 @@ function constrain_bounds(string, start, stop, schedule_hash_map) {
 		var e_id = eliminations[i][0]
 		var e_len = eliminations[i][1]
 		O.activities.recommit("", current_hash_map[e_id], "todo")
-		setupActivity(e_id, e_len, ".activitiesList", 0)
+		setupActivity(current_hash_map[e_id], e_len, ".activitiesList", 0)
 	}
 	Map.renderPath(get_id_list(state))
 
@@ -713,7 +713,7 @@ function partially_schedule(string, los, schedule_hash_map) {
 		var e_id = eliminations[i][0]
 		var e_len = eliminations[i][1]
 		O.activities.recommit("", current_hash_map[e_id], "todo")
-		setupActivity(e_id, e_len, ".activitiesList", 0)
+		setupActivity(current_hash_map[e_id], e_len, ".activitiesList", 0)
 	}
 	Map.renderPath(get_id_list(state))
 
