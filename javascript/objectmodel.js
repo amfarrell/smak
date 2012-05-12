@@ -184,9 +184,9 @@ window.initModel = function initModel () {
       'selected_activity':undefined,
       'select':function select(view,i) {
         checkstring(view);
-        console.log("selected: "+i);
+        //console.log("selected: "+i);
         O.activities.selected_activity = $.jStorage.get(i);
-        console.log(O.activities.selected_activity);
+        //console.log(O.activities.selected_activity);
         O.activities._firehandler(view, 'select', i,{});
       },
       'deselect':function deselect(view) {
@@ -199,7 +199,7 @@ window.initModel = function initModel () {
       },
       'update':function update(view,i,changes){
         checkstring(view);
-        console.log(i);
+        //console.log(i);
         var oldvalues = {};
         var activity = O.activities.get(i)
         for (change in changes){
@@ -211,7 +211,7 @@ window.initModel = function initModel () {
       'recommit':function recommit(view, i, newstate){
         checkstring(view);
         if (['','map','schedule','form'].indexOf(view) === -1){throw new Error("unknown interface "+view)};
-        console.log([view,i,newstate]);
+        //console.log([view,i,newstate]);
         var activity = O.activities.get(i);
         var oldstate = activity.commitment;
         if (oldstate === newstate){
@@ -268,7 +268,7 @@ window.initModel = function initModel () {
       },
       'todo': function todo(view, i){
         checkstring(view);
-        console.log("new activity added todo" + i);
+        //console.log("new activity added todo" + i);
         if (O.activities.get(i).commitment === 'suggested'){
           O.activities.recommit(view,i,'todo');
         }
@@ -278,7 +278,7 @@ window.initModel = function initModel () {
       },
       'set':function set(i, v){
       
-      console.log(v);
+      //console.log(v);
         return $.jStorage.set(i, v);
       },
       'add':function add(i){

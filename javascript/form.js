@@ -4,7 +4,10 @@ window.initForm = function initForm () {
   var autocompleteNames = new Array();
   
   $("#activity_name").autocomplete({
-    'minLength':1
+    'minLength':1,
+    'close':function(event, ui){
+      $("#activity_name").keyup();
+    }
   });
   initSuggestedList();
   
@@ -15,15 +18,28 @@ window.initForm = function initForm () {
     }
     $("#activity_name").autocomplete( "option", "source", autocompleteNames);
   }
-  $("#make_event").click(function submitMakeEvent(e){
+  $("#make_event").click(function(e){
+    var userDefined = true;
     var name = $("#activity_name")[0].value
     var start = undefined;
     var duration = 60;
+    var coords = [window.tempMarker.getPosition().lat(),window.tempMarker.getPosition().lng()];
     var range = [$("#radio-start-field")[0].value,$("#radio-end-field")[0].value];
 
-    //function Activity(name, coords, start, end, duration, range, user_createdP, commitment) {
-    var activity = new O.Activity(name,[window.tempMarker.getPosition().lat(),window.tempMarker.getPosition().lng()],start,undefined,duration,range,true,"suggested");
-    O.activities.set(activity.id,activity);
+    for (var i in O.activities.all("suggested")) {
+      var activity = O.activities.get(i);
+      if (name == activity.name){
+        activity.coords = coords;
+        activity.range = range;
+        userDefined = false;
+        break;
+      }
+    }
+    
+    if (userDefined){
+      var activity = new O.Activity(name,coords,undefined,undefined,duration,range,true,"suggested");
+      O.activities.set(activity.id,activity);
+    }
     O.activities.todo('',activity.id);
     
     $("#activity_name").val("");
@@ -35,6 +51,7 @@ window.initForm = function initForm () {
       window.tempMarker=null;
     }
     
+    saveState();
   });
 
   O.activities.selected("form",function(id,otherdata){
@@ -42,7 +59,7 @@ window.initForm = function initForm () {
       window.tempMarker.setMap(null);
       window.tempMarker=null;
     }
-    console.log("the form sees that "+id+" was selected.");
+    //console.log("the form sees that "+id+" was selected.");
     var activity = O.activities.get(id);
     $("#activity_name").val(activity.name);
     if (activity.range && activity.range[0]){
@@ -53,7 +70,7 @@ window.initForm = function initForm () {
   });
 
   O.activities.deselected("form",function(id,otherdata){
-    console.log("the form sees that "+id+" was de-selected.");
+    //console.log("the form sees that "+id+" was de-selected.");
     var activity = O.activities.get(id);
     $("#activity_name").val("");
     $("#radio-start-field").val("");
@@ -72,7 +89,14 @@ window.initForm = function initForm () {
   });
 
   $("#activity_name").keyup(function (e){
-    if (e.keycode == 13)submitMakeEvent(e);
+    if (e.keyCode == 13){ //sumbit on enter
+      if (O.activities.selected_activity){
+        O.activities.deselect('');
+      }else{
+        $("#make_event").click();
+      }
+      return;
+    }
     
     var name = $("#activity_name")[0].value
     if (O.activities.selected_activity){
@@ -97,7 +121,6 @@ window.initForm = function initForm () {
       }
       
       if (window.tempMarker==null || window.tempMarker.getTitle()!=undefined){
-      if (window.tempMarker!=null)console.log(window.tempMarker.getTitle())
         newMarker();
         $("#radio-start-field").val(startTime.toString("h:mmtt"));
         $("#radio-end-field").val(new Date( startTime.valueOf()).addHours(schedule.length/4).toString("h:mmtt"));

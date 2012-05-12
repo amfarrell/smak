@@ -89,7 +89,7 @@ window.initMap = function initMap () {
         //display my own markers.
         coords.push({'stopover':true,'location':list.shift().coords.join(",")})
       }
-      console.log(coords);
+      //console.log(coords);
       if (coords.length <2){
         return;
       }
@@ -102,19 +102,19 @@ window.initMap = function initMap () {
           //we are operating.
       };
       var disp;
-      console.log(coords);
+      //console.log(coords);
       _directions.route(request, function render(response,status) {
         if (status == google.maps.DirectionsStatus.OK){
           disp = _display.setDirections(response);
-          console.log([response,status]);
+          //console.log([response,status]);
         } else {
-          console.log([response,status]);
+          //console.log([response,status]);
         }
       });
     },
     'renderPath':function renderPath(list){
-      console.log("renderpath");
-      console.log(list);
+      //console.log("renderpath");
+      //console.log(list);
       if (list.length === 0) {
         _display.setOptions({
           'map':Map._map,
@@ -339,7 +339,7 @@ window.initMap = function initMap () {
             activity.marker.setDraggable(false);
           } else if (newstate === "scheduled"){
 
-            console.log("add to itinerary");
+            //console.log("add to itinerary");
           }
         } else if (oldstate === "todo") {
           if (newstate === "suggested"){
@@ -348,7 +348,7 @@ window.initMap = function initMap () {
           } else if (newstate === "scheduled"){
             var order = O.activities.all("ordered_schedule");
             Map.renderPath(order);
-            console.log("adding to schedule"+i)
+            //console.log("adding to schedule"+i)
             //change colour of marker
           }
         } else if (oldstate === "scheduled"){
@@ -357,7 +357,7 @@ window.initMap = function initMap () {
             marker.setMap(null);
           } else if (newstate === "todo"){
             var order = O.activities.all("ordered_schedule");
-            console.log("removing from schedule"+i)
+            //console.log("removing from schedule"+i)
             //change colour of marker, recalc order.
           } else if (newstate === "locked"){
             // Do nothing

@@ -15,7 +15,7 @@
       //Do stuff after an item's value is updated
       var activity = O.activities.get(i);
       for (key in oldvalues){
-      console.log("the schedule sees that "+key+" changed in activity "+i+" from "+oldvalues[key]+" to "+activity[key]+".");
+      //console.log("the schedule sees that "+key+" changed in activity "+i+" from "+oldvalues[key]+" to "+activity[key]+".");
 
         if (key == "name"){
           $("#"+i+" .activityName").html(activity.name);
@@ -47,7 +47,7 @@
       }
     });
     O.activities.selected("schedule",function scheduleDeselected(id,empty_map){
-      console.log("the schedule sees that "+id+" has been selected.");
+      //console.log("the schedule sees that "+id+" has been selected.");
       //Do stuff after the item is deselected.
       $(".selected:not(#"+id+")").removeClass('selected');
       $("#"+id).addClass('selected');
@@ -57,7 +57,7 @@
       $(".selected").removeClass('selected');
       updateDoBetweenBox();
       O.activities.deselect('schedule');
-      console.log("the schedule sees that "+id+" has been deselected.");
+      //console.log("the schedule sees that "+id+" has been deselected.");
       //Do stuff after the item is deselected.
     });
   }
@@ -99,7 +99,7 @@
       if (time==Math.floor(time)) { 
         if (time==0) time = 12;
         if (i > schedule.length - 4){//last time block is a partial hour
-          console.log("schedule.length "+schedule.length-i+" " + i + " " +schedule.length);
+          //console.log("schedule.length "+schedule.length-i+" " + i + " " +schedule.length);
           $('.scheduleGrid table').append("<tr><td class='gridTime' style='width:18px'>"+time+"</td><td class='gridSpace' style='width:228px'></td></tr>");
           $('.scheduleGrid td.gridTime:last').height(blockHeight*(schedule.length-i)-2);
           $('.scheduleGrid td.gridSpace:last').height(blockHeight*(schedule.length-i)-2);
@@ -148,15 +148,27 @@
     
     // remove all markers
     for (var i in O.activities.all()) {
-      O.activities.get(i).marker.setMap(null);
+      if (O.activities.get(i).marker)
+        O.activities.get(i).marker.setMap(null);
     }
     $.jStorage.flush();
     for (var j=0; j<state[2].length; j++){
-      state[2][j].marker=null;
+      var activity_copy = jQuery.extend(true, {}, state[2][j]);
+      var marker = activity_copy.marker;
+      activity_copy.marker=null;
       var id = JSON.stringify(j)
-      O.activities.set(id,state[2][j]); 
+      
+      O.activities.set(id, activity_copy);
+      
+     //O.activities.set(id,state[2][j]); 
       var activity = O.activities.get(id);
-      activity.marker = Map.placeMarker(activity);
+      activity.marker = marker;
+      if (activity.commitment == "todo"){
+        activity.marker = Map.placeMarker(activity);
+        activity.marker.icon = 'images/blue-dot.png';
+        activity.marker.setAnimation(null);
+        activity.marker.setDraggable(false);
+      }
     }
     initActivitiesList();
     drawScheduleGrid();
