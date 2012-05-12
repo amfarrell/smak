@@ -73,9 +73,6 @@
   function initActivitiesList() {
     $(".activitiesList").html("");
     for (var i in O.activities.all()) {
-      if (i > 6){
-        break;
-      }
       if (O.activities.get(i).commitment=="todo") {
         addActivity(i, O.activities.get(i).duration/15);
       }
@@ -140,6 +137,7 @@
     loadState(currentStateIndex+1);
   }
   function loadState(i){
+    deselectItem();
     currentStateIndex = i;
     var state = stateHistory[i];
     console.log(state);
@@ -149,9 +147,9 @@
     lastLetter = state[3];
     
     // remove all markers
-    for (var i in O.activities.all()) {
-      if (O.activities.get(i).marker)
-        O.activities.get(i).marker.setMap(null);
+    for (var j in O.activities.all()) {
+      if (O.activities.get(j).marker)
+        O.activities.get(j).marker.setMap(null);
     }
     $.jStorage.flush();
     for (var j=0; j<state[4].length; j++){
@@ -188,6 +186,7 @@
     var state = [schedule, startTime, scheduleHashMap, lastLetter, activities];
     currentStateIndex++;
     stateHistory[currentStateIndex]=state;
+    stateHistory.splice(currentStateIndex+1, 10000);
     undoButtons();
   }
   
@@ -469,8 +468,7 @@ window.autoSchedule = function autoSchedule(){
         } else if (list == ".schedule") {   // move from Schedule to Activities
           addActivity($(this).attr("id"), height);
           $(this).remove();
-          schedule = schedule.replace(new RegExp($(this).attr("id"), 'g'), " "); // remove item from schedule
-          
+          schedule = schedule.replace(new RegExp(hashMapContains($(this).attr("id")), 'g'), " "); // remove item from schedule
 					var new_activities = get_id_list(schedule.split(""));
 					Map.renderPath(new_activities);
 					saveState();

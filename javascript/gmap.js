@@ -83,7 +83,6 @@ window.initMap = function initMap () {
     'overlay':new google.maps.OverlayView(),
     'directions':function directions(list) {
       var coords = [];
-      debugger;
       while (list.length > 0){
         list[0].marker.setVisible(false);
         //Really what I want to do is suppress the markers and
@@ -103,13 +102,13 @@ window.initMap = function initMap () {
           //we are operating.
       };
       var disp;
-      console.log(coords);
+      //console.log(coords);
       _directions.route(request, function render(response,status) {
         if (status == google.maps.DirectionsStatus.OK){
           disp = _display.setDirections(response);
-          console.log([response,status]);
+          //console.log([response,status]);
         } else {
-          console.log([response,status]);
+          //console.log([response,status]);
         }
       });
     },
