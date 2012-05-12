@@ -1,7 +1,14 @@
+
+var autocompleteNames = new Array();
+function initSuggestedList() {
+  autocompleteNames = [];
+  for (var i in O.activities.all("suggested")) {
+    autocompleteNames.push(O.activities.get(i).name);
+  }
+  $("#activity_name").autocomplete( "option", "source", autocompleteNames);
+}
+
 window.initForm = function initForm () {
-  
-  
-  var autocompleteNames = new Array();
   
   $("#activity_name").autocomplete({
     'minLength':1,
@@ -18,13 +25,6 @@ window.initForm = function initForm () {
     }
   });
   
-  function initSuggestedList() {
-    autocompleteNames = [];
-    for (var i in O.activities.all("suggested")) {
-      autocompleteNames.push(O.activities.get(i).name);
-    }
-    $("#activity_name").autocomplete( "option", "source", autocompleteNames);
-  }
   $("#make_event").click(function(e){
     var userDefined = true;
     var name = $("#activity_name")[0].value

@@ -77,7 +77,7 @@ window.initModel = function initModel () {
       'commitment_changed':function(view,handler) {
         if (['map','schedule','form'].indexOf(view) === -1){throw new Error("unknown interface "+view)};
         O.activities._subscribers[view]['commitment'] = handler;
-      },
+      },      
       '_firehandler':function _firehandler(view, handler, i, otherdata) {
         if (['',false,'map','schedule','form'].indexOf(view) === -1){throw new Error("unknown interface "+view)};
         /*var prev = O.activities._undo_ll;

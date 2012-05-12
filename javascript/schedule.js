@@ -171,6 +171,7 @@
       }
     }
     initActivitiesList();
+    initSuggestedList();
     drawScheduleGrid();
     drawSchedule(newSchedule, true);
     undoButtons();
