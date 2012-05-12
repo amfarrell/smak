@@ -123,14 +123,14 @@ window.initModel = function initModel () {
         var a;
         if ( type === "activities" ) {
           for (i in $.jStorage.index()){
-            queriedevents.push($.jStorage.get(i));
+            queriedevents[i] = $.jStorage.get(i);
             }
           return queriedevents;
         } else if (['todo','scheduled','suggested',"locked"].indexOf(type) !== -1) {
           for (i in $.jStorage.index()){
             a = $.jStorage.get(i);
             if (a.commitment === type){
-              queriedevents.push(a);
+              queriedevents[i] = a;
             }
           }
           return queriedevents;

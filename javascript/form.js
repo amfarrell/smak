@@ -11,8 +11,15 @@ window.initForm = function initForm () {
   });
   initSuggestedList();
   
+  O.activities.commitment_changed('form',function commitmentUpdate(i,oldState){
+    var activity = O.activities.get(i);
+    if (oldState=='suggested' || activity.commitment == 'suggested'){
+      initSuggestedList();
+    }
+  });
+  
   function initSuggestedList() {
-    autocompleteNames = new Array();
+    autocompleteNames = [];
     for (var i in O.activities.all("suggested")) {
       autocompleteNames.push(O.activities.get(i).name);
     }
@@ -126,6 +133,7 @@ window.initForm = function initForm () {
         $("#radio-end-field").val(new Date( startTime.valueOf()).addHours(schedule.length/4).toString("h:mmtt"));
       }
     }
+    drawDoBetween(-1);
     //TODO: check if valid time. Highlight in red if not.
   });
     
@@ -153,8 +161,8 @@ window.initForm = function initForm () {
       }
       return ""+time[0]+':'+time[1];
   }
-  $("#radio-start-field").keyup(function (e){
-    console.log(e)
+  $("#radio-start-field").change(function (e){
+    console.log(e);
     var start = $("#radio-start-field")[0].value;
     if (e.which === 40) {
       start = decremened_time(start);
@@ -167,9 +175,8 @@ window.initForm = function initForm () {
     }
     //TODO: check if valid time. Highlight in red if not.
   });
-  $("#radio-end-field").keyup(function (e){
-    console.log(e)
-    console.log(e.which);
+  $("#radio-end-field").change(function (e){
+    console.log(e);
     var end = $("#radio-end-field")[0].value
     if (e.which === 40) {
       end = decremened_time(end);
@@ -181,50 +188,4 @@ window.initForm = function initForm () {
     }
     //TODO: check if valid time. Highlight in red if not.
   });
-  $("#radio-start-at-field").keyup(function (e){
-    console.log(e)
-    console.log(e.which);
-    var start_at = $("#radio-start-at-field")[0].value
-    if (e.which === 40) {
-      start_at = decremened_time(start_at);
-    } else if (e.which === 38) { 
-      start_at = incremened_time(start_at);
-    }
-    if (O.activities.selected_activity){
-        O.activities.update("",O.activities.selected_activity.id,{"start":start_at});
-    }
-    //TODO: check if valid time. Highlight in red if not.
-  });
-
-  /*
-  $("#range_duration").keyup(function (e){
-    console.log(e.which);
-    if (e.which === 40) {
-      //decrement
-    } else if (e.which === 38) { 
-      //increment
-    } 
-    O.activities.selected_activity.duration = e.srcElement.value;
-    //TODO: check if valid time. Highlight in red if not.
-  });
-  $("#range_end").keyup(function (e){
-    console.log(e.which);
-    if (e.which === 40) {
-      //decrement
-    } else if (e.which === 38) { 
-      //increment
-    }
-    O.activities.selected_activity.range[0] = e.srcElement.value;
-    //TODO: check if valid time. Highlight in red if not.
-    //TODO: visualize the time in some way.
-  });
-  $("#add_schedule").mouseup(function (e){
-
-  });
-  $("#add_todo").mouseup(function (e){
-    alert("TODO: add this to todo list\n"+JSON.stringify(O.activities.selected_activity));
-  });
-
-
-  */
 }

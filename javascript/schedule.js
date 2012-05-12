@@ -601,7 +601,11 @@ window.autoSchedule = function autoSchedule(){
   }
   
   function drawDoBetween(id){
-    var range = O.activities.get(id).range;
+    if (id==-1)
+      var range = [$("#radio-start-field")[0].value,$("#radio-end-field")[0].value];
+    else
+      var range = O.activities.get(id).range;
+      
     var boxStartTime = new Date(Date.parse(range[0]));
     var endTime =  new Date( startTime.valueOf()).addHours(schedule.length/4);
     var startPosition = dateToNumber(boxStartTime) - dateToNumber(startTime);  //in hours
@@ -615,7 +619,7 @@ window.autoSchedule = function autoSchedule(){
     
     $(".doBetween"+id).remove()   //remove if already exists
     $(".doBetweenContainerContainer").append('<div class="doBetweenContainer doBetween'+id+'"><div class="doBetweenTop"></div><div class="doBetweenBottom"></div></div>');
-    $(".doBetween"+id).css("z-index",-2).fadeTo(1,0);
+    if (id!=-1) $(".doBetween"+id).css("z-index",-2).fadeTo(1,0);
     $(".doBetween"+id).height(blockHeight*boxDuration*4);
     $(".doBetween"+id).css("top",startPosition*blockHeight*4);
     
