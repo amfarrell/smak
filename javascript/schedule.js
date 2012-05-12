@@ -620,7 +620,10 @@ window.autoSchedule = function autoSchedule(){
     
     $(".doBetween"+id).remove()   //remove if already exists
     $(".doBetweenContainerContainer").append('<div class="doBetweenContainer doBetween'+id+'"><div class="doBetweenTop"></div><div class="doBetweenBottom"></div></div>');
-    if (id!=-1) $(".doBetween"+id).css("z-index",-2).fadeTo(1,0);
+    if (id!=-1)
+      $(".doBetween"+id).css("z-index",-2).fadeTo(1,0);
+    else
+      $(".doBetween"+id).css("z-index",1).fadeTo(1,1);
     $(".doBetween"+id).height(blockHeight*boxDuration*4);
     $(".doBetween"+id).css("top",startPosition*blockHeight*4);
     

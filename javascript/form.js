@@ -57,6 +57,7 @@ window.initForm = function initForm () {
       window.tempMarker.setMap(null);
       window.tempMarker=null;
     }
+    $(".doBetween-1").remove();
     
     saveState();
   });
@@ -66,6 +67,8 @@ window.initForm = function initForm () {
       window.tempMarker.setMap(null);
       window.tempMarker=null;
     }
+    $(".doBetween-1").remove();
+    
     //console.log("the form sees that "+id+" was selected.");
     var activity = O.activities.get(id);
     $("#activity_name").val(activity.name);
@@ -123,6 +126,7 @@ window.initForm = function initForm () {
             $("#radio-start-field").val(new Date(Date.parse(activity.range[0])).toString("h:mmtt"));
             $("#radio-end-field").val(new Date(Date.parse(activity.range[1])).toString("h:mmtt"));
           }
+          drawDoBetween(-1);
           return;
         }
       }
@@ -164,27 +168,20 @@ window.initForm = function initForm () {
   $("#radio-start-field").change(function (e){
     console.log(e);
     var start = $("#radio-start-field")[0].value;
-    if (e.which === 40) {
-      start = decremened_time(start);
-    } else if (e.which === 38) { 
-      start = incremened_time(start);
-      //increment
-    }
     if (O.activities.selected_activity){
         O.activities.update("",O.activities.selected_activity.id,{"range":[start, O.activities.selected_activity.range[1]]});
+    }else{
+      drawDoBetween(-1);
     }
     //TODO: check if valid time. Highlight in red if not.
   });
   $("#radio-end-field").change(function (e){
     console.log(e);
     var end = $("#radio-end-field")[0].value
-    if (e.which === 40) {
-      end = decremened_time(end);
-    } else if (e.which === 38) { 
-      end = incremened_time(end);
-    } 
     if (O.activities.selected_activity){
         O.activities.update("",O.activities.selected_activity.id,{"range":[O.activities.selected_activity.range[0], end]});
+    }else{
+      drawDoBetween(-1);
     }
     //TODO: check if valid time. Highlight in red if not.
   });
