@@ -145,6 +145,8 @@
     console.log(state);
     var newSchedule = state[0];
     startTime = state[1];
+    scheduleHashMap = state[2];
+    lastLetter = state[3];
     
     // remove all markers
     for (var i in O.activities.all()) {
@@ -152,15 +154,15 @@
         O.activities.get(i).marker.setMap(null);
     }
     $.jStorage.flush();
-    for (var j=0; j<state[2].length; j++){
-      var activity_copy = jQuery.extend(true, {}, state[2][j]);
+    for (var j=0; j<state[4].length; j++){
+      var activity_copy = jQuery.extend(true, {}, state[4][j]);
       var marker = activity_copy.marker;
       activity_copy.marker=null;
       var id = JSON.stringify(j)
       
       O.activities.set(id, activity_copy);
       
-     //O.activities.set(id,state[2][j]); 
+     //O.activities.set(id,state[4][j]); 
       var activity = O.activities.get(id);
       activity.marker = marker;
       if (activity.commitment == "todo"){
@@ -183,7 +185,7 @@
       var a = $.extend(true, {}, O.activities.get(i));
       activities.push(a);
     }
-    var state = [schedule, startTime, activities];
+    var state = [schedule, startTime, scheduleHashMap, lastLetter, activities];
     currentStateIndex++;
     stateHistory[currentStateIndex]=state;
     undoButtons();
@@ -255,7 +257,7 @@ window.autoSchedule = function autoSchedule(){
     console.log("partially_schedule " + schedule + ", " + unscheduledActivities);
     $(".activitiesList").html('');
     var list = drawSchedule(partially_schedule(schedule, unscheduledActivities, scheduleHashMap));
-    Map.renderPath(list);
+    //Map.renderPath(list);
   }
 
   function updateModel(id, list){
