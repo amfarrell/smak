@@ -41,7 +41,7 @@ window.initMap = function initMap () {
     'clickable':true
   };
   _display.markerOptions = {
-
+    'icon':"http://maps.gstatic.com/mapfiles/markers2/marker_greenA.png"
   };
   window.Map = {
     
@@ -72,7 +72,6 @@ window.initMap = function initMap () {
             }
           }
           marker.icon = 'images/drag_me.gif';
-          marker.setAnimation(google.maps.Animation.BOUNCE);
           marker.setDraggable(true);
           O.activities.select("map",activity.id);
         }
@@ -138,8 +137,12 @@ window.initMap = function initMap () {
             }
         });
       }
+      _display.markerOptions = {};
       if (list.length === 1) {
         list.push(list[0]);
+        _display.markerOptions = {
+          'icon':"http://maps.gstatic.com/mapfiles/markers2/marker_greenA.png"
+        };
         //TODO: have it display a different colour marker.
       } else if (list.length === 0) {
         _display.setDirections({routes: []});
@@ -409,7 +412,6 @@ window.initMapInput = function initMapInput () {
     }
     if (O.activities.get(i).marker){
       O.activities.get(i).marker.icon = 'images/drag_me.gif';
-      O.activities.get(i).marker.setAnimation(google.maps.Animation.BOUNCE)
       O.activities.get(i).marker.setDraggable(true);      
     }
     
