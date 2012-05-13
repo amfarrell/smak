@@ -13,6 +13,7 @@
 var DEBUG = false
 var DEBUG_INSERT = false
 var DEBUG_COST_FUNC = false
+var DEBUG_FILTER = false
 
 var DISTANCE_COST = 		1000
 var DISPLACEMENT_COST = 1
@@ -215,19 +216,6 @@ function add(state, id, pos_final, len) {
 		state.splice(i, 1, id)
 	}
 
-	// check travel time for the next activity after pos_final + len TTV
-	/*for (var i = pos_final + len; i < state.length; i++) {
-		if (state[i] != " ") {
-			var travel_time_end = pos_final + len + distance(id, state[i]);
-			if (displaced.indexOf(state[i]) == -1 &&
-					travel_time_end >= state.indexOf(state[i])) {
-				// we found the next activity... check travel time
-				displaced.push(state[i])
-				console.log("TT VIOLATION: Initial add")
-			}
-		}
-	}*/
-
 	// pull out items that we pushed into displaced from the state vector 
 	// (resolves partial collisions)
 	var displaced_expanded = new Array()
@@ -240,17 +228,8 @@ function add(state, id, pos_final, len) {
 	return [state, displaced_expanded]
 }
 
-// given the state and a current index, return the two "currently selected" elements
-function find_next_id(state, index) {
-	for (var i = index; i < state.length; i++) {
-		if (state[i] != " ") return state[i]
-	}
-	return " "
-}
-
-function slack(state, start_id, end_id) {
-	if (end_id == " ") return 1000 // makes things easier
-	return additional_gap = state.lastIndexOf(start_id) - state.indexOf(end_id) - distance(start_id, end_id)
+function inserting_in_middle(state, pos) {
+	return pos > 0 && state[pos] != " " && state[pos] == state[pos-1]
 }
 
 // insert a new character of some length between two activities.  Activities 
@@ -269,8 +248,8 @@ function insert(state, id, pos, len, locked) {
 
 	// are we inserting in the middle of an activity?
 	// if so, push that activity backwards
-	if (pos > 0 && state[pos] != " " && state[pos] == state[pos-1]) {
-    var b_id = state[pos]
+	if (inserting_in_middle(state, pos)) {
+	  var b_id = state[pos]
 		var b_len = count_array_occurances(state, b_id)
 		state = array_replace(state, b_id, " ")
 		var b_state = state.slice(0, pos)
@@ -286,33 +265,12 @@ function insert(state, id, pos, len, locked) {
 	// insert the new item
 	for (var i = 0; i < len; i++) state.splice(pos, 0, id)
 
-	// travel time on initial insert TTV
-	/*var next_id = find_next_id(state, pos + len)
-	var additional_slack = slack(state, id, next_id)
-	if (additional_slack < 0)
-		console.log("TT VIOLATION: Insert, first")
-	for (var i = additional_slack; i < 0; i++) {
-		state.splice(pos + len, 0, " ")
-	}*/
-
 	// remove whitespace to make blocks align better
 	var num_inserted = 0
 	for (var i = pos + len; i < state.length; i++) {
-
-		var additional_slack = 1 // TODO replace with travel time TTV
-		/*if (state[i] != next_id && state[i] != " ") {
-			additional_slack = slack(state, next_id, state[i])
-			next_id = state[i]
-		}
-
-		if (state[i] == " " && additional_slack == 0) {
-			console.log("TT VIOLATION: Insert, second")
-		}*/
-
-		if (state[i] == " " && additional_slack > 0) {
+		if (state[i] == " ") {
 			state.splice(i, 1)
 			num_inserted++
-			additional_slack--
 			i--;
 			if (num_inserted == len) break;
 		}
@@ -374,8 +332,27 @@ function get_configurations(displacements, partial_configurations, locked) {
 		var start_points = find_breaks(partial_configurations[i])
 		//console.log("Start points for " + id + ": " + start_points)
 		for (var j = 0; j < start_points.length; j++) {
+
+			if (inserting_in_middle(partial_configurations[i], start_points[j])) {
+				var conflict_id = partial_configurations[i][start_points[j]]
+				var temp_state = array_replace(partial_configurations[i], conflict_id, " ");
+				// now, we can insert the new item and not worry about the conflict
+				var new_configuration = insert(	temp_state, id, 
+																				start_points[j], len, locked)
+				if (new_configuration[0]) {
+					console.log("Insert boost forward")
+					var forward_boosted_location = new_configuration[1].lastIndexOf(id) + 1
+					assert(!inserting_in_middle(new_configuration[1], forward_boosted_location), "still inserting in the middle...")
+					new_configuration = 		insert(	new_configuration[1], id, 
+																					forward_boosted_location, len, locked)				
+					if (new_configuration[0])
+						new_configurations.push(new_configuration[1])				
+				}
+			}
+
 			var new_configuration = insert(	partial_configurations[i], id, 
 																			start_points[j], len, locked)
+
 			if (DEBUG_INSERT) console.log("Finished insert() ~ Result: [" + new_configuration[1] + "]")
 			if (DEBUG_INSERT) console.log("")
 			if (new_configuration[0])
@@ -394,27 +371,13 @@ function filter_configurations(configurations) {
 		var unique_elements = array_unique_elements(current_config)
 		unique_elements = remove_element(unique_elements, " ")
 
-		// TODO filter travel time violations TTV
-		/*for (var j = 0; j < unique_elements.length - 1; j++) {
-			var from = unique_elements[j]
-			var from_end = current_config.lastIndexOf(from)
-			var to = unique_elements[j+1]
-			var to_start = current_config.indexOf(to)
-			var dist = distance(from, to)
-			if (from_end > -1 && to_start > -1 && (from_end + dist >= to_start)) {
-				console.log("Travel time violation between " + O.activities.get(from).name + " and " + O.activities.get(to).name)
-				current_config = array_replace(current_config, from, " ")
-			} else {
-				console.log("NO Travel time violation between " + O.activities.get(from).name + " and " + O.activities.get(to).name)
-			}
-		}*/
-
 		// filter start_at violations
 		for (var j = 0; j < unique_elements.length; j++) {
 			var fid = unique_elements[j]
 			var start_at_time = translate_start_at_time(fid)
 			var start_at_index = current_config.indexOf(fid)
 			if (start_at_time != -1 && start_at_index != start_at_time) {
+				if (DEBUG_FILTER) console.log("Filtered out (start at violation): [" + current_config + "] Cause: " + fid)
 				current_config = array_replace(current_config, fid, " ")
 			}
 		}
@@ -429,6 +392,7 @@ function filter_configurations(configurations) {
 			var end_index = current_config.lastIndexOf(fid)
 			if (start_index > -1 && (	start_index < start_threshold || 
 																end_index >= end_threshold)) {
+				if (DEBUG_FILTER) console.log("Filtered out (do between violation): [" + current_config + "] Cause: " + fid)
 				current_config = array_replace(current_config, fid, " ")				
 			}
 		}
@@ -469,7 +433,6 @@ function cost_function(initial_state, configuration, excludes, includes, use_dis
 	if (use_distance_cost) {
 		var distances = new Array()
 		var unique_elements = array_unique_elements(configuration)
-		//console.log(unique_elements)
 		unique_elements = remove_element(unique_elements, " ")
 		for (var j = 0; j < unique_elements.length - 1; j++) {
 			var from = unique_elements[j]
@@ -689,12 +652,18 @@ function partially_schedule(string, los, schedule_hash_map) {
 
 	// some preprocessing
 	var excludes = Array()
-	for (var i = 0; i < los.length; i++) { excludes.push(los[i].charAt(0)) }
+	//for (var i = 0; i < los.length; i++) { excludes.push(los[i].charAt(0)) }
 
-	for (var j = 0; j < los.length; j++) {
-		var current_element = los[j]
+	var rounds = 0
+	var los_len = los.length
+	var los_orig = los.slice()
 
+	while (true) {
 		//console.log("Round of auto-complete starting ~ adding: " + current_element)
+
+		if (los.length == 0/* || rounds > (ROUNDS * los_len)*/) break
+		
+		var current_element = los.pop()
 
 		var state_this_iteration = state.slice()
 
@@ -703,12 +672,24 @@ function partially_schedule(string, los, schedule_hash_map) {
 		configurations = filter_configurations(configurations)
 
 		// pick the best configuration
-		state = pick_configuration(state_this_iteration, configurations, excludes, [current_element[0]], true)[0]
+		var selected_tuple = pick_configuration(state_this_iteration, configurations, excludes, [current_element[0]], true)
+		state = selected_tuple[0]
 
-		//console.log("Round of auto-complete finished ~ [" + state + "]")
+		var elim = diff_state(state_this_iteration, [current_element], state)
+		var elim_formatted = new Array()
+		for (var k = 0; k < elim.length; k++) {
+			elim_formatted.push(Array(elim[k][1] + 1).join(elim[k][0]))
+		}
+		
+		//excludes.push(current_element.charAt(0))
+		//los = los.concat(elim_formatted)
+
+		console.log("Round of auto-complete finished ~ [" + state + "], Eliminated: " + elim_formatted)
+
+		rounds++
 	}
 
-	var eliminations = diff_state(initial_state, los, state)
+	var eliminations = diff_state(initial_state, los_orig, state)
 	for (var i = 0; i < eliminations.length; i++) {
 		var e_id = eliminations[i][0]
 		var e_len = eliminations[i][1]
