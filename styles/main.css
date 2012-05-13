@@ -7,10 +7,8 @@ body {
   margin: 10px; padding: 0;
 }
 #activity {
-  float:left;
   width:450px;
-  height:550px;
-  position:relative;
+  padding:0 10px 10px 10px;
 }
 #schedule {
   /*margin-left: auto;
@@ -223,6 +221,7 @@ body {
 .duration{
   position: absolute;
   right:30px;
+  font-size:80%;
 }
 .delete{
   position: absolute;
@@ -232,6 +231,7 @@ body {
 .times{
   position: absolute;
   left:30px;
+  font-size:80%;
 }
 .error{
   width:100%;
@@ -248,6 +248,12 @@ body {
   top:50%;
   height:20px;
   margin-top:-10px;
+}
+.marker{
+  position: relative;
+  width:24px;
+  height:5px;
+  top:5px;
 }
 .doBetweenContainerContainer{
   width:482px;

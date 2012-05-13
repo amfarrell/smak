@@ -240,26 +240,27 @@
   }
 
 window.autoSchedule = function autoSchedule(){
-    var unscheduledActivities = new Array();
-    $(".activitiesList .item").each(function() {
-      var height = Math.round(($(this).height() + borderMarginHeight) / blockHeight);
-      var id = $(this).attr("id")
-      var letter = hashMapContains(id);
-      if (letter == false){
-        lastLetter = String.fromCharCode(lastLetter.charCodeAt() + 1);
-        scheduleHashMap[lastLetter] = id;
-        letter = lastLetter;
-      }
-      unscheduledActivities.push(new Array(height + 1).join(letter));
-      
-    });
-    console.log("partially_schedule " + schedule + ", " + unscheduledActivities);
-    $(".activitiesList").html('');
-    var list = drawSchedule(partially_schedule(schedule, unscheduledActivities, scheduleHashMap));
-    //Map.renderPath(list);
+		for (var i = 0; i < 2; i++) {
+		  var unscheduledActivities = new Array();
+		  $(".activitiesList .item").each(function() {
+		    var height = Math.round(($(this).height() + borderMarginHeight) / blockHeight);
+		    var id = $(this).attr("id")
+		    var letter = hashMapContains(id);
+		    if (letter == false){
+		      lastLetter = String.fromCharCode(lastLetter.charCodeAt() + 1);
+		      scheduleHashMap[lastLetter] = id;
+		      letter = lastLetter;
+		    }
+		    unscheduledActivities.push(new Array(height + 1).join(letter));
+		    
+		  });
+		  console.log("partially_schedule " + schedule + ", " + unscheduledActivities);
+		  $(".activitiesList").html('');
+		  var list = drawSchedule(partially_schedule(schedule, unscheduledActivities, scheduleHashMap));
+		}
   }
 
-  function updateModel(id, list){
+  function updateModel(id){
     var height = getDuration(id);
     var positionY = getPositionY(id);
     var duration = height*15;
@@ -309,8 +310,8 @@ window.autoSchedule = function autoSchedule(){
       $("#"+id+" .duration").text((duration/4)+' Hour'+plural);
     }
     
-    if (duration <6 && duration>=4){
-      $("#"+id+" .activityCenter").css("margin-top", "-2px");
+    if (duration <4){
+      $("#"+id+" .activityCenter").css("margin-top", "-15px");
     }else{
       $("#"+id+" .activityCenter").css("margin-top", "");
     }
@@ -563,7 +564,7 @@ window.autoSchedule = function autoSchedule(){
         $("#" + id).append("<div class='lock'><img src='unlock.png' alt='unlocked' /></div>");
       $("#" + id + " .lock").click(toggleLock);
       var letter = String.fromCharCode(64+itemNumber);
-      $("#" + id).append("<div class='activityCenter'><img height='5px' src='Google Maps Markers/darkgreen_Marker"+letter+".png' alt='"+letter+"'/>"+O.activities.get(id).name+"</div>");
+      $("#" + id).append("<div class='activityCenter'><span class='marker'><img src='Google Maps Markers/circle"+letter+".png' alt='"+letter+"'/></span>"+O.activities.get(id).name+"</div>");
      
       $("#" + id).css({// Set item to it's current absolute position
         "position": "absolute",

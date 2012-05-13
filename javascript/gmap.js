@@ -357,6 +357,8 @@ window.initMap = function initMap () {
             activity.marker.setMap(null);
           } else if (newstate === "todo"){
             var order = O.activities.all("ordered_schedule");
+            console.log(activity.marker);
+            activity.marker.setVisible(true);
             //console.log("removing from schedule"+i)
             //change colour of marker, recalc order.
           } else if (newstate === "locked"){

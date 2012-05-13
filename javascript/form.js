@@ -77,7 +77,7 @@ window.initForm = function initForm () {
       $("#radio-start-field").val(new Date(Date.parse(activity.range[0])).toString("h:mmtt"));
       $("#radio-end-field").val(new Date(Date.parse(activity.range[1])).toString("h:mmtt"));
     }
-    $("#activityTD").addClass("activitySelected");
+    $("#activity").addClass("activitySelected");
   });
 
   O.activities.deselected("form",function(id,otherdata){
@@ -87,7 +87,7 @@ window.initForm = function initForm () {
     $("#activity_name").removeAttr('disabled');  
     $("#radio-start-field").val("");
     $("#radio-end-field").val("");
-    $("#activityTD").removeClass("activitySelected");    
+    $("#activity").removeClass("activitySelected");    
   });
 
   O.activities.updated("form",function form_updated(id,olddata){
