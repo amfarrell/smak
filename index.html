@@ -3,141 +3,39 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
-<head>
-
-  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>SMak</title>
-  <link rel="shortcut icon" href="smak-icon.png" /> 
-
-  <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?libraries=places&sensor=false"> </script>
-  <script type="text/javascript" src='./javascript/jquery-1.7.2.js'></script>
-  <script type="text/javascript" src='./javascript/jquery.json-2.3.js'></script>
-  <script type="text/javascript" src='./development-bundle/ui/jquery-ui-1.8.18.custom.js'></script>
-  <!--<script type="text/javascript" src="./development-bundle/ui/jquery.ui.autocomplete.js"></script>-->
-
-  <!--<script type="text/javascript" src='./javascript/jquery-ui-1.8.18.js'></script>
-  <script type="text/javascript" src="./javascript/my_autocomplete.js"></script>-->
-  <script type="text/javascript" src="./javascript/jquery.ui.touch-punch.js"></script>
-  <script type="text/javascript" src="./javascript/jquery.calendrical.js"></script>
-  <script type="text/javascript" src='./javascript/jquery.overlaps.js'></script>
-  <script type="text/javascript" src='./javascript/jquery.corner.js'></script>
-  <script type="text/javascript" src='./javascript/jstorage.js'></script>
-  <script type="text/javascript" src="./javascript/date.js"></script> 
-  <script type="text/javascript" src='./javascript/objectmodel.js'></script>
-  <script type="text/javascript" src="./javascript/gmap.js"></script>  
-  <script type="text/javascript" src="./javascript/form.js"></script>  
-  <script type="text/javascript" src="./javascript/schedule.js"></script>  
-  <script type="text/javascript" src="./javascript/edit_distance.js"></script>  
-  
-  <link rel="stylesheet" type="text/css" href="styles/main.css" />
-  <link rel="stylesheet" type="text/css" href="styles/calendrical.css" />  <link rel="stylesheet" href="development-bundle/themes/base/jquery.ui.all.css">
-</head>
+<head></head>
 
 <body>
 
-<script type="text/javascript">
-
-$(document).ready(function() {
-
-  initModel();
-  initMap();
-  
-  for (var a in prebuilt){
-    O.activities.set(a,prebuilt[a]); 
-    //O.activities.todo("",a);
-  }
-  initForm();
-  
-  initHeights();
-  drawScheduleGrid();
-  drawSchedule(schedule);
-  initActivitiesList();
-  initScheduleListeners()
-  initMapInput();
-
-  $('html').bind('click touchend',function() {
-    deselectItem();
-  });
-  $("#activity").bind('click touchend',function(event) {
-    event.stopPropagation();
-  });
-
-});
-</script>
-
-<div id="schedule">
-<table class="layout">
-  <tr>
-    <td><center><img class="title" src="images/smak_title.gif" alt="SMAK" /></center></td>
-    <td><b><h3>Activities</h3></b></td>
-    <td><b><h3>Schedule</h3></b></td>
-  </tr>
-    <td><button type="button" id='undo' onclick="undo();">Undo</button><button type="button" id='redo' onclick="redo();">Redo</button></td>
-    <td><div class="autoSchedule"><button type="button" onclick="autoSchedule();">Schedule these activities for me</button></div></td>
-    <td id="startTimeCell"></td>
-  <tr>
-    <td valign="top">
-    
-      <div id="activity">
-   
-      <div id="add_activity_form">
-        <input id="activity_name" type="text" name="activityName" placeholder="Enter your activity's name"></input>
-        <input type="submit" value="Add Activity" id="make_event"></input>
-          
-        <div id="activity_suggest">
-          <!-- Dynamically load this with activities. -->
-        </div>
-        <table id="time_form">
-          <form id="crud">
-            <tr valign="bottom">
-              <td> Earliest Start Time </td>
-              <td><input type="text" size="8" id="radio-start-field" readonly></input> 
-                              <script type="text/javascript"> 
-                                  $('#radio-start-field').calendricalTime(); 
-                              </script>
-                      </td>
-              <td> e.g. Museum Opening Time</td>
-            </tr><tr valign="top">
-              <td> Latest End Time </td>
-              <td><input type="text" size="8" id="radio-end-field" readonly></input>
-                              <script type="text/javascript">
-                                 $('#radio-end-field').calendricalTime(); 
-                              </script>
-                      </td>
-              <td> e.g. Museum Closing Time</td>
-            </tr>
-          </form>
-        </table>
-      </div>
-
-      <div id="activity_location">
-        <!--<img id="draggable" src='images/drag_me.gif' />
-        <div id="location_form">
-          Where:<span id="pin_spot">
-                    
-                    <img id="pin_slot" src="images/map_pin_empty.png"/>
-                </span>
-          <input id="location_text"></input>
-        </div>-->
-        <div id="map_canvas">    </div>
-      </div>
-    </div>
-    
-    
-    </td>
-    <td valign="top" style="padding:10px 10px">
-      <div class="activitiesResizeContainer"></div>
-      <div class="activitiesContainer"></div>
-      <div class="doBetweenContainerContainer"></div>
-      <div class="activitiesList"></div>
-    </td><td valign="top" style="position:relative;padding:10px 10px">
-      <div class="scheduleGrid"> 
-        <div class="schedule">  </div>
-      </div>
-    </td><td></td>
-  </tr>
+<table border="0" width="100%" id="table1" cellpadding="0" style="border-collapse: collapse" height="100%"> 
+	<tr> 
+		<td> 
+			<div align="center"> 
+			<table border="0" width="100%" id="table2" cellpadding="0" style="border-collapse: collapse" height="500"> 
+			<tr>
+				<td> 
+					<p align="center"><img class="title" src="images/smak_title.gif" alt="SMAK" />
+					<div align="center" >
+						<form name="welcome" action="smak.html">
+							Choose a city: 
+							<select name="choose_city" title="dada">
+								<option value="Boston">Florence</option>
+								<option value="Florence">Boston</option>
+								<option value="Berlin">Berlin</option>
+								<option value="Berlin">San Francisco</option>
+								<option value="Berlin">Pittsburg</option>
+							</select>
+							<br><br>
+							<input type=submit value="Plan your trip!"><a href="smak.html" ></a></input>
+						</form>
+					</div>
+				</td> 
+			</tr>  
+			</div>
+		</td>
+	</tr>
 </table>
-</div>
+
 </body>
+
 </html>
