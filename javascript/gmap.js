@@ -344,7 +344,7 @@ window.initMap = function initMap () {
         } else if (oldstate === "todo") {
           if (newstate === "suggested"){
             // remove marker. redisplay with new number.
-            marker.setMap(null);
+            activity.marker.setMap(null);
           } else if (newstate === "scheduled"){
             var order = O.activities.all("ordered_schedule");
             Map.renderPath(order);
@@ -354,7 +354,7 @@ window.initMap = function initMap () {
         } else if (oldstate === "scheduled"){
           if (newstate === "suggested"){
             // remove marker. recalc order.
-            marker.setMap(null);
+            activity.marker.setMap(null);
           } else if (newstate === "todo"){
             var order = O.activities.all("ordered_schedule");
             //console.log("removing from schedule"+i)

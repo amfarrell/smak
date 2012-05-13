@@ -248,7 +248,7 @@ window.initModel = function initModel () {
           O.activities.recommit(view,i,'scheduled');
         }
       },
-      'delete': function del(view, i){
+      'deleting': function del(view, i){
         checkstring(view);
         if (O.activities.get(i).commitment !== 'locked'){
           O.activities.recommit(view,i,'suggested');

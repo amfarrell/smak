@@ -25,8 +25,8 @@ body {
   padding:10px 25px;
   text-align:left;
 }
-.activitySelected#add_activity_form{
-  background:#B3E2F2;
+.activitySelected{
+  background:#89D3EB;
 }
 #activity_name { 
   width:275px;
@@ -80,7 +80,7 @@ body {
 }
 #map_canvas {
  width:450px; 
- height:450px;
+ height:460px;
 }
 
 /* New Activity Form */
@@ -222,7 +222,12 @@ body {
 }
 .duration{
   position: absolute;
+  right:30px;
+}
+.delete{
+  position: absolute;
   right:3px;
+  cursor: pointer;
 }
 .times{
   position: absolute;

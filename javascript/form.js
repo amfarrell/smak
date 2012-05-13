@@ -72,20 +72,22 @@ window.initForm = function initForm () {
     //console.log("the form sees that "+id+" was selected.");
     var activity = O.activities.get(id);
     $("#activity_name").val(activity.name);
+    $("#activity_name").attr('disabled','disabled');
     if (activity.range && activity.range[0]){
       $("#radio-start-field").val(new Date(Date.parse(activity.range[0])).toString("h:mmtt"));
       $("#radio-end-field").val(new Date(Date.parse(activity.range[1])).toString("h:mmtt"));
     }
-    $("#add_activity_form").addClass("activitySelected");
+    $("#activityTD").addClass("activitySelected");
   });
 
   O.activities.deselected("form",function(id,otherdata){
     //console.log("the form sees that "+id+" was de-selected.");
     var activity = O.activities.get(id);
     $("#activity_name").val("");
+    $("#activity_name").removeAttr('disabled');  
     $("#radio-start-field").val("");
     $("#radio-end-field").val("");
-    $("#add_activity_form").removeClass("activitySelected");    
+    $("#activityTD").removeClass("activitySelected");    
   });
 
   O.activities.updated("form",function form_updated(id,olddata){

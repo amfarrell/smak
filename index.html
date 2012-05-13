@@ -73,11 +73,11 @@ $(document).ready(function() {
     <td><b><h3>Activities</h3></b></td>
     <td><b><h3>Schedule</h3></b></td>
   </tr>
-    <td><button type="button" id='undo' onclick="undo();">Undo</button><button type="button" id='redo' onclick="redo();">Redo</button></td>
+    <td></td>
     <td><div class="autoSchedule"><button type="button" onclick="autoSchedule();">Schedule these activities for me</button></div></td>
     <td id="startTimeCell"></td>
   <tr>
-    <td valign="top">
+    <td valign="top" style="padding:0 10px" id="activityTD">
     
       <div id="activity">
    
@@ -112,30 +112,25 @@ $(document).ready(function() {
       </div>
 
       <div id="activity_location">
-        <!--<img id="draggable" src='images/drag_me.gif' />
-        <div id="location_form">
-          Where:<span id="pin_spot">
-                    
-                    <img id="pin_slot" src="images/map_pin_empty.png"/>
-                </span>
-          <input id="location_text"></input>
-        </div>-->
         <div id="map_canvas">    </div>
       </div>
     </div>
     
     
     </td>
-    <td valign="top" style="padding:10px 10px">
+    <td valign="top" style="padding:10px">
       <div class="activitiesResizeContainer"></div>
       <div class="activitiesContainer"></div>
       <div class="doBetweenContainerContainer"></div>
       <div class="activitiesList"></div>
-    </td><td valign="top" style="position:relative;padding:10px 10px">
+    </td><td valign="top" style="padding:10px">
       <div class="scheduleGrid"> 
         <div class="schedule">  </div>
       </div>
     </td><td></td>
+  </tr>
+  <tr>
+    <td colspan="3"><button type="button" id='undo' onclick="undo();">Undo</button><button type="button" id='redo' onclick="redo();">Redo</button></td>
   </tr>
 </table>
 </div>

@@ -466,13 +466,7 @@ window.autoSchedule = function autoSchedule(){
             $(this).css({"left":ui.originalPosition.left, "top":ui.originalPosition.top}); //return to original position
           }
         } else if (list == ".schedule") {   // move from Schedule to Activities
-          addActivity($(this).attr("id"), height);
-          $(this).remove();
-          schedule = schedule.replace(new RegExp(hashMapContains($(this).attr("id")), 'g'), " "); // remove item from schedule
-					var new_activities = get_id_list(schedule.split(""));
-					Map.renderPath(new_activities);
-					saveState();
-					
+          deleteActivity(id)
         } else {  // move within Activities
           $(this).css({"left":0, "top":0}); //return to original position
         }
@@ -480,7 +474,7 @@ window.autoSchedule = function autoSchedule(){
         $(this).removeClass("outsideDoBetween");
         updateTimes(id);
         selectItem(id);
-        updateModel(id); //We get errors if we don't change state (
+        updateModel(id); 
       }
     });
     
@@ -586,7 +580,8 @@ window.autoSchedule = function autoSchedule(){
     }
     $("#" + id).append("<div class='times'></div>");
     $("#" + id).append("<div class='duration'></div>");
-
+    $("#" + id).append("<div class='delete'><img src='images/delete.png' alt='delete' /></div>");
+    $("#" + id + " .delete").click(deleteActivityButton);
     
     $("#" + id).corner();
     
@@ -634,9 +629,28 @@ window.autoSchedule = function autoSchedule(){
     $(".doBetween"+id+" .doBetweenBottom").css("bottom",-(blockHeight*(schedule.length - endPosition*4)));
   }
 
-  /*
-   * XXX these should take either an event or an id of the activity represented.
-   */
+  function deleteActivityButton(event){
+    var id = $(this).parents(".scheduleItem").attr("id");
+    deleteActivity(id);
+  }
+  function deleteActivity(id){    
+    if ($("#"+id).parents(".schedule").length>0){   //if activity is in the schedule
+      addActivity(id, getDuration(id));
+      $(".schedule #"+id).remove();
+      schedule = schedule.replace(new RegExp(hashMapContains(id), 'g'), " "); // remove item from schedule
+      var new_activities = get_id_list(schedule.split(""));
+      Map.renderPath(new_activities);
+      $(".error").remove();
+      $("#"+id).removeClass("outsideDoBetween");
+      updateTimes(id);
+      selectItem(id);
+      updateModel(id); 
+    }else{//activity is in the todo
+      $("#"+id).remove();
+      O.activities.deleting("schedule",id);
+    }
+    saveState();
+  }
   function toggleItem(event){
     if(!$(this).hasClass('selected')){
       selectItem($(this).attr("id"));
