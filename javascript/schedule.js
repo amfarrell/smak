@@ -239,25 +239,26 @@
     return idList;
   }
 
-window.autoSchedule = function autoSchedule(){
-		for (var i = 0; i < 2; i++) {
-		  var unscheduledActivities = new Array();
-		  $(".activitiesList .item").each(function() {
-		    var height = Math.round(($(this).height() + borderMarginHeight) / blockHeight);
-		    var id = $(this).attr("id")
-		    var letter = hashMapContains(id);
-		    if (letter == false){
-		      lastLetter = String.fromCharCode(lastLetter.charCodeAt() + 1);
-		      scheduleHashMap[lastLetter] = id;
-		      letter = lastLetter;
-		    }
-		    unscheduledActivities.push(new Array(height + 1).join(letter));
-		    
-		  });
-		  console.log("partially_schedule " + schedule + ", " + unscheduledActivities);
-		  $(".activitiesList").html('');
-		  var list = drawSchedule(partially_schedule(schedule, unscheduledActivities, scheduleHashMap));
-		}
+window.autoSchedule = function autoSchedule() {
+	  var unscheduledActivities = new Array();
+	  $(".activitiesList .item").each(function() {
+	    var height = Math.round(($(this).height() + borderMarginHeight) / blockHeight);
+	    var id = $(this).attr("id")
+	    var letter = hashMapContains(id);
+	    if (letter == false){
+	      lastLetter = String.fromCharCode(lastLetter.charCodeAt() + 1);
+	      scheduleHashMap[lastLetter] = id;
+	      letter = lastLetter;
+	    }
+	    unscheduledActivities.push(new Array(height + 1).join(letter));
+	    
+	  });
+	  console.log("partially_schedule " + schedule + ", " + unscheduledActivities);
+	  $(".activitiesList").html('');
+		var as_bundle = partially_schedule(schedule, unscheduledActivities, scheduleHashMap);
+	  var list = drawSchedule(as_bundle[0]);
+		console.log("ORIG: " + as_bundle[1])
+		Map.renderPath(as_bundle[1])
   }
 
   function updateModel(id){

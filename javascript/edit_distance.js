@@ -684,7 +684,7 @@ function partially_schedule(string, los, schedule_hash_map) {
 		//excludes.push(current_element.charAt(0))
 		//los = los.concat(elim_formatted)
 
-		console.log("Round of auto-complete finished ~ [" + state + "], Eliminated: " + elim_formatted)
+		//console.log("Round of auto-complete finished ~ [" + state + "], Eliminated: " + elim_formatted)
 
 		rounds++
 	}
@@ -696,7 +696,6 @@ function partially_schedule(string, los, schedule_hash_map) {
 		O.activities.recommit("", current_hash_map[e_id], "todo")
 		setupActivity(current_hash_map[e_id], e_len, ".activitiesList", 0)
 	}
-	Map.renderPath(get_id_list(state))
 
 	//
 	// Post-schedule wrap-up
@@ -704,7 +703,7 @@ function partially_schedule(string, los, schedule_hash_map) {
 
 	var ret = state.join("").replace(/,/g, "")
 	console.log("partially_schedule() returning: \"" + ret + "\"")
-	return ret
+	return [ret, get_id_list(state)]
 }
 
 // -----------------------------------------------------------------------------
