@@ -4,7 +4,11 @@ html {
   height: 100%;
 }
 body {
-  margin-left: 0px; padding: 0;
+  margin: 0px; padding: 0;
+}
+body, input, button{
+  font-family: Trebuchet MS,Helvetica,Arial,sans-serif;
+  font-size:14px;
 }
 #activity {
   width:450px;
@@ -27,8 +31,9 @@ body {
   background:#89D3EB;
 }
 #activity_name { 
-  width:275px;
+  width:260px;
   position:relative;
+  font-size:15px;
 }
 #activity_suggest { 
   width:100%;
@@ -262,7 +267,7 @@ body {
   position: absolute;
 }
 .doBetweenContainer{
-  width:482px;
+  width:490px;
   position: absolute;
   left:0px;
   z-index:0;

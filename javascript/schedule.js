@@ -57,6 +57,7 @@
       $(".selected").removeClass('selected');
       updateDoBetweenBox();
       O.activities.deselect('schedule');
+      
       //console.log("the schedule sees that "+id+" has been deselected.");
       //Do stuff after the item is deselected.
     });
@@ -88,7 +89,7 @@
     var endTime =  new Date( startTime.valueOf()).addHours(schedule.length/4);
     
     $('.scheduleGrid').html("<div class='schedule'>  </div>");
-    $('#startTimeCell').html("Start Day at <input readonly='readonly' onchange='changeDayStartEndTimes()' type='time' size='8' id='startTime' name='startTime' value='"+ startTime.toString("h:mmtt")+"'/>");
+    $('#startTimeCell').html("Start Day at <input readonly='readonly' onchange='changeDayStartEndTimes()' type='time' size='9' id='startTime' name='startTime' value='"+ startTime.toString("h:mmtt")+"'/>");
     $('#startTime').calendricalTime();
     $('.scheduleGrid').append("<table cellspacing='0'></table");
     for (var i=0; i<schedule.length; i++) {
@@ -112,7 +113,7 @@
       }
     }
     //$('.scheduleGrid td').height(blockHeight*4-2);
-    $('.scheduleGrid').append("<br />End Day at <input readonly='readonly' onchange='changeDayStartEndTimes()' type='time' size='8' id='endTime' name='endTime' value='"+ endTime.toString("h:mmtt")+"'/>");
+    $('.scheduleGrid').append("<br />End Day at <input readonly='readonly' onchange='changeDayStartEndTimes()' type='time' size='9' id='endTime' name='endTime' value='"+ endTime.toString("h:mmtt")+"'/>");
     $('#endTime').calendricalTime();
     //TODO: modify length of the map so that they line up roughly.
   }
@@ -508,7 +509,6 @@ window.autoSchedule = function autoSchedule() {
       },
       stop: function(event, ui) {
         var id = $(this).attr("id");
-        console.log(ui);
         if (list == ".schedule" ) {
           var positionY = getPositionY(id);
           var height = getDuration(id);
@@ -544,7 +544,10 @@ window.autoSchedule = function autoSchedule() {
     $("#" + id).height(blockHeight*duration - borderMarginHeight);  // -2 to compensate for the border height
     
     // Make selectable
-    $("#" + id).bind('click touchstart touchend',toggleItem);
+    $("#" + id).bind('click',toggleItem);
+    $("#" + id).bind('touchend',function(event) {
+      event.stopPropagation();
+    });
     
     // Set z-index so that items are always on top
     $("#" + id).css({
@@ -657,9 +660,7 @@ window.autoSchedule = function autoSchedule() {
     if(!$(this).hasClass('selected')){
       selectItem($(this).attr("id"));
     }else{
-      $(".selected").removeClass('selected');
-      O.activities.deselect('schedule',this.id);
-      updateDoBetweenBox();
+      O.activities.deselect('');
     }
     event.stopPropagation();
   }

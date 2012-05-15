@@ -73,15 +73,11 @@ $(document).ready(function() {
     <td><b><h3>Activities</h3></b></td>
     <td><b><h3>Schedule</h3></b></td>
   </tr>
-    <td></td>
-    <td><div class="autoSchedule"><button type="button" onclick="autoSchedule();">Schedule these activities for me</button></div></td>
-    <td id="startTimeCell"></td>
-  <tr>
-    <td valign="top">
+    <td valign="top" rowspan='2'>
       <div id="activity">
    
       <div id="add_activity_form">
-        <input id="activity_name" type="text" name="activityName" placeholder="Enter your activity's name"></input>
+        <input id="activity_name" type="text" name="activityName"  size="14" placeholder="Enter your activity's name"></input>
         <input type="submit" value="Add Activity" id="make_event"></input>
           
         <div id="activity_suggest">
@@ -117,6 +113,9 @@ $(document).ready(function() {
     
     
     </td>
+    <td><div class="autoSchedule"><button type="button" onclick="autoSchedule();">Schedule these activities for me</button></div></td>
+    <td id="startTimeCell"></td>
+  <tr>
     <td valign="top" style="padding:10px">
       <div class="activitiesResizeContainer"></div>
       <div class="activitiesContainer"></div>
